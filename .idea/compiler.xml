@@ -10,5 +10,10 @@
         <module name="com.ourdressingtable.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="com.ourdressingtable" target="17" />
+      <module name="com.ourdressingtable.main" target="17" />
+      <module name="com.ourdressingtable.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
