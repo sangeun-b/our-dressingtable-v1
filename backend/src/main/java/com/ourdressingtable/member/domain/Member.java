@@ -1,7 +1,7 @@
-package com.ourdressingtable.domain.member.domain;
+package com.ourdressingtable.member.domain;
 
 
-import com.ourdressingtable.global.utils.BaseTimeEntity;
+import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,8 +1,8 @@
-package com.ourdressingtable.domain.member.controller;
+package com.ourdressingtable.member.controller;
 
-import com.ourdressingtable.domain.member.dto.CreateMemberRequest;
-import com.ourdressingtable.domain.member.dto.CreateMemberResponse;
-import com.ourdressingtable.domain.member.service.MemberService;
+import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.CreateMemberResponse;
+import com.ourdressingtable.member.service.MemberService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;

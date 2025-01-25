@@ -1,9 +1,9 @@
-package com.ourdressingtable.domain.member.service.impl;
+package com.ourdressingtable.member.service.impl;
 
-import com.ourdressingtable.domain.member.domain.Member;
-import com.ourdressingtable.domain.member.dto.CreateMemberRequest;
-import com.ourdressingtable.domain.member.repository.MemberRepository;
-import com.ourdressingtable.domain.member.service.MemberService;
+import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.repository.MemberRepository;
+import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

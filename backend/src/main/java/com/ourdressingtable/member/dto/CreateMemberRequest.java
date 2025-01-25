@@ -1,9 +1,9 @@
-package com.ourdressingtable.domain.member.dto;
+package com.ourdressingtable.member.dto;
 
-import com.ourdressingtable.domain.member.domain.ColorType;
-import com.ourdressingtable.domain.member.domain.Member;
-import com.ourdressingtable.domain.member.domain.Role;
-import com.ourdressingtable.domain.member.domain.SkinType;
+import com.ourdressingtable.member.domain.ColorType;
+import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.SkinType;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import lombok.Builder;

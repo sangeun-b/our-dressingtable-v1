@@ -1,4 +1,4 @@
-package com.ourdressingtable.global.utils;
+package com.ourdressingtable.util;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

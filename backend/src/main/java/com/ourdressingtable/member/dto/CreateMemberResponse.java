@@ -1,4 +1,4 @@
-package com.ourdressingtable.domain.member.dto;
+package com.ourdressingtable.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

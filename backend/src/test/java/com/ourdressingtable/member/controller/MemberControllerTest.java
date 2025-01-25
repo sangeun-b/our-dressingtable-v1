@@ -9,10 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ourdressingtable.domain.member.controller.MemberController;
-import com.ourdressingtable.domain.member.domain.Role;
-import com.ourdressingtable.domain.member.dto.CreateMemberRequest;
-import com.ourdressingtable.domain.member.service.MemberService;
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
