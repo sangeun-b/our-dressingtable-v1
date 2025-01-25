@@ -22,8 +22,8 @@ public class MemberController {
     private final MemberService memberService;
 //    private final PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
-    public ResponseEntity<CreateMemberResponse> createMember(@RequestBody @Valid
+    @PostMapping("/signup")
+    public ResponseEntity<CreateMemberResponse> signupMember(@RequestBody @Valid
     CreateMemberRequest request) {
         CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
                 .email(request.getEmail())
@@ -36,7 +36,5 @@ public class MemberController {
         Long id = memberService.createMember(createMemberRequest);
         return ResponseEntity.created(URI.create("/api/member/" + id))
                 .body(new CreateMemberResponse(id));
-
-
     }
 }
