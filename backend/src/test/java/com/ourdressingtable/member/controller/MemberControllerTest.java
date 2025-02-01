@@ -62,6 +62,26 @@ public class MemberControllerTest {
 
     }
 
+    @DisplayName("회원 가입 실패 테스트")
+    @Test
+    public void signupMember_withInvalidInput_shouldReturnError() throws Exception {
+        // given
+        CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
+                .email("member1@gmail.com")
+                .password("password")
+                .build();
+
+        Long memberId = 1L;
+        when(memberService.createMember(any(CreateMemberRequest.class))).thenReturn(memberId);
+
+        // when & then
+        mockMvc.perform(post("/api/member/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createMemberRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+    }
 
 
 }
