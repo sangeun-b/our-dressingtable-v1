@@ -16,7 +16,8 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "M005", "비밀번호가 일치하지 않습니다."),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "M006",
             "비밀번호는 최소 8자 이상, 알파벳 대/소문자, 숫자, 특수문자를 포함해야 합니다."),
-
+    // BAD_REQUEST
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "C001", "잘못된 접근입니다."),
     // INTERNAL_SEVER_ERROR
     INTERNAL_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "G001", "서버 에러입니다.");
 
