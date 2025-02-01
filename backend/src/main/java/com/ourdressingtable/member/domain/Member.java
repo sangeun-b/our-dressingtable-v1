@@ -1,7 +1,7 @@
-package com.ourdressingtable.domain.member.domain;
+package com.ourdressingtable.member.domain;
 
 
-import com.ourdressingtable.global.utils.BaseTimeEntity;
+import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Date;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -45,7 +46,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ColorType colorType;
 
-    private Date birth;
+    private Date birthDate;
 
     @Enumerated(EnumType.STRING)
     private AuthType authType;
@@ -55,4 +56,25 @@ public class Member extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private int lockedCount;
+
+    private String imageUrl;
+
+    @Builder
+    public Member(Long id, String email, String password, String name, String nickname, String phoneNumber, Role role, SkinType skinType, ColorType colorType, Date birthDate, AuthType authType, Status status, int lockedCount, String imageUrl) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.skinType = skinType;
+        this.colorType = colorType;
+        this.birthDate = birthDate;
+        this.authType = authType;
+        this.status = status;
+        this.lockedCount = lockedCount;
+        this.imageUrl = imageUrl;
+
+    }
 }

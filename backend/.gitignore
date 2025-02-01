@@ -7,6 +7,7 @@ build/
 
 ### Ignore yml file ###
 application-db.yml
+
 .env
 db/mysql/data
 

@@ -1,4 +1,4 @@
-package com.ourdressingtable.domain.member.domain;
+package com.ourdressingtable.member.domain;
 
 import lombok.Getter;
 
