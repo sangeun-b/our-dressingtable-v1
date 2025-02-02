@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         log.error("methodArgumentNotValidException", ex);
         List<ErrorResponse> errorResponses = new ArrayList<>();
         for(FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            // 추후 필드 별 에러 메세지 추가
+            // TODO: 추후 필드 별 예외 처리 추가
 
 //            if(fieldError.getField().equals("email")) {
 //                errorResponses.add(new ErrorResponse(ErrorCode.INVALID_EMAIL_FORMAT.getHttpStatus(), ErrorCode.BAD_REQUEST.getCode(), ErrorCode.BAD_REQUEST.getMessage()));
