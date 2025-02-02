@@ -4,7 +4,10 @@ import com.ourdressingtable.member.domain.ColorType;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.util.Date;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,19 +21,23 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateMemberRequest {
 
-    @NotBlank(message = "이메일을 입력해주세요")
+    @NotBlank(message = "이메일을 입력해주세요.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
-    @NotBlank(message = "비밀번호를 입력해주세요")
+    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @Size(min = 8, max = 20, message = "비밀번호는 8~20자 사이여야 합니다.")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$)",
+            message = "비밀번호는 알파벳 대/소문자, 숫자, 특수문자를 포함해야 합니다.")
     private String password;
 
-    @NotBlank(message = "이름을 입력해주세요")
+    @NotBlank(message = "이름을 입력해주세요.")
     private String name;
 
-    @NotBlank(message = "별명을 입력해주세요")
+    @NotBlank(message = "별명을 입력해주세요.")
     private String nickname;
 
-    @NotBlank(message = "전화번호를 입력해주세요")
+    @NotBlank(message = "전화번호를 입력해주세요.")
     private String phoneNumber;
 
     private Role role;
