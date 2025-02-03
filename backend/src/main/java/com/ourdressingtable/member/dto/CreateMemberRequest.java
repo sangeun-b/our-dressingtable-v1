@@ -25,10 +25,11 @@ public class CreateMemberRequest {
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
+    // TODO: CUSTOM ANNOTATION 생성 후 처리 하기
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    @Size(min = 8, max = 20, message = "비밀번호는 8~20자 사이여야 합니다.")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$)",
-            message = "비밀번호는 알파벳 대/소문자, 숫자, 특수문자를 포함해야 합니다.")
+//    @Size(min = 8, max = 20, message = "비밀번호는 8~20자 사이여야 합니다.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
+            message = "비밀번호는 알파벳 대/소문자, 숫자, 특수문자가 포함한 8자~20자 사이여야 합니다.")
     private String password;
 
     @NotBlank(message = "이름을 입력해주세요.")

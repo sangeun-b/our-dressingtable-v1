@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     // 회원 가입 관련
-    MEMBER_ALREADY_EXISTS(HttpStatus.CONFLICT, "M001", "이미 가입된 사용자입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "M001", "이미 가입된 이메일입니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "M002", "유효하지 않은 사용자입니다."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "M003", "사용자를 찾을 수 없습니다."),
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "M004", "유효하지 않은 이메일 형식입니다."),
