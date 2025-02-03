@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.ourdressingtable.exception.ErrorCode;
+import com.ourdressingtable.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
@@ -62,5 +64,26 @@ public class MemberServiceImplTest {
 
         }
 
+        @DisplayName("회원 가입 실패_중복 이메일")
+        @Test
+        void createMember_Fail_DuplicateEmail() {
+            // given
+            CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
+                    .email("member1@gmail.com")
+                    .password("Password123!")
+                    .name("member1")
+                    .nickname("me")
+                    .phoneNumber("010-1234-5678")
+                    .role(Role.ROLE_MEMBER)
+                    .build();
+
+            when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
+
+            // when & then
+            OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.createMember(createMemberRequest));
+            assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_ALREADY_EXISTS.getHttpStatus());
+            assertEquals(ourDressingTableException.getMessage(), ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
+
+        }
     }
 }
