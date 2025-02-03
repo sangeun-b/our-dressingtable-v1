@@ -41,7 +41,7 @@ public class MemberControllerTest {
         // given
         CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
                 .email("member1@gmail.com")
-                .password("password")
+                .password("Password1234!!")
                 .name("member1")
                 .nickname("me")
                 .phoneNumber("010-1234-5678")
