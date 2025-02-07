@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@AllArgsConstructor
 public class OurDressingTableException extends RuntimeException {
 
     private final HttpStatus httpStatus;

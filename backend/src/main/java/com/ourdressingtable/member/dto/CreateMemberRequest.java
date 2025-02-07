@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.Date;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,14 +19,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateMemberRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
-    // TODO: CUSTOM ANNOTATION 생성 후 처리 하기
+    // TODO: Passay or CUSTOM ANNOTATION 생성 후 처리 하기
     @NotBlank(message = "비밀번호를 입력해주세요.")
 //    @Size(min = 8, max = 20, message = "비밀번호는 8~20자 사이여야 합니다.")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
@@ -46,6 +47,7 @@ public class CreateMemberRequest {
     private SkinType skinType;
 
     private ColorType colorType;
+
     private Date birthDate;
 
     private String imageUrl;

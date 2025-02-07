@@ -1,14 +1,13 @@
 package com.ourdressingtable.member.dto;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateMemberResponse {
 
     private Long id;

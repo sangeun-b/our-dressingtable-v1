@@ -4,6 +4,7 @@ import com.ourdressingtable.exception.ErrorCode;
 import com.ourdressingtable.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,17 @@ public class MemberServiceImpl implements MemberService {
     public Long createMember(CreateMemberRequest createMemberRequest) {
         boolean isExists = memberRepository.existsByEmail(createMemberRequest.getEmail());
 
-        if(isExists) {
-            throw new OurDressingTableException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        if (isExists) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
         }
 
         Member member = memberRepository.save(createMemberRequest.toEntity());
         return member.getId();
+    }
+
+    @Override
+    public OtherMemberResponse getMember(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+        return OtherMemberResponse.fromEntity(member);
     }
 }
