@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    // 회원 가입 관련
+    // 회원 관련
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "M001", "이미 가입된 이메일입니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "M002", "유효하지 않은 사용자입니다."),
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "M003", "사용자를 찾을 수 없습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M003", "사용자를 찾을 수 없습니다."),
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "M004", "유효하지 않은 이메일 형식입니다."),
     PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "M005", "비밀번호가 일치하지 않습니다."),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "M006",
