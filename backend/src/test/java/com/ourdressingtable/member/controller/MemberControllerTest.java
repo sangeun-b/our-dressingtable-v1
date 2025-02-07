@@ -10,7 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = MemberController.class)
@@ -35,7 +38,7 @@ public class MemberControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @DisplayName("회원 가입")
+    @DisplayName("회원 가입 - 성공")
     @Test
     public void signupMember_withValidInput_shouldReturnSuccess() throws Exception {
         // given
@@ -62,7 +65,7 @@ public class MemberControllerTest {
 
     }
 
-    @DisplayName("회원 가입 실패 테스트")
+    @DisplayName("회원 가입 - 실패")
     @Test
     public void signupMember_withInvalidInput_shouldReturnError() throws Exception {
         // given
@@ -75,7 +78,7 @@ public class MemberControllerTest {
         when(memberService.createMember(any(CreateMemberRequest.class))).thenReturn(memberId);
 
         // when & then
-        mockMvc.perform(post("/api/member/signup")
+        mockMvc.perform(post("/api/members/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createMemberRequest)))
                 .andDo(print())
@@ -83,5 +86,19 @@ public class MemberControllerTest {
 
     }
 
+    @DisplayName("다른 회원 정보 조회 - 성공")
+    @Test
+    public void getOtherMember_shouldReturnSuccess() throws Exception {
+        //given
+        OtherMemberResponse otherMemberResponse = OtherMemberResponse.builder()
+                .nickname("me")
+                .skinType(SkinType.OILY_SKIN)
+                .build();
+        //when
+        when(memberService.getMember(1L)).thenReturn(otherMemberResponse);
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/members/1")).andExpect(status().isOk()).andDo(print());
+
+    }
 
 }
