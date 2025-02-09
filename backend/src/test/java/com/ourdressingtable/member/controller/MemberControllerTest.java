@@ -137,6 +137,6 @@ public class MemberControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/members/{id}", memberId)
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateMemberRequest)))
                 .andExpect(status().isNoContent()).andDo(print());
-    }
+    };
 
 }
