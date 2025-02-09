@@ -1,6 +1,7 @@
 package com.ourdressingtable.member.domain;
 
 
+import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -76,5 +77,23 @@ public class Member extends BaseTimeEntity {
         this.lockedCount = lockedCount;
         this.imageUrl = imageUrl;
 
+    }
+
+    public void updateMember(UpdateMemberRequest updateMemberRequest) {
+        this.password = getOrDefault(updateMemberRequest.getPassword(),this.password);
+        this.nickname = getOrDefault(updateMemberRequest.getNickname(),this.nickname);
+        this.phoneNumber = getOrDefault(updateMemberRequest.getPhoneNumber(),this.phoneNumber);
+        this.skinType = getOrDefault(updateMemberRequest.getSkinType(),this.skinType);
+        this.colorType = getOrDefault(updateMemberRequest.getColorType(),this.colorType);
+        this.birthDate = getOrDefault(updateMemberRequest.getBirthDate(),this.birthDate);
+        this.imageUrl = getOrDefault(updateMemberRequest.getImageUrl(),this.imageUrl);
+    }
+
+    private String getOrDefault(String newValue, String currentValue) {
+        return (newValue == null || newValue.isBlank()) ? currentValue : newValue;
+    }
+
+    private <T> T getOrDefault(T newValue, T currentValue) {
+        return (newValue != null) ? newValue : currentValue;
     }
 }

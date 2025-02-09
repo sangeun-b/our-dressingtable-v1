@@ -2,14 +2,18 @@ package com.ourdressingtable.member.controller;
 
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.CreateMemberResponse;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
+import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +56,12 @@ public class MemberController {
         OtherMemberResponse otherMemberResponse = memberService.getMember(userId);
         return ResponseEntity.ok(otherMemberResponse);
 
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity updateMember(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
+        memberService.updateMember(userId, updateMemberRequest);
+        return ResponseEntity.noContent().build();
     }
 
 }
