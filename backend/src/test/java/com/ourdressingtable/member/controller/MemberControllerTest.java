@@ -1,12 +1,15 @@
 package com.ourdressingtable.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.will;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.willThrow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.exception.ErrorCode;
@@ -15,6 +18,7 @@ import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
+import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,9 +116,27 @@ public class MemberControllerTest {
                 ErrorCode.MEMBER_NOT_FOUND));
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/members/{id}", memberId).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/members/{id}", memberId).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
     }
 
+    @DisplayName("회원 정보 수정 - 성공")
+    @Test
+    public void updateMember_shouldReturnSuccess() throws Exception {
+        // given
+        Long memberId = 1L;
+        UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                .nickname("new me")
+                .phoneNumber("010-1234-5678")
+                .build();
 
+        // when
+        doNothing().when(memberService).updateMember(memberId,updateMemberRequest);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/members/{id}", memberId)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateMemberRequest)))
+                .andExpect(status().isNoContent()).andDo(print());
+    }
 
 }
