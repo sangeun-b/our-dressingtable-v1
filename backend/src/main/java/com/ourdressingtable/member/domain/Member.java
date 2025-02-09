@@ -1,7 +1,12 @@
 package com.ourdressingtable.member.domain;
 
 
+import static jakarta.persistence.FetchType.LAZY;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.util.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
 import lombok.AccessLevel;
@@ -59,6 +66,11 @@ public class Member extends BaseTimeEntity {
 
     private String imageUrl;
 
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "member")
+    private WithdrawalMember withdrawalMember;
+
     @Builder
     public Member(Long id, String email, String password, String name, String nickname, String phoneNumber, Role role, SkinType skinType, ColorType colorType, Date birthDate, AuthType authType, Status status, int lockedCount, String imageUrl) {
         this.id = id;
@@ -76,5 +88,27 @@ public class Member extends BaseTimeEntity {
         this.lockedCount = lockedCount;
         this.imageUrl = imageUrl;
 
+    }
+
+    public void updateMember(UpdateMemberRequest updateMemberRequest) {
+        this.password = getOrDefault(updateMemberRequest.getPassword(),this.password);
+        this.nickname = getOrDefault(updateMemberRequest.getNickname(),this.nickname);
+        this.phoneNumber = getOrDefault(updateMemberRequest.getPhoneNumber(),this.phoneNumber);
+        this.skinType = getOrDefault(updateMemberRequest.getSkinType(),this.skinType);
+        this.colorType = getOrDefault(updateMemberRequest.getColorType(),this.colorType);
+        this.birthDate = getOrDefault(updateMemberRequest.getBirthDate(),this.birthDate);
+        this.imageUrl = getOrDefault(updateMemberRequest.getImageUrl(),this.imageUrl);
+    }
+
+    public void changeMemberStatus() {
+        this.status = Status.WITHDRAWAL;
+    }
+
+    private String getOrDefault(String newValue, String currentValue) {
+        return (newValue == null || newValue.isBlank()) ? currentValue : newValue;
+    }
+
+    private <T> T getOrDefault(T newValue, T currentValue) {
+        return (newValue != null) ? newValue : currentValue;
     }
 }

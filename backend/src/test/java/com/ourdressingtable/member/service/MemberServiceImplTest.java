@@ -13,6 +13,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
+import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import java.util.Optional;
@@ -96,7 +97,7 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 조회 성공 테스트")
         @Test
-        public void findUser_ShouldReturnSuccess() {
+        public void findMember_ShouldReturnSuccess() {
             // given
             Member member = Member.builder()
                     .id(1L)
@@ -120,7 +121,7 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 조회 실패 테스트 - USER NOT FOUND")
         @Test
-        public void findUser_ShouldReturnUserNotFoundError() {
+        public void findMember_ShouldReturnUserNotFoundError() {
             // given
             Member member = Member.builder()
                     .id(1L)
@@ -135,6 +136,60 @@ public class MemberServiceImplTest {
 
             // when
             OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.getMember(member.getId()));
+
+            //then
+            assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
+
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 정보 수정 테스트")
+    class updateUser {
+
+        @DisplayName("회원 정보 수정 성공 테스트")
+        @Test
+        public void updateMember_ShouldReturnSuccess() {
+            // given
+            Member member = Member.builder()
+                    .id(1L)
+                    .email("member1@gmail.com")
+                    .password("Password123!")
+                    .name("member1")
+                    .nickname("me")
+                    .phoneNumber("010-1234-5678")
+                    .role(Role.ROLE_MEMBER)
+                    .build();
+
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("new me")
+                    .build();
+
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+
+            // when
+            memberServiceImpl.updateMember(member.getId(),updateMemberRequest);
+
+            //then
+            assertEquals(member.getNickname(),"new me");
+
+
+        }
+
+        @DisplayName("회원 조회 실패 테스트 - USER NOT FOUND")
+        @Test
+        public void updateMember_ShouldReturnUserNotFoundError() {
+            // given
+            Long memberId = 9999L;
+
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("new me")
+                    .build();
+
+            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+            // when
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.updateMember(memberId,updateMemberRequest));
 
             //then
             assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
