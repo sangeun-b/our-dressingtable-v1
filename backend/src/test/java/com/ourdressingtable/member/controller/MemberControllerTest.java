@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.exception.ErrorCode;
+import com.ourdressingtable.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
@@ -100,5 +102,19 @@ public class MemberControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/members/1")).andExpect(status().isOk()).andDo(print());
 
     }
+
+    @DisplayName("다른 회원 정보 조회 - 실패")
+    @Test
+    public void getOtherMember_shouldReturnError() throws Exception {
+        // given
+        Long memberId = 99L;
+        when(memberService.getMember(memberId)).thenThrow(new OurDressingTableException(
+                ErrorCode.MEMBER_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/members/{id}", memberId).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
+    }
+
+
 
 }
