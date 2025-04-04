@@ -66,11 +66,6 @@ public class Member extends BaseTimeEntity {
 
     private String imageUrl;
 
-
-    @JsonIgnore
-    @OneToOne(mappedBy = "member")
-    private WithdrawalMember withdrawalMember;
-
     @Builder
     public Member(Long id, String email, String password, String name, String nickname, String phoneNumber, Role role, SkinType skinType, ColorType colorType, Date birthDate, AuthType authType, Status status, int lockedCount, String imageUrl) {
         this.id = id;
@@ -98,10 +93,6 @@ public class Member extends BaseTimeEntity {
         this.colorType = getOrDefault(updateMemberRequest.getColorType(),this.colorType);
         this.birthDate = getOrDefault(updateMemberRequest.getBirthDate(),this.birthDate);
         this.imageUrl = getOrDefault(updateMemberRequest.getImageUrl(),this.imageUrl);
-    }
-
-    public void changeMemberStatus() {
-        this.status = Status.WITHDRAWAL;
     }
 
     private String getOrDefault(String newValue, String currentValue) {

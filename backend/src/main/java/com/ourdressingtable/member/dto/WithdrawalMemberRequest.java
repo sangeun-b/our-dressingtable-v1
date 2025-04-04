@@ -17,15 +17,21 @@ public class WithdrawalMemberRequest {
 
     @NotBlank
     private String reason;
+    private boolean isBlock;
 
     @Builder
-    public WithdrawalMemberRequest(String reason) {
+    public WithdrawalMemberRequest(String reason, String email, String phone, boolean isBlock) {
         this.reason = reason;
     }
 
-    public WithdrawalMember toEntity() {
+    public WithdrawalMember toEntity(String maskedEmail, String hashedEmail, String maskedPhone, String hashedPhone, boolean isBlock) {
         return WithdrawalMember.builder()
                 .reason(reason)
+                .hashedEmail(hashedEmail)
+                .maskedEmail(maskedEmail)
+                .maskedPhone(maskedPhone)
+                .hashedPhone(hashedPhone)
+                .isBlock(isBlock)
                 .build();
     }
 }
