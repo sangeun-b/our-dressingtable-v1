@@ -30,18 +30,26 @@ public class WithdrawalMember extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String email_hashed;
+
+    private String email_masked;
+
+    private String phone_hashed;
+
+    private String phone_masked;
+
     private String reason;
 
-    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private boolean is_blacklisted;
 
     @Builder
-    public WithdrawalMember(Long id, String reason, Member member) {
-        this.id = id;
+    public WithdrawalMember(String email_hashed, String email_masked, String phone_hashed, String phone_masked, String reason, boolean is_blacklisted) {
+        this.email_hashed = email_hashed;
+        this.email_masked = email_masked;
+        this.phone_hashed = phone_hashed;
+        this.phone_masked = phone_masked;
         this.reason = reason;
-        this.member = member;
-
+        this.is_blacklisted = is_blacklisted;
     }
 
 
