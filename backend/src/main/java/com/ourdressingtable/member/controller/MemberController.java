@@ -68,18 +68,8 @@ public class MemberController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity deleteMember(@PathVariable("userId") Long userId) {
-        memberService.deleteMember(userId);
+    public ResponseEntity deleteMember(@PathVariable("userId") Long userId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
+        memberService.deleteMember(userId, withdrawalMemberRequest);
         return ResponseEntity.noContent().build();
     }
-
-    // 탈퇴 회원 관리
-    @PostMapping("/withdrawal/{userId}")
-    public ResponseEntity<WithdrawalMemberResponse> withdrawMember(@PathVariable("userId") Long userId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
-        Long id = memberService.createWithdrawMember(userId, withdrawalMemberRequest);
-
-        return ResponseEntity.created(URI.create("/api/withdrawalMembers/" + id))
-                .body(new WithdrawalMemberResponse(id));
-    }
-
 }
