@@ -1,11 +1,11 @@
-package com.ourdressingtable.community.service.impl;
+package com.ourdressingtable.community.post.service;
 
-import com.ourdressingtable.community.domain.CommunityCategory;
-import com.ourdressingtable.community.domain.Post;
-import com.ourdressingtable.community.dto.CreatePostRequest;
-import com.ourdressingtable.community.dto.UpdatePostRequest;
-import com.ourdressingtable.community.repository.PostRepository;
-import com.ourdressingtable.community.service.PostService;
+import com.ourdressingtable.community.post.domain.Post;
+import com.ourdressingtable.community.post.repository.PostRepository;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.communityCategory.service.CommunityCategoryServiceImpl;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;

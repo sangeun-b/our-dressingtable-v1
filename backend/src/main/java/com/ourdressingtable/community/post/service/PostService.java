@@ -1,9 +1,8 @@
-package com.ourdressingtable.community.service;
+package com.ourdressingtable.community.post.service;
 
-import com.ourdressingtable.community.domain.CommunityCategory;
-import com.ourdressingtable.community.domain.Post;
-import com.ourdressingtable.community.dto.CreatePostRequest;
-import com.ourdressingtable.community.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.domain.Post;
+import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 
 import java.util.List;
 import java.util.Optional;

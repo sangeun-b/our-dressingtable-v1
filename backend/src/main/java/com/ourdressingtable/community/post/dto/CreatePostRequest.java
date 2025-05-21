@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.dto;
+package com.ourdressingtable.community.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

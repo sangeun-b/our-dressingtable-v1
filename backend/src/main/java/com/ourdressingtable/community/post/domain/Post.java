@@ -1,6 +1,7 @@
-package com.ourdressingtable.community.domain;
+package com.ourdressingtable.community.post.domain;
 
-import com.ourdressingtable.community.dto.CreatePostRequest;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.*;

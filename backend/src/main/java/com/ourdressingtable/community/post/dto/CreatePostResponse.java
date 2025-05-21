@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.dto;
+package com.ourdressingtable.community.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

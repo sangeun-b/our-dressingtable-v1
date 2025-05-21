@@ -1,8 +1,7 @@
-package com.ourdressingtable.community.controller;
+package com.ourdressingtable.communityCategory.controller;
 
-import com.ourdressingtable.community.dto.CommunityCategoryResponse;
-import com.ourdressingtable.community.repository.CommunityCategoryRepository;
-import com.ourdressingtable.community.service.CommunityCategoryService;
+import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
+import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/communities/community-categories")
+@RequestMapping("/api/community-categories")
 public class CommunityCategoryController {
 
     private final CommunityCategoryService communityCategoryService;

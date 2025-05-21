@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.domain;
+package com.ourdressingtable.communityCategory.domain;
 
 
 import jakarta.persistence.*;

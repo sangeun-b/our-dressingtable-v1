@@ -1,7 +1,7 @@
-package com.ourdressingtable.community.service;
+package com.ourdressingtable.communityCategory.service;
 
-import com.ourdressingtable.community.domain.CommunityCategory;
-import com.ourdressingtable.community.dto.CommunityCategoryResponse;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
 
 import java.util.List;
 

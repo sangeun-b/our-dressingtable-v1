@@ -1,6 +1,6 @@
 package com.ourdressingtable.community.service;
 
-import com.ourdressingtable.community.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.CreatePostRequest;
 
 public interface CommunityService {
 

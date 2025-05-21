@@ -1,13 +1,10 @@
-package com.ourdressingtable.community.service.impl;
+package com.ourdressingtable.communityCategory.service;
 
-import com.ourdressingtable.community.domain.CommunityCategory;
-import com.ourdressingtable.community.dto.CommunityCategoryResponse;
-import com.ourdressingtable.community.repository.CommunityCategoryRepository;
-import com.ourdressingtable.community.service.CommunityCategoryService;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
+import com.ourdressingtable.communityCategory.repository.CommunityCategoryRepository;
 import com.ourdressingtable.exception.ErrorCode;
-import com.ourdressingtable.exception.GlobalExceptionHandler;
 import com.ourdressingtable.exception.OurDressingTableException;
-import com.ourdressingtable.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
