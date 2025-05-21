@@ -61,12 +61,12 @@ public class MemberControllerTest {
         when(memberService.createMember(any(CreateMemberRequest.class))).thenReturn(memberId);
 
         // when & then
-        mockMvc.perform(post("/api/member/signup")
+        mockMvc.perform(post("/api/members/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createMemberRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location","/api/member/1"))
+                .andExpect(header().string("Location","/api/members/1"))
                 .andExpect(jsonPath("$.id").value(memberId));
 
     }

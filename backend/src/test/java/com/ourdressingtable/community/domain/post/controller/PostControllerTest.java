@@ -56,6 +56,7 @@ public class PostControllerTest {
             CreatePostRequest createPostRequest = CreatePostRequest.builder()
                     .title("제목")
                     .content("내용")
+                    .communityCategoryId(1L)
                     .build();
             given(postService.createPost(any(),eq(1L))).willReturn(100L);
 
@@ -106,6 +107,7 @@ public class PostControllerTest {
                     .andExpect(status().isNoContent());
         }
 
+        // TODO: 회원 인증 후 수정 필요
         @DisplayName("게시글 수정 - 실패")
         @Test
         public void updatePost_withInvalidMember_ReturnError() throws Exception {
@@ -116,7 +118,7 @@ public class PostControllerTest {
                     .build();
 
             doThrow(new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT))
-                    .when(postService).updatePost(eq(123L), eq(updatePostRequest));
+                    .when(postService).updatePost(eq(1L), eq(updatePostRequest));
 
             mockMvc.perform(patch("/api/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
