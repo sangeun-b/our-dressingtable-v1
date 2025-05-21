@@ -55,4 +55,17 @@ public class Post extends BaseTimeEntity {
                 .build();
 
     }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+
+    }
+
+    public void updateCommunityCategory(CommunityCategory communityCategory) {
+        this.communityCategory = communityCategory;
+    }
 }

@@ -1,6 +1,7 @@
-package com.ourdressingtable.community.service.impl;
+package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.community.post.service.PostService;
@@ -22,4 +23,9 @@ public class CommunityServiceImpl implements CommunityService {
         return postService.createPost(createPostRequest, memberId);
     }
 
+    @Override
+    public void updatePost(Long postId, UpdatePostRequest updatePostRequest) {
+        // TODO: 포스트 작성자 인지 확인 필요
+        postService.updatePost(postId, updatePostRequest);
+    }
 }

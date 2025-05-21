@@ -6,6 +6,8 @@ import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryServiceImpl;
+import com.ourdressingtable.exception.ErrorCode;
+import com.ourdressingtable.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +57,20 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void updatePost(UpdatePostRequest request) {
+    @Transactional
+    public void updatePost(Long postId, UpdatePostRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+
+        if (request.getTitle() != null)
+            post.updateTitle(request.getTitle());
+
+        if (request.getContent() != null)
+            post.updateContent(request.getContent());
+
+        if (request.getCommunityCategoryId() != null) {
+            CommunityCategory communityCategory = communityCategoryService.getCategoryEntityById(request.getCommunityCategoryId());
+            post.updateCommunityCategory(communityCategory);
+        }
 
     }
 

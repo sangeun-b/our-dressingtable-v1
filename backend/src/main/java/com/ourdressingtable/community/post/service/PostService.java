@@ -12,7 +12,7 @@ public interface PostService {
     Optional<Post> getPost(Long id);
     List<Post> getPosts();
     void deletePost(Long id);
-    void updatePost(UpdatePostRequest request);
+    void updatePost(Long postId, UpdatePostRequest request);
     int countPosts();
     int countPostsByCategory(String category);
     List<Post> getPostsByCategory(String category);

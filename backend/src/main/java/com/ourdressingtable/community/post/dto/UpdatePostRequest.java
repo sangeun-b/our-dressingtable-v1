@@ -12,6 +12,14 @@ public class UpdatePostRequest {
 
     private String title;
     private String content;
-    private Long CommunityCategoryId;
+    private Long communityCategoryId;
     private List<String> images;
+
+    @Builder
+    public UpdatePostRequest(String title, String content, Long communityCategoryId, List<String> images) {
+        this.title = title;
+        this.content = content;
+        this.communityCategoryId = communityCategoryId;
+        this.images = images;
+    }
 }
