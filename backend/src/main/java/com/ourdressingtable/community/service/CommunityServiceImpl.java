@@ -26,8 +26,8 @@ public class CommunityServiceImpl implements CommunityService {
     private final MemberService memberService;
 
     @Override
-    public Long createPost(CreatePostRequest createPostRequest) {
-        Long memberId = 1L;
+    public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
+//        Member member = memberService.getMember(memberId);
         return postService.createPost(createPostRequest, memberId);
     }
 

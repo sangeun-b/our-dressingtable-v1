@@ -52,22 +52,41 @@ public class CommunityServiceImplTest {
                     .communityCategoryId(1L)
                     .build();
             CommunityCategory category = CommunityCategory.builder().id(1L).name("자유").build();
+            Member member = Member.builder().id(1L).name("이름").build();
 
             given(communityCategoryService.getCategoryById(1L)).willReturn(CommunityCategoryResponse.from(category));
-            given(postService.createPost(createPostRequest,1L)).willReturn(123L);
+            given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
 
             // when
-            Long postId = communityService.createPost(createPostRequest);
+            Long postId = communityService.createPost(createPostRequest, member.getId());
 
             // then
             assertEquals(123L, postId);
             then(postService).should().createPost(createPostRequest,1L);
         }
 
-        // TODO: 게시글 작성 실패 테스트
         @DisplayName("게시글 작성 실패_비회원")
         @Test
-        public void createPosts_shouldReturnError() {}
+        public void createPosts_shouldReturnError() {
+            // given
+            CreatePostRequest createPostRequest = CreatePostRequest.builder()
+                    .title("제목")
+                    .content("내용")
+                    .communityCategoryId(1L)
+                    .build();
+            CommunityCategory category = CommunityCategory.builder().id(1L).name("자유").build();
+            Member member = Member.builder().id(1L).name("이름").build();
+
+            given(communityCategoryService.getCategoryById(1L)).willReturn(CommunityCategoryResponse.from(category));
+            given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
+
+            // when
+            Long postId = communityService.createPost(createPostRequest,member.getId());
+
+            // then
+            assertEquals(123L, postId);
+            then(postService).should().createPost(createPostRequest,1L);
+        }
 
     }
 

@@ -22,7 +22,9 @@ public class PostController {
 
     @PostMapping()
     public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest request) {
-        Long id = communityService.createPost(request);
+        // TODO: 로그인 회원 정보로 변경 필요
+        Long memberId = 1L;
+        Long id = communityService.createPost(request, memberId);
         return ResponseEntity.created(URI.create("/api/posts/"+id))
                 .body(new CreatePostResponse(id));
     }
