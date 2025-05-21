@@ -6,5 +6,5 @@ import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 public interface CommunityService {
 
     Long createPost(CreatePostRequest createPostRequest);
-    void updatePost(Long postId, UpdatePostRequest updatePostRequest);
+    void updatePost(Long postId, Long memberId, UpdatePostRequest updatePostRequest);
 }

@@ -30,7 +30,8 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Long createPost(CreatePostRequest request, Long memberId) {
         CommunityCategory communityCategory = communityCategoryService.getCategoryEntityById(request.getCommunityCategoryId());
-        // TODO: member 조회 변경 필요
+        // TODO: member 조회 변경 필요, Entity 조회 method 추가하기
+//        Member member = memberService.getMemberEntityById(memberId);
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -42,8 +43,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<Post> getPost(Long id) {
-        return Optional.empty();
+    public Post getPost(Long id) {
+        return null;
     }
 
     @Override
@@ -102,5 +103,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getPostsByContent(String content) {
         return List.of();
+    }
+
+    @Override
+    public Post getPostEntityById(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
     }
 }

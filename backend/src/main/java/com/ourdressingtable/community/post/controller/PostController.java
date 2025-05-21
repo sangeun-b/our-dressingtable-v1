@@ -27,9 +27,9 @@ public class PostController {
                 .body(new CreatePostResponse(id));
     }
 
-    @PatchMapping("/{postId")
-    public ResponseEntity updatePost(@PathVariable("userId") Long postId, @RequestBody @Valid UpdatePostRequest request) {
-        communityService.updatePost(postId, request);
+    @PatchMapping("/{postId}/{memberId}")
+    public ResponseEntity updatePost(@PathVariable("postId") Long postId, @PathVariable("memberId") Long memberId, @RequestBody @Valid UpdatePostRequest request) {
+        communityService.updatePost(postId, memberId, request);
         return ResponseEntity.noContent().build();
     }
 }

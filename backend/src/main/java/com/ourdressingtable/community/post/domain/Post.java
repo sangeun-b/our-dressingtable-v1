@@ -37,7 +37,8 @@ public class Post extends BaseTimeEntity {
     private CommunityCategory communityCategory;
 
     @Builder
-    public Post(String title, String content, int viewCount, Member member, CommunityCategory communityCategory) {
+    public Post(Long id, String title, String content, int viewCount, Member member, CommunityCategory communityCategory) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;

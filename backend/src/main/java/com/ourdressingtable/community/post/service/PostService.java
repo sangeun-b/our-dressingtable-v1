@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface PostService {
     Long createPost(CreatePostRequest request, Long memberId);
-    Optional<Post> getPost(Long id);
+    Post getPost(Long id);
     List<Post> getPosts();
     void deletePost(Long id);
     void updatePost(Long postId, UpdatePostRequest request);
@@ -19,5 +19,5 @@ public interface PostService {
     List<Post> getPostsByMember(Long memberId);
     List<Post> getPostsByTitle(String title);
     List<Post> getPostsByContent(String content);
-
+    Post getPostEntityById(Long id);
 }

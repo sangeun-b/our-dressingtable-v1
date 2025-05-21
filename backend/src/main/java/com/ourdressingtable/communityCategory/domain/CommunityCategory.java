@@ -20,7 +20,8 @@ public class CommunityCategory {
     private String name;
 
     @Builder
-    public CommunityCategory(String name) {
+    public CommunityCategory(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }
