@@ -1,6 +1,9 @@
 package com.ourdressingtable.member.domain;
 
+import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.util.BaseTimeEntity;
+import com.ourdressingtable.util.HashUtil;
+import com.ourdressingtable.util.MaskingUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter
@@ -48,6 +50,17 @@ public class WithdrawalMember {
         this.maskedPhone = maskedPhone;
         this.reason = reason;
         this.isBlock = isBlock;
+    }
+
+    public static WithdrawalMember from(Member member, WithdrawalMemberRequest withdrawalMemberRequest, boolean isBlock) {
+        return WithdrawalMember.builder()
+                .hashedEmail(HashUtil.hash(member.getEmail()))
+                .maskedEmail(MaskingUtil.maskedEmail(member.getEmail()))
+                .hashedPhone(HashUtil.hash(member.getPhoneNumber()))
+                .maskedPhone(MaskingUtil.maskedPhone(member.getPhoneNumber()))
+                .reason(withdrawalMemberRequest.getReason())
+                .isBlock(isBlock)
+                .build();
     }
 
     @PrePersist

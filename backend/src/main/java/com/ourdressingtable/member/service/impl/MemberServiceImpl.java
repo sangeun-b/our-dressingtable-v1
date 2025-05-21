@@ -67,15 +67,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public Long createWithdrawalMember(WithdrawalMemberRequest withdrawalMemberRequest, Member member) {
-        String maskedEmail = MaskingUtil.maskedEmail(member.getEmail());
-        String maskedPhone = MaskingUtil.maskedPhone(member.getPhoneNumber());
-        String hashedEmail = HashUtil.hash(member.getEmail());
-        String hashedPhone = HashUtil.hash(member.getPhoneNumber());
-        boolean isBlock = false;
-        if(member.getStatus() == Status.BLOCK) {
-            isBlock = true;
-        }
-        WithdrawalMember withdrawalMember = withdrawalMemberRepository.save(withdrawalMemberRequest.toEntity(hashedEmail,hashedPhone,maskedEmail,maskedPhone, isBlock));
+        boolean isBlock = member.getStatus() == Status.BLOCK;
+
+        WithdrawalMember withdrawalMember = WithdrawalMember.from(member, withdrawalMemberRequest, isBlock);
+        withdrawalMemberRepository.save(withdrawalMember);
         return withdrawalMember.getId();
     }
 

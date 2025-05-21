@@ -14,7 +14,7 @@
   </springProfile>
 
   <!-- Environment 내의 properties 개별 설정-->
-  <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root"/>
+  <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="INFO"/>
 
   <!-- log file name -->
   <property name="LOG_FILE_NAME" value="log"/>

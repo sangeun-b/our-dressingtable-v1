@@ -1,7 +1,9 @@
 package com.ourdressingtable.member.dto;
 
+import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.WithdrawalMember;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,22 +18,15 @@ import lombok.Setter;
 public class WithdrawalMemberRequest {
 
     @NotBlank
+    @Size(max=500)
     private String reason;
+
     private boolean isBlock;
 
     @Builder
-    public WithdrawalMemberRequest(String reason, String email, String phone, boolean isBlock) {
+    public WithdrawalMemberRequest(String reason, boolean isBlock) {
         this.reason = reason;
+        this.isBlock = isBlock;
     }
 
-    public WithdrawalMember toEntity(String maskedEmail, String hashedEmail, String maskedPhone, String hashedPhone, boolean isBlock) {
-        return WithdrawalMember.builder()
-                .reason(reason)
-                .hashedEmail(hashedEmail)
-                .maskedEmail(maskedEmail)
-                .maskedPhone(maskedPhone)
-                .hashedPhone(hashedPhone)
-                .isBlock(isBlock)
-                .build();
-    }
 }
