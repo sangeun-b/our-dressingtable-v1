@@ -7,7 +7,6 @@ import com.ourdressingtable.member.domain.SkinType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.util.Date;
 import lombok.AccessLevel;
 import lombok.Builder;

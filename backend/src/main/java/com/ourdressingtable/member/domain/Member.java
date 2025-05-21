@@ -3,7 +3,7 @@ package com.ourdressingtable.member.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
@@ -23,11 +23,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "members")
+@DynamicInsert
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,7 +64,7 @@ public class Member extends BaseTimeEntity {
     private Status status;
 
     @ColumnDefault("0")
-    private int lockedCount;
+    private int lockedCount = 0;
 
     private String imageUrl;
 
