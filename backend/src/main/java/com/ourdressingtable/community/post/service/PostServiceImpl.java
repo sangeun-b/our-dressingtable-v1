@@ -5,17 +5,16 @@ import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
-import com.ourdressingtable.communityCategory.service.CommunityCategoryServiceImpl;
+import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.exception.ErrorCode;
 import com.ourdressingtable.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.service.impl.MemberServiceImpl;
+import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +22,8 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final MemberServiceImpl memberService;
-    private final CommunityCategoryServiceImpl communityCategoryService;
+    private final MemberService memberService;
+    private final CommunityCategoryService communityCategoryService;
 
     @Override
     @Transactional

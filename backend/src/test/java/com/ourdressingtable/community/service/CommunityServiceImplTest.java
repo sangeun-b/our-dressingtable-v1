@@ -28,6 +28,7 @@ import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@DisplayName("Community 테스트")
 public class CommunityServiceImplTest {
 
     @InjectMocks
