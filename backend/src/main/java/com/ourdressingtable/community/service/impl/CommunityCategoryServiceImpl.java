@@ -33,4 +33,9 @@ public class CommunityCategoryServiceImpl implements CommunityCategoryService {
         CommunityCategory communityCategory = communityCategoryRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.COMMUNITY_CATEGORY_NOT_FOUND));
         return CommunityCategoryResponse.from(communityCategory);
     }
+
+    @Override
+    public CommunityCategory getCategoryEntityById(Long id) {
+        return communityCategoryRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.COMMUNITY_CATEGORY_NOT_FOUND));
+    }
 }

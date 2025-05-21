@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostService {
-    Long createPost(CreatePostRequest request, CommunityCategory category);
+    Long createPost(CreatePostRequest request, Long memberId);
     Optional<Post> getPost(Long id);
     List<Post> getPosts();
     void deletePost(Long id);

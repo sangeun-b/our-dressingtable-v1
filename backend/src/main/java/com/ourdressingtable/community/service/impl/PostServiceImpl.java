@@ -1,12 +1,12 @@
 package com.ourdressingtable.community.service.impl;
 
+import com.ourdressingtable.community.domain.CommunityCategory;
 import com.ourdressingtable.community.domain.Post;
-import com.ourdressingtable.community.dto.CommunityCategoryResponse;
 import com.ourdressingtable.community.dto.CreatePostRequest;
 import com.ourdressingtable.community.dto.UpdatePostRequest;
 import com.ourdressingtable.community.repository.PostRepository;
 import com.ourdressingtable.community.service.PostService;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
+import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,21 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final MemberServiceImpl memberService;
+    private final CommunityCategoryServiceImpl communityCategoryService;
 
     @Override
     @Transactional
-    public Long createPost(CreatePostRequest request, CommunityCategoryResponse category) {
-        Long memberId = 1L;
-        OtherMemberResponse otherMemberResponse = memberService.getMember(memberId);
-        return 0L;
+    public Long createPost(CreatePostRequest request, Long memberId) {
+        CommunityCategory communityCategory = communityCategoryService.getCategoryEntityById(request.getCommunityCategoryId());
+        // TODO: member 조회 변경 필요
+        Post post = Post.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .communityCategory(communityCategory)
+                .member(Member.builder().id(memberId).build())
+                .build();
+        postRepository.save(post);
+        return post.getId();
     }
 
     @Override

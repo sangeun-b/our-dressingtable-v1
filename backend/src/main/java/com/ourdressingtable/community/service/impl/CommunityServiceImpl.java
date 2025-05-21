@@ -22,14 +22,8 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Long createPost(CreatePostRequest createPostRequest) {
-        CommunityCategory communityCategory = communityCategoryService.getCategoryById(createPostRequest.getCommunityCategoryId());
-        Member member = new Member();
-        Post post = Post.builder()
-                .title(createPostRequest.getTitle())
-                .content(createPostRequest.getContent())
-                .communityCategory(communityCategory)
-                .member(member)
-                .build();
-        return postService.createPost(createPostRequest, communityCategory);
+        Long memberId = 1L;
+        return postService.createPost(createPostRequest, memberId);
     }
+
 }
