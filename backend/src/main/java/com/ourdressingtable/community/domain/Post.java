@@ -1,9 +1,11 @@
 package com.ourdressingtable.community.domain;
 
+import com.ourdressingtable.community.dto.CreatePostRequest;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -33,5 +35,23 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "community_category_id", nullable = false)
     private CommunityCategory communityCategory;
 
+    @Builder
+    public Post(String title, String content, int viewCount, Member member, CommunityCategory communityCategory) {
+        this.title = title;
+        this.content = content;
+        this.viewCount = viewCount;
+        this.member = member;
+        this.communityCategory = communityCategory;
 
+    }
+
+    public static Post from(Member member, CommunityCategory communityCategory, CreatePostRequest createPostRequest) {
+        return Post.builder()
+                .title(createPostRequest.getTitle())
+                .content(createPostRequest.getContent())
+                .member(member)
+                .communityCategory(communityCategory)
+                .build();
+
+    }
 }
