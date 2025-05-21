@@ -2,7 +2,9 @@ package com.ourdressingtable.community.post.controller;
 
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.CreatePostResponse;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.net.URI;
 public class PostController {
 
     private final CommunityService communityService;
+    private final PostService postService;
 
     @PostMapping()
     public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest request) {
@@ -34,5 +37,11 @@ public class PostController {
         Long memberId = 1L;
         communityService.updatePost(postId, memberId, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> getPost(@PathVariable Long postId) {
+        PostDetailResponse response = postService.getPost(postId);
+        return ResponseEntity.ok(response);
     }
 }

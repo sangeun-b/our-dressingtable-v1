@@ -1,6 +1,7 @@
 package com.ourdressingtable.community.post.service;
 
 import com.ourdressingtable.community.post.domain.Post;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -42,8 +43,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post getPost(Long id) {
-        return null;
+    public PostDetailResponse getPost(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+        return PostDetailResponse.from(post);
     }
 
     @Override
