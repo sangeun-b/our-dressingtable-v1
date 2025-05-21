@@ -74,6 +74,11 @@ public class MemberServiceImpl implements MemberService {
         return withdrawalMember.getId();
     }
 
+    @Override
+    public Member getMemberEntityById(Long id) {
+        return memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
 
 
 }
