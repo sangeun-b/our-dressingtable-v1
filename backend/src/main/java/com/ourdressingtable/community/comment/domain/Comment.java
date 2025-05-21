@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.domain.comment;
+package com.ourdressingtable.community.comment.domain;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
