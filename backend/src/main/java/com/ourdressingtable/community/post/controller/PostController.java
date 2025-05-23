@@ -44,4 +44,13 @@ public class PostController {
         PostDetailResponse response = postService.getPost(postId);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePost(@PathVariable Long postId) {
+        // TODO: 로그인 MEMBER 정보
+        Long memberId = 1L;
+        communityService.deletePost(postId, memberId);
+        return ResponseEntity.noContent().build();
+
+    }
 }
