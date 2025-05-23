@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -125,6 +126,43 @@ public class CommunityServiceImplTest {
             // when & then
             assertThrows(OurDressingTableException.class, () -> {
                 communityService.updatePost(1L, 1L, updatePostRequest);
+            });
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 삭제 테스트")
+    class deletePost {
+        @DisplayName("게시글 삭제 성공")
+        @Test
+        public void deletePost_shouldReturnSuccess() {
+            // given
+            Post post = Post.builder()
+                    .id(1L)
+                    .member(Member.builder().id(1L).build())
+                    .build();
+
+            given(postService.getPostEntityById(1L)).willReturn(post);
+
+            // when
+            communityService.deletePost(1L,1L);
+
+            // then
+            verify(postService).deletePost(1L);
+        }
+
+        @DisplayName("게시글 삭제 실패 - 작성자 불일치")
+        @Test
+        public void deletePost_shouldReturnNoPermissionError () {
+            Post post = Post.builder()
+                    .id(1L)
+                    .member(Member.builder().id(99L).build())
+                    .build();
+
+            given(postService.getPostEntityById(1L)).willReturn(post);
+
+            assertThrows(OurDressingTableException.class, () -> {
+                communityService.deletePost(1L, 1L);
             });
         }
     }

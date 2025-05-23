@@ -43,8 +43,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDetailResponse getPost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+    public PostDetailResponse getPost(Long postId) {
+        Post post = getPostEntityById(postId);
+
         return PostDetailResponse.from(post);
     }
 
@@ -54,8 +55,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+    public void deletePost(Long postId) {
+        Post post = getPostEntityById(postId);
+
         postRepository.delete(post);
 
     }
@@ -63,7 +65,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void updatePost(Long postId, UpdatePostRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+        Post post = getPostEntityById(postId);
 
         if (request.getTitle() != null)
             post.updateTitle(request.getTitle());
