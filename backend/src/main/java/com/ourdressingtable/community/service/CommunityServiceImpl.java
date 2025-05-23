@@ -33,11 +33,20 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public void updatePost(Long postId, Long memberId, UpdatePostRequest updatePostRequest) {
-        // TODO: 포스트 작성자 인지 확인 필요
+        checkPermission(postId, memberId);
+        postService.updatePost(postId, updatePostRequest);
+    }
+
+    @Override
+    public void deletePost(Long postId, Long memberId) {
+        checkPermission(postId, memberId);
+        postService.deletePost(postId);
+    }
+
+    private void checkPermission(Long postId, Long memberId) {
         Post post = postService.getPostEntityById(postId);
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
         }
-        postService.updatePost(postId, updatePostRequest);
     }
 }

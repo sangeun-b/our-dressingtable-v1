@@ -6,7 +6,6 @@ import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PostService {
     Long createPost(CreatePostRequest request, Long memberId);

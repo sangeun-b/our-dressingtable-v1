@@ -55,6 +55,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+        postRepository.delete(post);
 
     }
 

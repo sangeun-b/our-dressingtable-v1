@@ -10,11 +10,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
+
+import java.sql.Timestamp;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
+@SQLDelete(sql = "UPDATE posts SET is_deleted = true, deleted_at = NOW() WHERE post_id = ?")
+@SQLRestriction("is_deleted = false")
 public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,14 +43,22 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "community_category_id", nullable = false)
     private CommunityCategory communityCategory;
 
+    @Column(name = "is_deleted", nullable = false)
+    @ColumnDefault("false")
+    private Boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt;
+
     @Builder
-    public Post(Long id, String title, String content, int viewCount, Member member, CommunityCategory communityCategory) {
+    public Post(Long id, String title, String content, int viewCount, Member member, CommunityCategory communityCategory, Boolean isDeleted) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
         this.member = member;
         this.communityCategory = communityCategory;
+        this.isDeleted = isDeleted;
 
     }
 
@@ -69,4 +84,10 @@ public class Post extends BaseTimeEntity {
     public void updateCommunityCategory(CommunityCategory communityCategory) {
         this.communityCategory = communityCategory;
     }
+
+    @PreRemove
+    public void onSoftDelete() {
+        this.deletedAt = new Timestamp(System.currentTimeMillis());
+    }
+
 }
