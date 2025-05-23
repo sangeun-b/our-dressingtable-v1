@@ -1,4 +1,4 @@
-package com.ourdressingtable.exception;
+package com.ourdressingtable.common.exception;
 
 import java.util.ArrayList;
 import java.util.List;

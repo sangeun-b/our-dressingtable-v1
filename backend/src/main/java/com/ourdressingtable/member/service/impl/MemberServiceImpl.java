@@ -1,10 +1,8 @@
 package com.ourdressingtable.member.service.impl;
 
-import com.ourdressingtable.exception.ErrorCode;
-import com.ourdressingtable.exception.OurDressingTableException;
-import com.ourdressingtable.member.domain.ColorType;
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
@@ -14,8 +12,6 @@ import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.util.HashUtil;
-import com.ourdressingtable.util.MaskingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

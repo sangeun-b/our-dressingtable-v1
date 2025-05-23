@@ -42,7 +42,8 @@ dependencies {
 
 	implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
+	// api doc
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
 tasks.named('test') {
