@@ -1,10 +1,12 @@
 package com.ourdressingtable.community.domain.post.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -127,7 +129,7 @@ public class PostServiceImplTest {
             assertEquals("업데이트", post.getContent());
         }
 
-        @DisplayName("게시글 수정 실패 -  POST NOT FOUND")
+        @DisplayName("게시글 수정 실패 - POST NOT FOUND")
         @Test
         public void updatePost_shouldReturnPostNotFoundError() {
             // given
@@ -135,6 +137,40 @@ public class PostServiceImplTest {
 
             // when & then
             assertThrows(OurDressingTableException.class, () -> postService.updatePost(2L, UpdatePostRequest.builder().build()));
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 삭제 테스트")
+    class deletePost {
+        @DisplayName("게시글 삭제 성공")
+        @Test
+        public void deletePost_shouldReturnSuccess() {
+            // given
+            Post post = Post.builder()
+                    .id(1L)
+                    .title("제목")
+                    .isDeleted(false)
+                    .member(Member.builder().id(1L).build())
+                    .build();
+
+            given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+            // when
+            postService.deletePost(1L);
+
+            // then
+            assertThat(post.getIsDeleted()).isTrue();
+            verify(postRepository).delete(post);
+        }
+
+        @DisplayName("게시글 삭제 실패 - POST_NOT_FOUND")
+        @Test
+        public void deletePost_shouldReturnPostNotFoundError() {
+            given(postRepository.findById(1L)).willReturn(Optional.empty());
+
+            assertThrows(OurDressingTableException.class, () -> postService.deletePost(1L));
+
         }
     }
 

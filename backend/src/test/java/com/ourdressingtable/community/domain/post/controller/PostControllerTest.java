@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -92,7 +94,7 @@ public class PostControllerTest {
     @Nested
     @DisplayName("게시글 수정 테스트")
     class updatePost {
-        @DisplayName("게시글 수정 - 성공")
+        @DisplayName("게시글 수정 성공")
         @Test
         public void updatePost_withValidData_ReturnSuccess() throws Exception {
             UpdatePostRequest updatePostRequest = UpdatePostRequest.builder()
@@ -108,7 +110,7 @@ public class PostControllerTest {
         }
 
         // TODO: 회원 인증 후 수정 필요
-        @DisplayName("게시글 수정 - 실패")
+        @DisplayName("게시글 수정 실패 - 작성자 불일치")
         @Test
         public void updatePost_withInvalidMember_ReturnError() throws Exception {
             UpdatePostRequest updatePostRequest = UpdatePostRequest.builder()
@@ -118,13 +120,39 @@ public class PostControllerTest {
                     .build();
 
             doThrow(new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT))
-                    .when(postService).updatePost(eq(1L), eq(updatePostRequest));
+                    .when(communityService).updatePost(eq(1L), eq(1L), eq(updatePostRequest));
 
             mockMvc.perform(patch("/api/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatePostRequest)))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isForbidden());
         }
     }
+
+    @Nested
+    @DisplayName("게시글 삭제 테스트")
+    class deletePost {
+        @DisplayName("게시글 삭제 - 성공")
+        @Test
+        public void deletePost_withValidData_ReturnSuccess() throws Exception {
+
+            mockMvc.perform(delete("/api/posts/1"))
+                    .andExpect(status().isNoContent());
+
+            verify(communityService).deletePost(1L,1L);
+        }
+
+        // TODO: 회원 인증 후 수정 필요
+        @DisplayName("게시글 삭제 - 실패")
+        @Test
+        public void deletePost_withInvalidMember_ReturnError() throws Exception {
+            doThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND))
+                    .when(communityService).deletePost(eq(1L),eq(1L));
+
+            mockMvc.perform(delete("/api/posts/1"))
+                    .andExpect(status().isNotFound());
+        }
+    }
+
 
 }

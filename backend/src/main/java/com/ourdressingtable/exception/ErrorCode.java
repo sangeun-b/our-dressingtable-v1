@@ -24,7 +24,7 @@ public enum ErrorCode {
     // 커뮤니티 관련
     COMMUNITY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "카테고리를 찾을 수 없습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "게시글을 찾을 수 없습니다."),
-    NO_PERMISSION_TO_EDIT(HttpStatus.NOT_FOUND, "P001", "자신이 작성한 글만 수정할 수 있습니다.");
+    NO_PERMISSION_TO_EDIT(HttpStatus.FORBIDDEN, "P001", "자신이 작성한 글만 수정할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
