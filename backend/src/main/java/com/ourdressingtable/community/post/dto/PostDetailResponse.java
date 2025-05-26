@@ -34,6 +34,9 @@ public class PostDetailResponse {
     @Schema(description = "게시글 좋아요", example = "345")
     private int postLikes;
 
+    @Schema(description = "로그인 사용자가 좋아요를 눌렀는지 여부", example = "true")
+    private boolean likedByCurrentMember;
+
     @Schema(description = "게시글 작성자", example = "사용자1")
     private String memberName;
 
@@ -41,25 +44,27 @@ public class PostDetailResponse {
     private Timestamp createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String categoryName, String images, int viewCount, int postLikes, String memberName, Timestamp createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String categoryName, String images, int viewCount, int postLikes, boolean likedByCurrentMember, String memberName, Timestamp createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.categoryName = categoryName;
         this.viewCount = viewCount;
         this.postLikes = postLikes;
+        this.likedByCurrentMember = likedByCurrentMember;
         this.memberName = memberName;
         this.createdAt = createdAt;
     }
 
-    public static PostDetailResponse from(Post post) {
+    public static PostDetailResponse from(Post post, boolean likedByCurrentMember) {
         return PostDetailResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .categoryName(post.getCommunityCategory().getName())
                 .viewCount(post.getViewCount())
-                .postLikes(post.getPostLikes().size())
+                .postLikes(post.getLikeCount())
+                .likedByCurrentMember(likedByCurrentMember)
                 .memberName(post.getMember().getNickname())
                 .createdAt(post.getCreatedAt())
                 .build();

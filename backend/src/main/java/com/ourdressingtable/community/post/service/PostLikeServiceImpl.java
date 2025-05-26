@@ -40,4 +40,12 @@ public class PostLikeServiceImpl implements PostLikeService {
         return true;
 
     }
+
+    @Override
+    public boolean hasLiked(Long postId, Long memberId) {
+        Member member = memberService.getMemberEntityById(memberId);
+        Post post = postService.getPostEntityById(postId);
+        return postLikeRepository.existsByMemberAndPost(member, post);
+
+    }
 }

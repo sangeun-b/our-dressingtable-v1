@@ -48,9 +48,8 @@ public class PostController {
 
     @Operation(summary = "게시글 단건 조회", description = "게시글을 단건 조회합니다.")
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailResponse> getPost(@PathVariable Long postId) {
-        PostDetailResponse response = postService.getPost(postId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<PostDetailResponse> getPost(@PathVariable Long postId, @RequestParam Long memberId) {
+        return ResponseEntity.ok(communityService.getPostDetail(postId, memberId));
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")

@@ -3,6 +3,7 @@ package com.ourdressingtable.community.post.service;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.repository.PostRepository;
+import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
@@ -40,13 +41,6 @@ public class PostServiceImpl implements PostService {
                 .build();
         postRepository.save(post);
         return post.getId();
-    }
-
-    @Override
-    public PostDetailResponse getPost(Long postId) {
-        Post post = getPostEntityById(postId);
-
-        return PostDetailResponse.from(post);
     }
 
     @Override
@@ -113,5 +107,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPostEntityById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    @Override
+    public Post getValidPostEntityById(Long id) {
+        return postRepository.findById(id).filter(post -> !post.isDeleted())
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
     }
 }

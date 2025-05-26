@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface PostService {
     Long createPost(CreatePostRequest request, Long memberId);
-    PostDetailResponse getPost(Long id);
     List<Post> getPosts();
     void deletePost(Long id);
     void updatePost(Long postId, UpdatePostRequest request);
@@ -20,4 +19,5 @@ public interface PostService {
     List<Post> getPostsByTitle(String title);
     List<Post> getPostsByContent(String content);
     Post getPostEntityById(Long id);
+    Post getValidPostEntityById(Long id);
 }
