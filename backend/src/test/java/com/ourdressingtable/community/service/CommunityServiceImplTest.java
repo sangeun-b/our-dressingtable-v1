@@ -7,7 +7,7 @@ import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
-import com.ourdressingtable.exception.OurDressingTableException;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,8 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

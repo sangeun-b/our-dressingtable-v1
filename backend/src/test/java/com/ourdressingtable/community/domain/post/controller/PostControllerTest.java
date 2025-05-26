@@ -6,8 +6,8 @@ import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
-import com.ourdressingtable.exception.ErrorCode;
-import com.ourdressingtable.exception.OurDressingTableException;
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;

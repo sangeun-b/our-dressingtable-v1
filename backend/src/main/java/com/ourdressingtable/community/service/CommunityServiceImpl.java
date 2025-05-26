@@ -4,17 +4,13 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
-import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.community.post.service.PostService;
-import com.ourdressingtable.exception.ErrorCode;
-import com.ourdressingtable.exception.OurDressingTableException;
-import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
