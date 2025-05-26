@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -39,11 +39,17 @@ dependencies {
 	implementation 'ch.qos.logback:logback-classic:1.5.6'
 	implementation 'ch.qos.logback:logback-core:1.5.6'
 	implementation 'org.codehaus.janino:janino:3.1.10' // 버전은 logback-core에 맞게
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// api doc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+	// jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {
