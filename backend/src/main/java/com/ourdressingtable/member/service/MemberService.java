@@ -14,4 +14,5 @@ public interface MemberService {
     void deleteMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest );
     Long createWithdrawalMember(WithdrawalMemberRequest withdrawalMemberRequest, Member member);
     Member getMemberEntityById(Long id);
+    Member getActiveMemberEntityById(Long id);
 }

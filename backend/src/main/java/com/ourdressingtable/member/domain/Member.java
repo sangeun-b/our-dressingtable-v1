@@ -1,23 +1,16 @@
 package com.ourdressingtable.member.domain;
 
 
-import static jakarta.persistence.FetchType.LAZY;
-
-
+import com.ourdressingtable.community.post.domain.Post;
+import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.util.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,6 +61,12 @@ public class Member extends BaseTimeEntity {
 
     private String imageUrl;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
     @Builder
     public Member(Long id, String email, String password, String name, String nickname, String phoneNumber, Role role, SkinType skinType, ColorType colorType, Date birthDate, AuthType authType, Status status, int lockedCount, String imageUrl) {
         this.id = id;
@@ -104,4 +103,5 @@ public class Member extends BaseTimeEntity {
     private <T> T getOrDefault(T newValue, T currentValue) {
         return (newValue != null) ? newValue : currentValue;
     }
+
 }
