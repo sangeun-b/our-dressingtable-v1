@@ -26,6 +26,7 @@ spring:
         - db-test
     include:
       - db
+      - jwt
 #       - site
 logging:
   level:
