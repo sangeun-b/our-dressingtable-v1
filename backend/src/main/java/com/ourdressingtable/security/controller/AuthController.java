@@ -10,7 +10,6 @@ import com.ourdressingtable.security.dto.LoginResponse;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import com.ourdressingtable.security.dto.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
