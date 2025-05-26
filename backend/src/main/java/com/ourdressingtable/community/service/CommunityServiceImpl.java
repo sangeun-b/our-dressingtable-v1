@@ -2,7 +2,9 @@ package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.common.exception.ErrorCode;
@@ -20,6 +22,7 @@ public class CommunityServiceImpl implements CommunityService {
     private final PostService postService;
     private final CommunityCategoryService communityCategoryService;
     private final MemberService memberService;
+    private final PostLikeService postLikeService;
 
     @Override
     public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
@@ -44,5 +47,12 @@ public class CommunityServiceImpl implements CommunityService {
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
         }
+    }
+
+    @Override
+    public PostDetailResponse getPostDetail(Long postId, Long memberId) {
+        Post post = postService.getPostEntityById(postId);
+        boolean liked = postLikeService.hasLiked(memberId, postId);
+        return PostDetailResponse.from(post, liked);
     }
 }

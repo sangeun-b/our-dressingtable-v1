@@ -3,7 +3,7 @@ package com.ourdressingtable.community.post.dto;
 import com.ourdressingtable.community.post.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +31,12 @@ public class PostDetailResponse {
     @Schema(description = "게시글 조회수", example = "123")
     private int viewCount;
 
+    @Schema(description = "게시글 좋아요", example = "345")
+    private int postLikes;
+
+    @Schema(description = "로그인 사용자가 좋아요를 눌렀는지 여부", example = "true")
+    private boolean likedByCurrentMember;
+
     @Schema(description = "게시글 작성자", example = "사용자1")
     private String memberName;
 
@@ -38,23 +44,27 @@ public class PostDetailResponse {
     private Timestamp createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String categoryName, String images, int viewCount, String memberName, Timestamp createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String categoryName, String images, int viewCount, int postLikes, boolean likedByCurrentMember, String memberName, Timestamp createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.categoryName = categoryName;
         this.viewCount = viewCount;
+        this.postLikes = postLikes;
+        this.likedByCurrentMember = likedByCurrentMember;
         this.memberName = memberName;
         this.createdAt = createdAt;
     }
 
-    public static PostDetailResponse from(Post post) {
+    public static PostDetailResponse from(Post post, boolean likedByCurrentMember) {
         return PostDetailResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .categoryName(post.getCommunityCategory().getName())
                 .viewCount(post.getViewCount())
+                .postLikes(post.getLikeCount())
+                .likedByCurrentMember(likedByCurrentMember)
                 .memberName(post.getMember().getNickname())
                 .createdAt(post.getCreatedAt())
                 .build();

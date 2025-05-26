@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,7 +34,13 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @ColumnDefault("0")
-    private int viewCount;
+    private int viewCount = 0;
+
+    @ColumnDefault("0")
+    private int likeCount = 0;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -45,17 +52,19 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
-    private Boolean isDeleted = false;
+    private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
     private Timestamp deletedAt;
 
     @Builder
-    public Post(Long id, String title, String content, int viewCount, Member member, CommunityCategory communityCategory, Boolean isDeleted) {
+    public Post(Long id, String title, String content, int viewCount, int likeCount, List<PostLike> postLikes, Member member, CommunityCategory communityCategory, boolean isDeleted) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.postLikes = postLikes;
         this.member = member;
         this.communityCategory = communityCategory;
         this.isDeleted = isDeleted;
@@ -71,6 +80,13 @@ public class Post extends BaseTimeEntity {
                 .build();
 
     }
+    public void addMember(Member member) {
+        if(this.member != null) {
+            this.member.getPosts().remove(this);
+        }
+        this.member = member;
+        member.getPosts().add(this);
+    }
 
     public void updateTitle(String title) {
         this.title = title;
@@ -85,9 +101,17 @@ public class Post extends BaseTimeEntity {
         this.communityCategory = communityCategory;
     }
 
-    @PreRemove
-    public void onSoftDelete() {
-        this.deletedAt = new Timestamp(System.currentTimeMillis());
+    public void increaseLike() {
+        this.likeCount++;
     }
+
+    public void decreaseLike() {
+        if(this.likeCount > 0)
+            this.likeCount--;
+    }
+//    @PreRemove
+//    public void onSoftDelete() {
+//        this.deletedAt = new Timestamp(System.currentTimeMillis());
+//    }
 
 }

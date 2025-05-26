@@ -75,6 +75,14 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
+    @Override
+    public Member getActiveMemberEntityById(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
+        if(!member.getStatus().equals(Status.ACTIVATE)) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
 
+        }
+        return member;
+    }
 }
