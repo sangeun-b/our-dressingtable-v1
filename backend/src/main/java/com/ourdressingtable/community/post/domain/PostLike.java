@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "post_likes")
+@Table(name = "post_likes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"member_id", "post_id"})
+})
 public class PostLike {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +32,28 @@ public class PostLike {
         this.id = id;
         this.member = member;
         this.post = post;
+    }
+
+    private void addPost(Post post) {
+       if(this.post != null) {
+           this.post.getPostLikes().remove(this);
+       }
+       this.post = post;
+       post.getPostLikes().add(this);
+    }
+
+    private void addMember(Member member) {
+        if(this.member != null) {
+            this.member.getPostLikes().remove(this);
+        }
+        this.member = member;
+        member.getPostLikes().add(this);
+    }
+
+    public static PostLike create(Member member, Post post) {
+        PostLike postLike = PostLike.builder().build();
+        postLike.addMember(member);
+        postLike.addPost(post);
+        return postLike;
     }
 }

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreatePostResponse {
+public class PostLikeResponse {
 
-    @Schema(description = "생성된 게시글 ID", example = "1")
-    private Long id;
+    @Schema(description = "좋아요 여부", example = "true")
+    private boolean liked;
 
 }
