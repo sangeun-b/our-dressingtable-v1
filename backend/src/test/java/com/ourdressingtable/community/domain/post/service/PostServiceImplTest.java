@@ -150,7 +150,7 @@ public class PostServiceImplTest {
             Post post = Post.builder()
                     .id(1L)
                     .title("제목")
-                    .isDeleted(false)
+                    .isDeleted(true)
                     .member(Member.builder().id(1L).build())
                     .build();
 
@@ -160,7 +160,7 @@ public class PostServiceImplTest {
             postService.deletePost(1L);
 
             // then
-            assertThat(post.getIsDeleted()).isTrue();
+            assertThat(post.isDeleted()).isTrue();
             verify(postRepository).delete(post);
         }
 
