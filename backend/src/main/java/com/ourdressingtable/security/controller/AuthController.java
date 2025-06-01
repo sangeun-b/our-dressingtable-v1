@@ -45,9 +45,9 @@ public class AuthController {
         String refreshToken = jwtTokenProvider.createRefreshToken(
                 member.getEmail(), member.getRole());
 
-        redisTokenService.saveTokenInfo(member.getEmail(), accessToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
-
-        return ResponseEntity.ok(LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).memberId(member.getId()).build());
+        redisTokenService.saveTokenInfo(member.getEmail(), accessToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"accessToken");
+        redisTokenService.saveTokenInfo(member.getEmail(), refreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"refreshToken");
+        return ResponseEntity.ok(LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).memberId(member.getId()).email(member.getEmail()).name(member.getName()).nickname(member.getNickname()).imageUrl(member.getImageUrl()).build());
     }
 
     @PostMapping("/refresh")
@@ -59,7 +59,7 @@ public class AuthController {
         }
 
         String email = jwtTokenProvider.getEmail(token);
-        boolean isValid = redisTokenService.validate(email, token, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
+        boolean isValid = redisTokenService.validate(email, token, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
         if(!isValid) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -68,7 +68,7 @@ public class AuthController {
         String newAccessToken = jwtTokenProvider.createAccessToken(email, member.getRole());
         String newRefreshToken = jwtTokenProvider.createRefreshToken(email, member.getRole());
 
-        redisTokenService.saveTokenInfo(email, newRefreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
+        redisTokenService.saveTokenInfo(email, newRefreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
         return ResponseEntity.ok(TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
     }
@@ -83,8 +83,11 @@ public class AuthController {
     public ResponseEntity logout(HttpServletRequest httpServletRequest) {
         String token = jwtTokenProvider.resolveToken(httpServletRequest);
         if(token != null && jwtTokenProvider.validateToken(token)) {
+            long remaining = jwtTokenProvider.getExpirationTime(token);
+            redisTokenService.blacklistAccessToken(token, remaining);
+
             String email = jwtTokenProvider.getEmail(token);
-            redisTokenService.deleteTokenInfo(email);
+            redisTokenService.deleteTokenInfo(email, "refreshToken", httpServletRequest.getHeader("User-Agent"));
         }
         return ResponseEntity.noContent().build();
     }

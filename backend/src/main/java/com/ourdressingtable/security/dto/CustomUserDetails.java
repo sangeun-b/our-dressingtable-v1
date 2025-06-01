@@ -14,7 +14,6 @@ public class CustomUserDetails implements UserDetails {
 
     private final Member member;
 
-    @Builder
     public CustomUserDetails(Member member) {
         this.member = member;
     }
@@ -24,14 +23,18 @@ public class CustomUserDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
     }
 
-    @Override
-    public String getUsername() {
+    public String getEmail() {
         return member.getEmail();
     }
 
     @Override
     public String getPassword() {
         return member.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return member.getEmail();
     }
 
     @Override

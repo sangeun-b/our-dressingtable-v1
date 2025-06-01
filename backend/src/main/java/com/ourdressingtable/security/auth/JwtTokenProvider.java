@@ -1,10 +1,16 @@
 package com.ourdressingtable.security.auth;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Role;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @Slf4j
@@ -31,10 +38,8 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.access-token-validity}")
     private long accessTokenValidity;
 
-    @Value("${spring.jwt.refresh-token-validity")
+    @Value("${spring.jwt.refresh-token-validity}")
     private long refreshTokenValidity;
-
-    private final CustomUserDetailsService customUserDetailsService;
 
     @PostConstruct
     protected void init() {
@@ -73,9 +78,18 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            log.warn("[validateToken] 만료된 토큰: {}", e.getMessage());
+            throw new OurDressingTableException(ErrorCode.UNAUTHORIZED, e);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            log.warn("[validateToken] 유효하지 않은 발생: {}", e.getMessage());
+            throw new OurDressingTableException(ErrorCode.UNAUTHORIZED, e);
+        } catch (IllegalArgumentException e) {
+            log.warn("[validateToken] 토큰 없음 또는 비어있음: {}", e.getMessage());
+            throw new OurDressingTableException(ErrorCode.BAD_REQUEST, e);
         } catch (Exception e) {
-            log.info("[validateToken] 토큰 체크 예외 발생");
-            return false;
+            log.warn("[validateToken] 기타 JWT 오류: {}", e.getMessage());
+            throw new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR, e);
         }
     }
 
@@ -102,9 +116,17 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
     }
+
+    // 유효시간 계산
+    public long getExpirationTime(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims.getExpiration().getTime() - new Date().getTime();
+    }
+
+
 }
