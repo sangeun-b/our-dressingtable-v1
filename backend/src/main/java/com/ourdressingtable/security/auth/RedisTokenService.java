@@ -58,11 +58,13 @@ public class RedisTokenService {
     public void deleteTokenInfo(String email, String type, String ua) {
         String deviceId = getDeviceId(ua);
         String redisKey = generateKey(email, type, deviceId);
+        log.info("Redis Token Delete Start:", redisKey);
         Boolean result = redisTemplate.delete(redisKey);
         if(!result) {
             log.warn("Redis Token Delete Fail: email={}, type={}, deviceId={}", email, type, deviceId);
             throw new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR);
         }
+        log.info("Redis Token Delete End:", redisKey);
     }
 
     public void blacklistAccessToken(String accessToken, long expireTime) {

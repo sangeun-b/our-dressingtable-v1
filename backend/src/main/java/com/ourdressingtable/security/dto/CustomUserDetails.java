@@ -1,5 +1,6 @@
 package com.ourdressingtable.security.dto;
 
+import com.ourdressingtable.common.util.AuthorityUtil;
 import com.ourdressingtable.member.domain.Member;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +21,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
+        return AuthorityUtil.createAuthorities(member.getRole());
     }
 
     public String getEmail() {
@@ -55,7 +56,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
 
 }
