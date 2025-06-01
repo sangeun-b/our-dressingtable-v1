@@ -18,8 +18,13 @@ public enum ErrorCode {
             "비밀번호는 최소 8자 이상, 알파벳 대/소문자, 숫자, 특수문자를 포함해야 합니다."),
     MEMBER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "M007", "활동 불가 회원입니다."),
 
+    // 인증/인가 관련
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "인증이 필요합니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
+
     // BAD_REQUEST
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "C001", "잘못된 접근입니다."),
+
     // INTERNAL_SEVER_ERROR
     INTERNAL_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "G001", "서버 에러입니다."),
 

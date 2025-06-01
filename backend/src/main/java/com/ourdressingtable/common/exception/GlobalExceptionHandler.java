@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("badCredentialsException", ex);
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.PASSWORD_MISMATCH.getHttpStatus(), ErrorCode.PASSWORD_MISMATCH.getCode(), ErrorCode.PASSWORD_MISMATCH.getMessage());
+        return ResponseEntity.status(ErrorCode.PASSWORD_MISMATCH.getHttpStatus()).body(errorResponse);
+    }
 
     @ExceptionHandler(OurDressingTableException.class)
     public ResponseEntity<ErrorResponse> handleOurDressingTableException(OurDressingTableException ex) {
@@ -42,7 +50,6 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INTERNAL_SEVER_ERROR.getHttpStatus(), ErrorCode.INTERNAL_SEVER_ERROR.getCode(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
-
 
 
 }
