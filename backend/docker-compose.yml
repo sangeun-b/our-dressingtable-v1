@@ -11,7 +11,7 @@ services:
 
     volumes:
       - ./db/mysql/data:/var/lib/mysql
-      # - ./db/mysql/init:/docker-entrypoint-initdb.d/mysql-init.sql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
 
   redis:
     image: redis:7.2
