@@ -53,7 +53,6 @@ public class MemberControllerTest {
                 .name("member1")
                 .nickname("me")
                 .phoneNumber("010-1234-5678")
-                .role(Role.ROLE_MEMBER)
                 .build();
 
         Long memberId = 1L;

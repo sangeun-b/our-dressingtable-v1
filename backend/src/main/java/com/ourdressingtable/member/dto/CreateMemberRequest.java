@@ -47,9 +47,6 @@ public class CreateMemberRequest {
     @NotBlank(message = "전화번호를 입력해주세요.")
     private String phoneNumber;
 
-    @Schema(description = "역할", example = "ROLE_MEMBER")
-    private Role role;
-
     @Schema(description = "피부타입", example = "NORMAL_SKIN")
     private SkinType skinType;
 
@@ -63,13 +60,12 @@ public class CreateMemberRequest {
     private String imageUrl;
 
     @Builder
-    public CreateMemberRequest(String email, String password, String name, String nickname, String phoneNumber, Role role, SkinType skinType, ColorType colorType, Date birthDate, String imageUrl) {
+    public CreateMemberRequest(String email, String password, String name, String nickname, String phoneNumber, SkinType skinType, ColorType colorType, Date birthDate, String imageUrl) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.role = role;
         this.skinType = skinType;
         this.colorType = colorType;
         this.birthDate = birthDate;
@@ -77,14 +73,14 @@ public class CreateMemberRequest {
 
     }
 
-    public Member toEntity() {
+    public Member toEntity(String encodedPassword) {
         return Member.builder()
                 .email(email)
-                .password(password)
+                .password(encodedPassword)
                 .name(name)
                 .nickname(nickname)
                 .phoneNumber(phoneNumber)
-                .role(role)
+                .role(Role.ROLE_BASIC)
                 .skinType(skinType)
                 .colorType(colorType)
                 .birthDate(birthDate)

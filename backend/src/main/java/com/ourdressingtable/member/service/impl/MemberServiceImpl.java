@@ -13,6 +13,7 @@ import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final WithdrawalMemberRepository withdrawalMemberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -32,8 +34,9 @@ public class MemberServiceImpl implements MemberService {
         if (isExists) {
             throw new OurDressingTableException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
+        String encodedPassword = passwordEncoder.encode(createMemberRequest.getPassword());
 
-        Member member = memberRepository.save(createMemberRequest.toEntity());
+        Member member = memberRepository.save(createMemberRequest.toEntity(encodedPassword));
         return member.getId();
     }
 

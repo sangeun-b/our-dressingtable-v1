@@ -51,10 +51,9 @@ public class MemberServiceImplTest {
                     .name("member1")
                     .nickname("me")
                     .phoneNumber("010-1234-5678")
-                    .role(Role.ROLE_MEMBER)
                     .build();
-
-            Member member = createMemberRequest.toEntity();
+            String encodedPassword = "password";
+            Member member = createMemberRequest.toEntity(encodedPassword);
             ReflectionTestUtils.setField(member,"id",1L);
             when(memberRepository.save(any(Member.class))).thenReturn(member);
 
@@ -77,7 +76,6 @@ public class MemberServiceImplTest {
                     .name("member1")
                     .nickname("me")
                     .phoneNumber("010-1234-5678")
-                    .role(Role.ROLE_MEMBER)
                     .build();
 
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
@@ -105,7 +103,6 @@ public class MemberServiceImplTest {
                     .name("member1")
                     .nickname("me")
                     .phoneNumber("010-1234-5678")
-                    .role(Role.ROLE_MEMBER)
                     .build();
 
             given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
@@ -129,7 +126,6 @@ public class MemberServiceImplTest {
                     .name("member1")
                     .nickname("me")
                     .phoneNumber("010-1234-5678")
-                    .role(Role.ROLE_MEMBER)
                     .build();
             given(memberRepository.findById(member.getId())).willReturn(Optional.empty());
 
@@ -157,7 +153,6 @@ public class MemberServiceImplTest {
                     .name("member1")
                     .nickname("me")
                     .phoneNumber("010-1234-5678")
-                    .role(Role.ROLE_MEMBER)
                     .build();
 
             UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
