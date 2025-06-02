@@ -24,7 +24,7 @@ public class PostLikeServiceImpl implements PostLikeService {
 
     @Override
     @Transactional
-    public boolean postLike(Long postId, Long memberId) {
+    public boolean toggleLike(Long postId, Long memberId) {
         Member member = memberService.getActiveMemberEntityById(memberId);
         Post post = postService.getPostEntityById(postId);
         Optional<PostLike> existingLike = postLikeRepository.findByMemberAndPost(member, post);
