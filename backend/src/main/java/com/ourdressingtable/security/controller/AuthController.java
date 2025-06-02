@@ -1,6 +1,7 @@
 package com.ourdressingtable.security.controller;
 
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
@@ -11,6 +12,7 @@ import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import com.ourdressingtable.security.dto.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -45,9 +48,9 @@ public class AuthController {
         String refreshToken = jwtTokenProvider.createRefreshToken(
                 member.getEmail(), member.getRole());
 
-        redisTokenService.saveTokenInfo(member.getEmail(), accessToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
-
-        return ResponseEntity.ok(LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).memberId(member.getId()).build());
+        redisTokenService.saveTokenInfo(member.getEmail(), accessToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"accessToken");
+        redisTokenService.saveTokenInfo(member.getEmail(), refreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"refreshToken");
+        return ResponseEntity.ok(LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).memberId(member.getId()).email(member.getEmail()).name(member.getName()).nickname(member.getNickname()).imageUrl(member.getImageUrl()).build());
     }
 
     @PostMapping("/refresh")
@@ -59,7 +62,7 @@ public class AuthController {
         }
 
         String email = jwtTokenProvider.getEmail(token);
-        boolean isValid = redisTokenService.validate(email, token, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
+        boolean isValid = redisTokenService.validate(email, token, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
         if(!isValid) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -68,7 +71,7 @@ public class AuthController {
         String newAccessToken = jwtTokenProvider.createAccessToken(email, member.getRole());
         String newRefreshToken = jwtTokenProvider.createRefreshToken(email, member.getRole());
 
-        redisTokenService.saveTokenInfo(email, newRefreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"));
+        redisTokenService.saveTokenInfo(email, newRefreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
         return ResponseEntity.ok(TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
     }
@@ -76,15 +79,31 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Member member = userDetails.getMember();
-        return ResponseEntity.ok(member);
+        MemberResponse response = MemberResponse.builder()
+                .name(member.getName())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .imageUrl(member.getImageUrl())
+                .phoneNumber(member.getPhoneNumber())
+                .skinType(member.getSkinType())
+                .colorType(member.getColorType())
+                .birthDate(member.getBirthDate())
+                .role(member.getRole().getAuth())
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity logout(HttpServletRequest httpServletRequest) {
+        log.info("[logout] 호출");
         String token = jwtTokenProvider.resolveToken(httpServletRequest);
+        log.info("[logout] token = {} " + token + "");
         if(token != null && jwtTokenProvider.validateToken(token)) {
+            long remaining = jwtTokenProvider.getExpirationTime(token);
+            redisTokenService.blacklistAccessToken(token, remaining);
+
             String email = jwtTokenProvider.getEmail(token);
-            redisTokenService.deleteTokenInfo(email);
+            redisTokenService.deleteTokenInfo(email, "refreshToken", httpServletRequest.getHeader("User-Agent"));
         }
         return ResponseEntity.noContent().build();
     }

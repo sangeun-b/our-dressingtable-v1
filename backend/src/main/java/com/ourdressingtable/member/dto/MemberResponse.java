@@ -2,6 +2,7 @@ package com.ourdressingtable.member.dto;
 
 import com.ourdressingtable.member.domain.ColorType;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
@@ -35,8 +36,11 @@ public class MemberResponse {
     @Schema(description = "회원 이미지", example = "URL")
     private String imageUrl;
 
+    @Schema(description = "회원 ROLE", example = "일반회원")
+    private String role;
+
     @Builder
-    public MemberResponse(String email, String name, String nickname, String phoneNumber, SkinType skinType, ColorType colorType, Date birthDate, String imageUrl) {
+    public MemberResponse(String email, String name, String nickname, String phoneNumber, SkinType skinType, ColorType colorType, Date birthDate, String imageUrl, String role) {
         this.email = email;
         this.name = name;
         this.nickname = nickname;
@@ -45,6 +49,7 @@ public class MemberResponse {
         this.colorType = colorType;
         this.birthDate = birthDate;
         this.imageUrl = imageUrl;
+        this.role = role;
     }
 
     public static MemberResponse fromEntity(Member member) {
@@ -57,6 +62,7 @@ public class MemberResponse {
                 .colorType(member.getColorType())
                 .birthDate(member.getBirthDate())
                 .imageUrl(member.getImageUrl())
+                .role(member.getRole().getAuth())
                 .build();
     }
 

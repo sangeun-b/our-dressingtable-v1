@@ -47,7 +47,6 @@ public class MemberController {
                 .colorType(request.getColorType())
                 .birthDate(request.getBirthDate())
                 .imageUrl(request.getImageUrl())
-                .role(request.getRole())
                 .build();
 
         Long id = memberService.createMember(createMemberRequest);
