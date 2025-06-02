@@ -9,6 +9,7 @@ import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
-//        Member member = memberService.getMember(memberId);
+        Member member = memberService.getMemberEntityById(memberId);
         return postService.createPost(createPostRequest, memberId);
     }
 
@@ -43,7 +44,7 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     private void checkPermission(Long postId, Long memberId) {
-        Post post = postService.getPostEntityById(postId);
+        Post post = postService.getValidPostEntityById(postId);
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
         }
@@ -51,8 +52,11 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public PostDetailResponse getPostDetail(Long postId, Long memberId) {
-        Post post = postService.getPostEntityById(postId);
-        boolean liked = postLikeService.hasLiked(memberId, postId);
+        Post post = postService.getValidPostEntityById(postId);
+        boolean liked = false;
+        if(memberId != null){
+            liked = postLikeService.hasLiked(memberId, postId);
+        }
         return PostDetailResponse.from(post, liked);
     }
 }

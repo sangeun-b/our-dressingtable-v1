@@ -4,6 +4,10 @@ import com.ourdressingtable.common.util.AuthorityUtil;
 import com.ourdressingtable.member.domain.Member;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.Status;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,40 +17,46 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
-    private final Member member;
+    private final Long memberId;
+    private final String email;
+    private final String password;
+    private final Role role;
+    private final Status status;
 
-    public CustomUserDetails(Member member) {
-        this.member = member;
+    @Builder
+    public CustomUserDetails(Long memberId, String email, String password, Role role, Status status) {
+        this.memberId = memberId;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.status = status;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtil.createAuthorities(member.getRole());
-    }
-
-    public String getEmail() {
-        return member.getEmail();
+        return AuthorityUtil.createAuthorities(role);
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return status != Status.WITHDRAWAL;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return status != Status.LOCK;
     }
+
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -54,7 +64,29 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return status == Status.ACTIVATE;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomUserDetails that = (CustomUserDetails) o;
+        return Objects.equals(email,that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email);
+    }
+
+    public static CustomUserDetails from(Member member) {
+        return CustomUserDetails.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .role(member.getRole())
+                .status(member.getStatus())
+                .build();
+    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 public interface PostService {
     Long createPost(CreatePostRequest request, Long memberId);
     List<Post> getPosts();
-    void deletePost(Long id);
+    void deletePost(Long postI);
     void updatePost(Long postId, UpdatePostRequest request);
     int countPosts();
     int countPostsByCategory(String category);
