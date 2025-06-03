@@ -21,9 +21,11 @@ public class CreatePostRequest {
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
+    @Schema(description = "카테고리", example = "1")
     @NotNull(message = "카테고리를 선택해주세요.")
     private Long communityCategoryId;
 
+    @Schema(description = "이미지", example = "imageUrl")
     private List<String> images;
 
     @Builder
