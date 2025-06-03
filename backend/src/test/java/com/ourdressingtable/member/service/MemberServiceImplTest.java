@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +39,9 @@ public class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @Nested
     @DisplayName("회원 가입 테스트")
     class singUp {
@@ -45,16 +49,13 @@ public class MemberServiceImplTest {
         @Test
         public void createMember_shouldReturnSuccess() {
             // given
-            CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
-                    .email("member1@gmail.com")
-                    .password("Password123!")
-                    .name("member1")
-                    .nickname("me")
-                    .phoneNumber("010-1234-5678")
-                    .build();
+            CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
+
             String encodedPassword = "password";
             Member member = createMemberRequest.toEntity(encodedPassword);
             ReflectionTestUtils.setField(member,"id",1L);
+
+            when(passwordEncoder.encode(createMemberRequest.getPassword())).thenReturn(encodedPassword);
             when(memberRepository.save(any(Member.class))).thenReturn(member);
 
             // when
@@ -70,13 +71,7 @@ public class MemberServiceImplTest {
         @Test
         public void createMember_withDuplicateEmail_shouldReturnError() {
             // given
-            CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
-                    .email("member1@gmail.com")
-                    .password("Password123!")
-                    .name("member1")
-                    .nickname("me")
-                    .phoneNumber("010-1234-5678")
-                    .build();
+            CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
 
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
 
@@ -96,19 +91,12 @@ public class MemberServiceImplTest {
         @Test
         public void findMember_ShouldReturnSuccess() {
             // given
-            Member member = Member.builder()
-                    .id(1L)
-                    .email("member1@gmail.com")
-                    .password("Password123!")
-                    .name("member1")
-                    .nickname("me")
-                    .phoneNumber("010-1234-5678")
-                    .build();
+            Member member = TestDataFactory.testMember(1L);
 
             given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
 
             // when
-            OtherMemberResponse findMember = memberServiceImpl.getMember(member.getId());
+            OtherMemberResponse findMember = memberServiceImpl.getOtherMember(member.getId());
 
             //then
             assertEquals(findMember.getNickname(),member.getNickname());
@@ -119,18 +107,11 @@ public class MemberServiceImplTest {
         @Test
         public void findMember_ShouldReturnUserNotFoundError() {
             // given
-            Member member = Member.builder()
-                    .id(1L)
-                    .email("member1@gmail.com")
-                    .password("Password123!")
-                    .name("member1")
-                    .nickname("me")
-                    .phoneNumber("010-1234-5678")
-                    .build();
+            Member member = TestDataFactory.testMember(1L);
             given(memberRepository.findById(member.getId())).willReturn(Optional.empty());
 
             // when
-            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.getMember(member.getId()));
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.getOtherMember(member.getId()));
 
             //then
             assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
@@ -146,18 +127,9 @@ public class MemberServiceImplTest {
         @Test
         public void updateMember_ShouldReturnSuccess() {
             // given
-            Member member = Member.builder()
-                    .id(1L)
-                    .email("member1@gmail.com")
-                    .password("Password123!")
-                    .name("member1")
-                    .nickname("me")
-                    .phoneNumber("010-1234-5678")
-                    .build();
+            Member member = TestDataFactory.testMember(1L);
 
-            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
-                    .nickname("new me")
-                    .build();
+            UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
             when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
@@ -176,9 +148,7 @@ public class MemberServiceImplTest {
             // given
             Long memberId = 9999L;
 
-            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
-                    .nickname("new me")
-                    .build();
+            UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
             given(memberRepository.findById(memberId)).willReturn(Optional.empty());
 

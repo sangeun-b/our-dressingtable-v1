@@ -96,6 +96,18 @@ public class Member extends BaseTimeEntity {
         this.imageUrl = getOrDefault(updateMemberRequest.getImageUrl(),this.imageUrl);
     }
 
+    public void withdraw() {
+        this.status = Status.WITHDRAWAL;
+    }
+
+    public void block() {
+        this.status = Status.BLOCK;
+    }
+
+    public void active() {
+        this.status = Status.ACTIVATE;
+    }
+
     private String getOrDefault(String newValue, String currentValue) {
         return (newValue == null || newValue.isBlank()) ? currentValue : newValue;
     }

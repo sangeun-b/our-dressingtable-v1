@@ -17,8 +17,10 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "M006",
             "비밀번호는 최소 8자 이상, 알파벳 대/소문자, 숫자, 특수문자를 포함해야 합니다."),
     MEMBER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "M007", "활동 불가 회원입니다."),
+    ALREADY_WITHDRAW_OR_BLOCKED(HttpStatus.BAD_REQUEST, "M008", "이미 탈퇴 또는 차단된 회원입니다."),
 
     // 인증/인가 관련
+
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
 

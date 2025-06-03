@@ -34,7 +34,7 @@ dependencies {
 	testImplementation ('org.springframework.boot:spring-boot-starter-test'){
 		runtimeOnly 'com.h2database:h2'
 	}
-//	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'ch.qos.logback:logback-classic:1.5.6'
 	implementation 'ch.qos.logback:logback-core:1.5.6'
