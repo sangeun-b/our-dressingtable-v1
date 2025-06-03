@@ -1,5 +1,6 @@
 package com.ourdressingtable.security.auth;
 
+import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return memberRepository.findByEmail(email)
-                .map(CustomUserDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        "User Not Found with email : " + email));
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
+        return CustomUserDetails.from(member);
     }
 }

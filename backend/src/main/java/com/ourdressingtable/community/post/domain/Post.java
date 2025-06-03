@@ -14,6 +14,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +109,11 @@ public class Post extends BaseTimeEntity {
     public void decreaseLike() {
         if(this.likeCount > 0)
             this.likeCount--;
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+        this.deletedAt = Timestamp.valueOf(LocalDateTime.now());
     }
 //    @PreRemove
 //    public void onSoftDelete() {

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +32,12 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Long createPost(CreatePostRequest request, Long memberId) {
         CommunityCategory communityCategory = communityCategoryService.getCategoryEntityById(request.getCommunityCategoryId());
-        // TODO: member 조회 변경 필요, Entity 조회 method 추가하기
-//        Member member = memberService.getMemberEntityById(memberId);
+        Member member = memberService.getMemberEntityById(memberId);
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
                 .communityCategory(communityCategory)
-                .member(Member.builder().id(memberId).build())
+                .member(member)
                 .build();
         postRepository.save(post);
         return post.getId();
@@ -45,21 +45,21 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getPosts() {
-        return List.of();
+        return postRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Override
     public void deletePost(Long postId) {
-        Post post = getPostEntityById(postId);
+        Post post = getValidPostEntityById(postId);
 
-        postRepository.delete(post);
+        post.markAsDeleted();
 
     }
 
     @Override
     @Transactional
     public void updatePost(Long postId, UpdatePostRequest request) {
-        Post post = getPostEntityById(postId);
+        Post post = getValidPostEntityById(postId);
 
         if (request.getTitle() != null)
             post.updateTitle(request.getTitle());

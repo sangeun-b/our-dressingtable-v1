@@ -44,7 +44,7 @@ public class PostDetailResponse {
     private Timestamp createdAt;
 
     @Builder
-    public PostDetailResponse(Long id, String title, String content, String categoryName, String images, int viewCount, int postLikes, boolean likedByCurrentMember, String memberName, Timestamp createdAt) {
+    public PostDetailResponse(Long id, String title, String content, String categoryName, int viewCount, int postLikes, boolean likedByCurrentMember, String memberName, Timestamp createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;

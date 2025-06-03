@@ -7,7 +7,6 @@ import com.ourdressingtable.community.post.controller.PostLikeController;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,7 @@ public class PostLikeControllerTest {
             // given
             Post post = Post.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            given(postLikeService.postLike(post.getId(), member.getId())).willReturn(true);
+            given(postLikeService.toggleLike(post.getId(), member.getId())).willReturn(true);
 
             // when & then
             mockMvc.perform(post("/api/posts/{postId}/like", post.getId())
@@ -62,7 +61,7 @@ public class PostLikeControllerTest {
         @Test
         public void createPostLike_ReturnFailure() throws Exception {
             doThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE))
-                    .when(postLikeService).postLike(eq(1L), eq(1L));
+                    .when(postLikeService).toggleLike(eq(1L), eq(1L));
             Long postId = 1L;
             Long memberId = 1L;
             mockMvc.perform(post("/api/posts/{postId}/like", postId)
