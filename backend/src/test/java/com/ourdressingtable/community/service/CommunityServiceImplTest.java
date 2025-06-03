@@ -1,5 +1,7 @@
 package com.ourdressingtable.community.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
@@ -9,6 +11,7 @@ import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,9 @@ public class CommunityServiceImplTest {
     @Mock
     private CommunityCategoryService communityCategoryService;
 
+    @Mock
+    private MemberService memberService;
+
     @Nested
     @DisplayName("게시글 작성 테스트")
     class createPost {
@@ -46,13 +52,13 @@ public class CommunityServiceImplTest {
         @Test
         public void createPosts_shouldReturnSuccess() {
             // given
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .communityCategoryId(1L)
-                    .build();
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
+
             CommunityCategory category = CommunityCategory.builder().id(1L).name("자유").build();
-            Member member = Member.builder().id(1L).name("이름").build();
+
+            Member member = TestDataFactory.testMember(1L);
+            given(memberService.getActiveMemberEntityById(member.getId())).willReturn(member);
+
 
             given(communityCategoryService.getCategoryById(1L)).willReturn(CommunityCategoryResponse.from(category));
             given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
@@ -69,23 +75,12 @@ public class CommunityServiceImplTest {
         @Test
         public void createPosts_shouldReturnError() {
             // given
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .communityCategoryId(1L)
-                    .build();
-            CommunityCategory category = CommunityCategory.builder().id(1L).name("자유").build();
-            Member member = Member.builder().id(1L).name("이름").build();
+            Long invalidMemberId = 999L;
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
 
-            given(communityCategoryService.getCategoryById(1L)).willReturn(CommunityCategoryResponse.from(category));
-            given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
-
-            // when
-            Long postId = communityService.createPost(createPostRequest,member.getId());
-
-            // then
-            assertEquals(123L, postId);
-            then(postService).should().createPost(createPostRequest,1L);
+            given(memberService.getActiveMemberEntityById(invalidMemberId)).willReturn(null);
+            // when & then
+            assertThrows(OurDressingTableException.class, () -> communityService.createPost(createPostRequest, invalidMemberId));
         }
 
     }
@@ -97,11 +92,13 @@ public class CommunityServiceImplTest {
         @Test
         public void updatePost_shouldReturnSuccess() {
             // given
-            Member member = Member.builder().id(1L).name("이름").build();
-            Post post = Post.builder().id(1L).title("기존").content("내용").member(member).build();
-            UpdatePostRequest updatePostRequest = UpdatePostRequest.builder().title("수정").content("변경").build();
+            Member member = TestDataFactory.testMember(1L);
 
-            given(postService.getPostEntityById(1L)).willReturn(post);
+            Post post = TestDataFactory.testPost(1L, member);
+
+            UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
+
+            given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             // when
             communityService.updatePost(1L, 1L, updatePostRequest);
@@ -116,14 +113,16 @@ public class CommunityServiceImplTest {
         @Test
         public void updatePost_shouldReturnError() {
             // given
-            Post post = Post.builder().id(1L).title("기존").content("내용").member(Member.builder().id(2L).build()).build();
-            UpdatePostRequest updatePostRequest = UpdatePostRequest.builder().title("수정").content("변경").build();
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L, member);
 
-            given(postService.getPostEntityById(1L)).willReturn(post);
+            UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
+
+            given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             // when & then
             assertThrows(OurDressingTableException.class, () -> {
-                communityService.updatePost(1L, 1L, updatePostRequest);
+                communityService.updatePost(1L, 2L, updatePostRequest);
             });
         }
     }
@@ -135,12 +134,10 @@ public class CommunityServiceImplTest {
         @Test
         public void deletePost_shouldReturnSuccess() {
             // given
-            Post post = Post.builder()
-                    .id(1L)
-                    .member(Member.builder().id(1L).build())
-                    .build();
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L, member);
 
-            given(postService.getPostEntityById(1L)).willReturn(post);
+            given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             // when
             communityService.deletePost(1L,1L);
@@ -152,16 +149,16 @@ public class CommunityServiceImplTest {
         @DisplayName("게시글 삭제 실패 - 작성자 불일치")
         @Test
         public void deletePost_shouldReturnNoPermissionError () {
-            Post post = Post.builder()
-                    .id(1L)
-                    .member(Member.builder().id(99L).build())
-                    .build();
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L, member);
 
-            given(postService.getPostEntityById(1L)).willReturn(post);
+            given(postService.getValidPostEntityById(1L)).willReturn(post);
 
-            assertThrows(OurDressingTableException.class, () -> {
-                communityService.deletePost(1L, 1L);
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> {
+                communityService.deletePost(1L, 2L);
             });
+
+            assertEquals(ErrorCode.NO_PERMISSION_TO_EDIT.getCode(), exception.getCode());
         }
     }
 

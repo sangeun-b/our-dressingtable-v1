@@ -27,7 +27,10 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
-        Member member = memberService.getMemberEntityById(memberId);
+        Member member = memberService.getActiveMemberEntityById(memberId);
+        if(member == null) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
+        }
         return postService.createPost(createPostRequest, memberId);
     }
 

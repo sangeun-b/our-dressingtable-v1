@@ -32,7 +32,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Long createPost(CreatePostRequest request, Long memberId) {
         CommunityCategory communityCategory = communityCategoryService.getCategoryEntityById(request.getCommunityCategoryId());
-        Member member = memberService.getMemberEntityById(memberId);
+        Member member = memberService.getActiveMemberEntityById(memberId);
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())

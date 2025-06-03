@@ -1,6 +1,8 @@
 package com.ourdressingtable.community.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.common.security.WithCustomUser;
+import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.controller.PostController;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
@@ -8,6 +10,10 @@ import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.Status;
+import com.ourdressingtable.security.dto.CustomUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,11 +31,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = PostController.class)
@@ -52,20 +61,18 @@ public class PostControllerTest {
     class createPost {
 
         @DisplayName("게시글 작성 - 성공")
+        @WithCustomUser
         @Test
         public void createPost_withValidData_ReturnSuccess() throws Exception {
             // given
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .communityCategoryId(1L)
-                    .build();
-            given(postService.createPost(any(),eq(1L))).willReturn(100L);
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
+            given(communityService.createPost(any(),eq(1L))).willReturn(100L);
 
             // when & then
             mockMvc.perform(post("/api/posts")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPostRequest)))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createPostRequest)))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(header().string(HttpHeaders.LOCATION, "/api/posts/100"))
@@ -73,20 +80,19 @@ public class PostControllerTest {
         }
 
         @DisplayName("게시글 작성 - 실패")
+        @WithCustomUser(status = Status.BLOCK)
         @Test
         public void createPost_withInvalidMember_ReturnError() throws Exception {
             // given
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .build();
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
 
-            given(postService.createPost(any(),eq(1L))).willThrow(new RuntimeException("<UNK>"));
+            given(communityService.createPost(any(),eq(1L))).willThrow(new OurDressingTableException(ErrorCode.FORBIDDEN));
 
             mockMvc.perform(post("/api/posts")
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createPostRequest)))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isForbidden());
 
         }
     }
@@ -95,34 +101,29 @@ public class PostControllerTest {
     @DisplayName("게시글 수정 테스트")
     class updatePost {
         @DisplayName("게시글 수정 성공")
+        @WithCustomUser
         @Test
         public void updatePost_withValidData_ReturnSuccess() throws Exception {
-            UpdatePostRequest updatePostRequest = UpdatePostRequest.builder()
-                    .title("수정제목")
-                    .content("수정내용")
-                    .communityCategoryId(2L)
-                    .build();
+            UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
             mockMvc.perform(patch("/api/posts/1")
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatePostRequest)))
                     .andExpect(status().isNoContent());
         }
 
-        // TODO: 회원 인증 후 수정 필요
         @DisplayName("게시글 수정 실패 - 작성자 불일치")
+        @WithCustomUser(memberId = 2L)
         @Test
         public void updatePost_withInvalidMember_ReturnError() throws Exception {
-            UpdatePostRequest updatePostRequest = UpdatePostRequest.builder()
-                    .title("수정제목")
-                    .content("수정내용")
-                    .communityCategoryId(2L)
-                    .build();
+            UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
             doThrow(new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT))
-                    .when(communityService).updatePost(eq(1L), eq(1L), eq(updatePostRequest));
+                    .when(communityService).updatePost(eq(1L), eq(2L), eq(updatePostRequest));
 
             mockMvc.perform(patch("/api/posts/1")
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatePostRequest)))
                     .andExpect(status().isForbidden());
@@ -131,25 +132,27 @@ public class PostControllerTest {
 
     @Nested
     @DisplayName("게시글 삭제 테스트")
+    @WithCustomUser
     class deletePost {
         @DisplayName("게시글 삭제 - 성공")
         @Test
         public void deletePost_withValidData_ReturnSuccess() throws Exception {
 
-            mockMvc.perform(delete("/api/posts/1"))
+            mockMvc.perform(delete("/api/posts/1")
+                    .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(communityService).deletePost(1L,1L);
         }
 
-        // TODO: 회원 인증 후 수정 필요
         @DisplayName("게시글 삭제 - 실패")
         @Test
         public void deletePost_withInvalidMember_ReturnError() throws Exception {
             doThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND))
                     .when(communityService).deletePost(eq(1L),eq(1L));
 
-            mockMvc.perform(delete("/api/posts/1"))
+            mockMvc.perform(delete("/api/posts/1")
+                    .with(csrf()))
                     .andExpect(status().isNotFound());
         }
     }

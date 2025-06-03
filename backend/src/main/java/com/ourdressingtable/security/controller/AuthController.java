@@ -3,6 +3,7 @@ package com.ourdressingtable.security.controller;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.repository.MemberRepository;
+import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
 import com.ourdressingtable.security.dto.CustomUserDetails;
@@ -32,7 +33,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final RedisTokenService redisTokenService;
 
     @PostMapping("/login")
@@ -40,7 +41,7 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+        Member member = memberService.getActiveMemberEntityByEmail(request.getEmail());
 
         String accessToken = jwtTokenProvider.createAccessToken(
                 member.getEmail(), member.getRole());
@@ -66,7 +67,7 @@ public class AuthController {
 
         if(!isValid) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        Member member = memberRepository.findByEmail(email).orElseThrow();
+        Member member = memberService.getActiveMemberEntityByEmail(email);
 
         String newAccessToken = jwtTokenProvider.createAccessToken(email, member.getRole());
         String newRefreshToken = jwtTokenProvider.createRefreshToken(email, member.getRole());
@@ -78,7 +79,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Member member = userDetails.getMember();
+        Member member = memberService.getActiveMemberEntityById(userDetails.getMemberId());
         MemberResponse response = MemberResponse.builder()
                 .name(member.getName())
                 .email(member.getEmail())

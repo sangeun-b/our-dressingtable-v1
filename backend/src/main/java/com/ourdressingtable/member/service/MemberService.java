@@ -9,10 +9,11 @@ import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 
 public interface MemberService {
     Long createMember(CreateMemberRequest createMemberRequest);
-    OtherMemberResponse getMember(Long id);
+    OtherMemberResponse getOtherMember(Long id);
     void updateMember(Long id, UpdateMemberRequest updateMemberRequest);
     void deleteMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest );
     Long createWithdrawalMember(WithdrawalMemberRequest withdrawalMemberRequest, Member member);
     Member getMemberEntityById(Long id);
     Member getActiveMemberEntityById(Long id);
+    Member getActiveMemberEntityByEmail(String email);
 }

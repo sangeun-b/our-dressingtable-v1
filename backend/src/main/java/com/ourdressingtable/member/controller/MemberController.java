@@ -1,5 +1,7 @@
 package com.ourdressingtable.member.controller;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.CreateMemberResponse;
 import com.ourdressingtable.member.dto.MemberResponse;
@@ -8,6 +10,7 @@ import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberResponse;
 import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.security.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.sql.Update;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -55,25 +59,31 @@ public class MemberController {
     }
 
     // 다른 회원 프로필 조회
-    @GetMapping("/{userId}")
+    @GetMapping("/{memberId}")
     @Operation(summary = "다른 회원 조회", description = "다른 회원의 프로필을 조회합니다.")
-    public ResponseEntity<OtherMemberResponse> getMember(@PathVariable("userId") Long userId) {
-        OtherMemberResponse otherMemberResponse = memberService.getMember(userId);
+    public ResponseEntity<OtherMemberResponse> getOtherMember(@PathVariable("memberId") Long memberId) {
+        OtherMemberResponse otherMemberResponse = memberService.getOtherMember(memberId);
         return ResponseEntity.ok(otherMemberResponse);
 
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping("/{memberId}")
     @Operation(summary = "회원 수정", description = "회원 정보를 수정합니다.")
-    public ResponseEntity updateMember(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
-        memberService.updateMember(userId, updateMemberRequest);
+    public ResponseEntity updateMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if(!memberId.equals(customUserDetails.getMemberId())) {
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+        memberService.updateMember(memberId, updateMemberRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/{memberId}")
     @Operation(summary = "회원 삭제", description = "회원을 삭제합니다.")
-    public ResponseEntity deleteMember(@PathVariable("userId") Long userId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
-        memberService.deleteMember(userId, withdrawalMemberRequest);
+    public ResponseEntity deleteMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if(!memberId.equals(customUserDetails.getMemberId())) {
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+        memberService.deleteMember(memberId, withdrawalMemberRequest);
         return ResponseEntity.noContent().build();
     }
 }

@@ -8,6 +8,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
+import com.ourdressingtable.common.security.WithCustomUser;
+import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
@@ -55,15 +57,15 @@ public class PostServiceImplTest {
         @Test
         public void createPost_shouldReturnSuccess() {
             // given
-            Long memberId = 1L;
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .build();
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
+
             CommunityCategory communityCategory = CommunityCategory.builder()
                     .id(10L)
                     .name("자유")
                     .build();
+
+            Member member = TestDataFactory.testMember(1L);
+            given(memberService.getMemberEntityById(member.getId())).willReturn(member);
 
             given(communityCategoryService.getCategoryEntityById(10L)).willReturn(communityCategory);
             given(postRepository.save(any(Post.class))).willAnswer(invocation -> {
@@ -73,7 +75,7 @@ public class PostServiceImplTest {
             });
 
             // when
-            Long postId = postService.createPost(createPostRequest, memberId);
+            Long postId = postService.createPost(createPostRequest, member.getId());
 
             // then
             assertEquals(100L, postId);
@@ -86,13 +88,11 @@ public class PostServiceImplTest {
         public void createPost_shouldReturnUserNotFoundError() {
             // given
             Long memberId = 999L;
-            CreatePostRequest createPostRequest = CreatePostRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .communityCategoryId(1L)
-                    .build();
+            CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
 
-            given(memberService.getMember(memberId)).willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+            given(memberService.getActiveMemberEntityById(memberId)).willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+
+            assertThrows(OurDressingTableException.class, () -> postService.createPost(createPostRequest, memberId));
         }
     }
     @Nested
@@ -101,12 +101,7 @@ public class PostServiceImplTest {
         @DisplayName("게시글 수정 성공")
         @Test
         public void updatePost_shouldReturnSuccess() {
-            Long postId = 2L;
-            UpdatePostRequest updatePostRequest = UpdatePostRequest.builder()
-                    .title("새로운")
-                    .content("업데이트")
-                    .communityCategoryId(20L)
-                    .build();
+            UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
             Post post = Post.builder()
                     .title("기존")
@@ -114,19 +109,20 @@ public class PostServiceImplTest {
                     .member(Member.builder().id(1L).build())
                     .communityCategory(CommunityCategory.builder().id(10L).name("자유").build())
                     .build();
+            ReflectionTestUtils.setField(post, "id", 1L);
 
-            CommunityCategory newCategory = CommunityCategory.builder().id(20L).name("기타").build();
+            CommunityCategory newCategory = CommunityCategory.builder().id(2L).name("기타").build();
 
-            given(communityCategoryService.getCategoryEntityById(20L)).willReturn(newCategory);
-            given(postRepository.findById(postId)).willReturn(Optional.of(post));
+            given(communityCategoryService.getCategoryEntityById(2L)).willReturn(newCategory);
+            given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
             // when
-            postService.updatePost(postId, updatePostRequest);
+            postService.updatePost(1L, updatePostRequest);
 
             // then
-            assertEquals(20L, post.getCommunityCategory().getId());
-            assertEquals("새로운", post.getTitle());
-            assertEquals("업데이트", post.getContent());
+            assertEquals(2L, post.getCommunityCategory().getId());
+            assertEquals("수정 제목", post.getTitle());
+            assertEquals("수정 내용", post.getContent());
         }
 
         @DisplayName("게시글 수정 실패 - POST NOT FOUND")
@@ -150,7 +146,7 @@ public class PostServiceImplTest {
             Post post = Post.builder()
                     .id(1L)
                     .title("제목")
-                    .isDeleted(true)
+                    .isDeleted(false)
                     .member(Member.builder().id(1L).build())
                     .build();
 
@@ -161,7 +157,6 @@ public class PostServiceImplTest {
 
             // then
             assertThat(post.isDeleted()).isTrue();
-            verify(postRepository).delete(post);
         }
 
         @DisplayName("게시글 삭제 실패 - POST_NOT_FOUND")
