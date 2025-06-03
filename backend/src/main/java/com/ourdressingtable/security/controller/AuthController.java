@@ -11,6 +11,7 @@ import com.ourdressingtable.security.dto.LoginRequest;
 import com.ourdressingtable.security.dto.LoginResponse;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import com.ourdressingtable.security.dto.TokenResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class AuthController {
     private final RedisTokenService redisTokenService;
 
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "로그인을 합니다.")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -55,6 +57,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "refresh token 재발급", description = "refresh token 재발급합니다.")
     public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request, HttpServletRequest httpServletRequest) {
         String token = request.getRefreshToken();
 
@@ -77,24 +80,8 @@ public class AuthController {
         return ResponseEntity.ok(TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Member member = memberService.getActiveMemberEntityById(userDetails.getMemberId());
-        MemberResponse response = MemberResponse.builder()
-                .name(member.getName())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .imageUrl(member.getImageUrl())
-                .phoneNumber(member.getPhoneNumber())
-                .skinType(member.getSkinType())
-                .colorType(member.getColorType())
-                .birthDate(member.getBirthDate())
-                .role(member.getRole().getAuth())
-                .build();
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃을 합니다.")
     public ResponseEntity logout(HttpServletRequest httpServletRequest) {
         log.info("[logout] 호출");
         String token = jwtTokenProvider.resolveToken(httpServletRequest);

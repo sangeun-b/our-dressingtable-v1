@@ -26,6 +26,7 @@ public class CommunityServiceImpl implements CommunityService {
     private final PostLikeService postLikeService;
 
     @Override
+    @Transactional
     public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
         Member member = memberService.getActiveMemberEntityById(memberId);
         if(member == null) {
@@ -35,12 +36,14 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    @Transactional
     public void updatePost(Long postId, Long memberId, UpdatePostRequest updatePostRequest) {
         checkPermission(postId, memberId);
         postService.updatePost(postId, updatePostRequest);
     }
 
     @Override
+    @Transactional
     public void deletePost(Long postId, Long memberId) {
         checkPermission(postId, memberId);
         postService.deletePost(postId);
@@ -58,7 +61,7 @@ public class CommunityServiceImpl implements CommunityService {
         Post post = postService.getValidPostEntityById(postId);
         boolean liked = false;
         if(memberId != null){
-            liked = postLikeService.hasLiked(memberId, postId);
+            liked = postLikeService.hasLiked(postId, memberId);
         }
         return PostDetailResponse.from(post, liked);
     }

@@ -12,6 +12,7 @@ import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.member.service.WithdrawalMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final WithdrawalMemberRepository withdrawalMemberRepository;
+    private final WithdrawalMemberService withdrawalMemberService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -37,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
         String encodedPassword = passwordEncoder.encode(createMemberRequest.getPassword());
 
         Member member = memberRepository.save(createMemberRequest.toEntity(encodedPassword));
+        member.active();
         return member.getId();
     }
 
@@ -56,23 +58,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void deleteMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest) {
+    public void withdrawMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-        Long newId = createWithdrawalMember(withdrawalMemberRequest, member);
-        if(newId != null) {
-            memberRepository.delete(member);
+
+        if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
+            throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
         }
+
+        member.withdraw();
+
+        withdrawalMemberService.createWithdrawalMember(withdrawalMemberRequest, member);
+
     }
 
-    @Override
-    @Transactional
-    public Long createWithdrawalMember(WithdrawalMemberRequest withdrawalMemberRequest, Member member) {
-        boolean isBlock = member.getStatus() == Status.BLOCK;
-
-        WithdrawalMember withdrawalMember = WithdrawalMember.from(member, withdrawalMemberRequest, isBlock);
-        withdrawalMemberRepository.save(withdrawalMember);
-        return withdrawalMember.getId();
-    }
 
     @Override
     public Member getMemberEntityById(Long id) {
@@ -100,7 +98,4 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
-    private void checkMember(Long memberId) {
-
-    }
 }
