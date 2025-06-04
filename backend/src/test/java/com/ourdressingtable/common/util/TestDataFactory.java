@@ -2,6 +2,7 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
@@ -12,6 +13,8 @@ import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
+
+import java.sql.Timestamp;
 
 public class TestDataFactory {
 
@@ -56,6 +59,20 @@ public class TestDataFactory {
                 .title("수정 제목")
                 .content("수정 내용")
                 .communityCategoryId(2L)
+                .build();
+    }
+
+    public static PostDetailResponse testPostDetailResponse() {
+        return PostDetailResponse.builder()
+                .id(1L)
+                .title("제목")
+                .content("내용")
+                .categoryName("후기")
+                .viewCount(10)
+                .postLikes(5)
+                .likedByCurrentMember(true)
+                .memberName("사용자1")
+                .createdAt(new Timestamp(System.currentTimeMillis()))
                 .build();
     }
 

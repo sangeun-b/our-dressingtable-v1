@@ -1,6 +1,7 @@
 package com.ourdressingtable.community.domain.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -166,6 +167,36 @@ public class PostServiceImplTest {
 
             assertThrows(OurDressingTableException.class, () -> postService.deletePost(1L));
 
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 ENTITY 조회 테스트")
+    class getPost {
+        @DisplayName("게시글 ENTITY 조회 - 성공")
+        @Test
+        public void getPost_shouldReturnSuccess() {
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L,member);
+
+            given(memberService.getMemberEntityById(member.getId())).willReturn(member);
+            given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+            Post result = postService.getValidPostEntityById(1L);
+
+            assertEquals(post, result);
+
+        }
+        @DisplayName("게시글 ENTITY 조회 실패 - 삭제된 게시글")
+        @Test
+        public void getPost_shouldReturnPostNotFoundError() {
+             Post post = TestDataFactory.testPost(1L,TestDataFactory.testMember(1L));
+             post.markAsDeleted();
+
+             given(postRepository.findById(1L)).willReturn(Optional.of(post));
+
+             assertThatThrownBy(() ->postService.getValidPostEntityById(1L)).isInstanceOf(OurDressingTableException.class)
+                     .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
         }
     }
 
