@@ -5,13 +5,11 @@ import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
-import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
-import com.ourdressingtable.member.domain.SkinType;
-import com.ourdressingtable.member.domain.Status;
+import com.ourdressingtable.member.domain.*;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 
 import java.sql.Timestamp;
@@ -22,9 +20,17 @@ public class TestDataFactory {
         return Member.builder()
                 .id(id)
                 .email("test@example.com")
+                .phoneNumber("010-1234-5678")
                 .build();
     }
 
+    public static Member testMemberWithEmailNull(Long id) {
+        return Member.builder()
+                .id(id)
+                .email(null)
+                .phoneNumber("010-1234-5678")
+                .build();
+    }
     public static CreateMemberRequest testCreateMemberRequest() {
         return CreateMemberRequest.builder()
                 .email("member1@gmail.com")
@@ -43,6 +49,13 @@ public class TestDataFactory {
         return OtherMemberResponse.builder()
                 .nickname("me")
                 .skinType(SkinType.OILY_SKIN)
+                .build();
+    }
+
+    public static WithdrawalMemberRequest testWithdrawalMemberRequest() {
+        return WithdrawalMemberRequest.builder()
+                .reason("재가입 예정")
+                .isBlock(false)
                 .build();
     }
 

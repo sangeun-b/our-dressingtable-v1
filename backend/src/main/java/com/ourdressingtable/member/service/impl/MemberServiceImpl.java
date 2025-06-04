@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void withdrawMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+        Memberrrr member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
         if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
             throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
@@ -82,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
         if(!member.getStatus().equals(Status.ACTIVATE)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
 
         }
         return member;
@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
     public Member getActiveMemberEntityByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
         if(!member.getStatus().equals(Status.ACTIVATE)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
         }
         return member;
 

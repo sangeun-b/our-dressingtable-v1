@@ -5,15 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import java.util.Optional;
@@ -34,13 +37,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class MemberServiceImplTest {
 
     @InjectMocks
-    private MemberServiceImpl memberServiceImpl;
+    private MemberServiceImpl memberService;
 
     @Mock
     private MemberRepository memberRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private WithdrawalMemberService withdrawalMemberService;
 
     @Nested
     @DisplayName("회원 가입 테스트")
@@ -59,7 +65,7 @@ public class MemberServiceImplTest {
             when(memberRepository.save(any(Member.class))).thenReturn(member);
 
             // when
-            Long savedId = memberServiceImpl.createMember(createMemberRequest);
+            Long savedId = memberService.createMember(createMemberRequest);
 
             //then
             assertNotNull(savedId);
@@ -76,7 +82,7 @@ public class MemberServiceImplTest {
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
 
             // when & then
-            OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.createMember(createMemberRequest));
+            OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
             assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_ALREADY_EXISTS.getHttpStatus());
             assertEquals(ourDressingTableException.getMessage(), ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
 
@@ -96,7 +102,7 @@ public class MemberServiceImplTest {
             given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
 
             // when
-            OtherMemberResponse findMember = memberServiceImpl.getOtherMember(member.getId());
+            OtherMemberResponse findMember = memberService.getOtherMember(member.getId());
 
             //then
             assertEquals(findMember.getNickname(),member.getNickname());
@@ -111,7 +117,7 @@ public class MemberServiceImplTest {
             given(memberRepository.findById(member.getId())).willReturn(Optional.empty());
 
             // when
-            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.getOtherMember(member.getId()));
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberService.getOtherMember(member.getId()));
 
             //then
             assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
@@ -134,7 +140,7 @@ public class MemberServiceImplTest {
             when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
             // when
-            memberServiceImpl.updateMember(member.getId(),updateMemberRequest);
+            memberService.updateMember(member.getId(),updateMemberRequest);
 
             //then
             assertEquals(member.getNickname(),"new me");
@@ -153,10 +159,53 @@ public class MemberServiceImplTest {
             given(memberRepository.findById(memberId)).willReturn(Optional.empty());
 
             // when
-            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberServiceImpl.updateMember(memberId,updateMemberRequest));
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberService.updateMember(memberId,updateMemberRequest));
 
             //then
             assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
+
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 삭제 테스트")
+    class deleteUser {
+
+        @DisplayName("회원 삭제 성공")
+        @Test
+        public void deleteMember_ShouldReturnSuccess() {
+            // given
+            Member member = TestDataFactory.testMember(1L);
+
+            WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
+
+            given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+
+            // when
+            memberService.withdrawMember(member.getId(),withdrawalMemberRequest);
+
+            //then
+            assertEquals(Status.WITHDRAWAL, member.getStatus());
+            verify(withdrawalMemberService).createWithdrawalMember(withdrawalMemberRequest, member);
+
+
+        }
+
+        @DisplayName("회원 삭제 실패 - 이미 탈퇴한 회원")
+        @Test
+        public void updateMember_ShouldReturnUserNotFoundError() {
+            // given
+            Long memberId = 2L;
+            Member member = TestDataFactory.testMember(2L);
+            member.withdraw();
+
+            WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+            assertThrows(OurDressingTableException.class, () -> {
+                memberService.withdrawMember(memberId,withdrawalMemberRequest);
+            });
+
 
         }
     }
