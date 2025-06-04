@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void withdrawMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest) {
-        Memberrrr member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
         if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
             throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
