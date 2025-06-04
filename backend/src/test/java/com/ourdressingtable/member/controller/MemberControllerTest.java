@@ -112,7 +112,7 @@ public class MemberControllerTest {
             when(memberService.getOtherMember(1L)).thenReturn(otherMemberResponse);
             //then
             mockMvc.perform(MockMvcRequestBuilders.get("/api/members/1")
-                    .with(csrf())).andExpect(status().isOk()).andDo(print());
+                    .with(csrf())).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$.nickname").value("me"));
 
         }
 
