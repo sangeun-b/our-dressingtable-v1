@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.controller.PostController;
+import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
@@ -32,9 +34,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -146,6 +146,7 @@ public class PostControllerTest {
         }
 
         @DisplayName("게시글 삭제 - 실패")
+        @WithCustomUser
         @Test
         public void deletePost_withInvalidMember_ReturnError() throws Exception {
             doThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND))
@@ -154,6 +155,47 @@ public class PostControllerTest {
             mockMvc.perform(delete("/api/posts/1")
                     .with(csrf()))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 단건 조회 테스트")
+    class getPost {
+        @DisplayName("게시글 조회 - 성공")
+        @WithCustomUser
+        @Test
+        public void getPost_withValidData_ReturnSuccess() throws Exception {
+            // given
+            Long postId = 1L;
+            Long memberId = 1L;
+
+            PostDetailResponse postDetailResponse = TestDataFactory.testPostDetailResponse();
+
+            given(communityService.getPostDetail(eq(postId), eq(memberId))).willReturn(postDetailResponse);
+
+            // when & then
+            mockMvc.perform(get("/api/posts/1")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("제목"))
+            .andDo(print());
+
+        }
+        @DisplayName("게시글 조회 - 실패")
+        @WithCustomUser
+        @Test
+        public void getPost_withInvalidPost_ReturnError() throws Exception {
+            Long postId = 999L;
+            Long memberId = 1L;
+
+            given(communityService.getPostDetail(eq(postId), eq(memberId))).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+
+            mockMvc.perform(get("/api/posts/{postId}", postId)
+                    .with(csrf()))
+                    .andExpect(status().isNotFound())
+                    .andDo(print())
+                    .andExpect(jsonPath("$.message").value("게시글을 찾을 수 없습니다."));
+
         }
     }
 

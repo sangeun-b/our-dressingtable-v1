@@ -2,10 +2,9 @@ package com.ourdressingtable.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,6 +23,7 @@ import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
@@ -111,8 +111,8 @@ public class MemberControllerTest {
             //when
             when(memberService.getOtherMember(1L)).thenReturn(otherMemberResponse);
             //then
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/members/1")
-                    .with(csrf())).andExpect(status().isOk()).andDo(print());
+            mockMvc.perform(get("/api/members/1")
+                    .with(csrf())).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$.nickname").value("me"));
 
         }
 
@@ -125,7 +125,7 @@ public class MemberControllerTest {
                     ErrorCode.MEMBER_NOT_FOUND));
 
             // when & then
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/members/{id}", memberId).contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get("/api/members/{id}", memberId).contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
         }
     }
@@ -145,7 +145,7 @@ public class MemberControllerTest {
             doNothing().when(memberService).updateMember(memberId,updateMemberRequest);
 
             // then
-            mockMvc.perform(MockMvcRequestBuilders.patch("/api/members/{id}", memberId)
+            mockMvc.perform(patch("/api/members/{id}", memberId)
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateMemberRequest)))
                     .andExpect(status().isNoContent()).andDo(print());
@@ -164,7 +164,7 @@ public class MemberControllerTest {
                     .given(memberService).updateMember(memberId,updateMemberRequest);
 
             //then
-            mockMvc.perform(MockMvcRequestBuilders.patch("/api/members/{id}", memberId)
+            mockMvc.perform(patch("/api/members/{id}", memberId)
             .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateMemberRequest)))
@@ -176,6 +176,44 @@ public class MemberControllerTest {
 
     }
 
+    @Nested
+    @DisplayName("회원 삭제 테스트")
+    class deleteMember {
+        @DisplayName("회원 삭제 - 성공")
+        @WithCustomUser
+        @Test
+        public void deleteMember_shouldReturnSuccess() throws Exception {
+            // given
+            Long memberId = 1L;
+            WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
+
+            mockMvc.perform(delete("/api/members/{id}", memberId)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
+                    .andExpect(status().isNoContent()).andDo(print());
+
+            verify(memberService).withdrawMember(eq(memberId),any(WithdrawalMemberRequest.class));
+
+        };
+
+        @DisplayName("회원 삭제 실패 - 사용자 불일치")
+        @WithCustomUser
+        @Test
+        public void deleteMember_shouldReturnError () throws Exception{
+            Long targetMemberId = 2L;
+            WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
+
+            mockMvc.perform(delete("/api/members/{id}", targetMemberId)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN.getMessage()))
+                    .andDo(print());
+        }
+
+    }
 
 
 

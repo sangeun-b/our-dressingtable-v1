@@ -4,7 +4,9 @@ import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
@@ -22,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -44,6 +47,9 @@ public class CommunityServiceImplTest {
 
     @Mock
     private MemberService memberService;
+
+    @Mock
+    private PostLikeService postLikeService;
 
     @Nested
     @DisplayName("게시글 작성 테스트")
@@ -161,5 +167,37 @@ public class CommunityServiceImplTest {
             assertEquals(ErrorCode.NO_PERMISSION_TO_EDIT.getCode(), exception.getCode());
         }
     }
+
+    @Nested
+    @DisplayName("게시글 단건 조회 테스트")
+    class getPost {
+        @DisplayName("게시글 단건 조회 성공")
+        @Test
+        public void getPost_shouldReturnSuccess() {
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L, member);
+            boolean liked = true;
+
+            given(postService.getValidPostEntityById(1L)).willReturn(post);
+            given(postLikeService.hasLiked(post.getId(), member.getId())).willReturn(liked);
+
+            PostDetailResponse response = communityService.getPostDetail(post.getId(), member.getId());
+
+            assertEquals(post.getId(), response.getId());
+            assertEquals(post.getTitle(), response.getTitle());
+        }
+
+        @DisplayName("게시글 단건 조회 실패_")
+        @Test
+        public void getPost_shouldReturnError() {
+            Long postId = 999L;
+            given(postService.getValidPostEntityById(postId)).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+
+            assertThatThrownBy(() ->communityService.getPostDetail(postId,1L)).isInstanceOf(OurDressingTableException.class)
+                    .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
+
+        }
+    }
+
 
 }

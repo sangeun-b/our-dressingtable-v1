@@ -1,4 +1,6 @@
-package com.ourdressingtable.util;
+package com.ourdressingtable.common.util;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -7,6 +9,10 @@ import java.security.NoSuchAlgorithmException;
 public class HashUtil {
 
     public static String hash(String input) {
+        if(StringUtils.isBlank(input)) {
+            throw new IllegalArgumentException("Input cannot be blank or null");
+        }
+
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));

@@ -2,16 +2,17 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
-import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
-import com.ourdressingtable.member.domain.SkinType;
-import com.ourdressingtable.member.domain.Status;
+import com.ourdressingtable.member.domain.*;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
+
+import java.sql.Timestamp;
 
 public class TestDataFactory {
 
@@ -19,9 +20,17 @@ public class TestDataFactory {
         return Member.builder()
                 .id(id)
                 .email("test@example.com")
+                .phoneNumber("010-1234-5678")
                 .build();
     }
 
+    public static Member testMemberWithEmailNull(Long id) {
+        return Member.builder()
+                .id(id)
+                .email(null)
+                .phoneNumber("010-1234-5678")
+                .build();
+    }
     public static CreateMemberRequest testCreateMemberRequest() {
         return CreateMemberRequest.builder()
                 .email("member1@gmail.com")
@@ -43,6 +52,13 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static WithdrawalMemberRequest testWithdrawalMemberRequest() {
+        return WithdrawalMemberRequest.builder()
+                .reason("재가입 예정")
+                .isBlock(false)
+                .build();
+    }
+
     public static CreatePostRequest testCreatePostRequest() {
         return CreatePostRequest.builder()
                 .title("Test 제목")
@@ -56,6 +72,20 @@ public class TestDataFactory {
                 .title("수정 제목")
                 .content("수정 내용")
                 .communityCategoryId(2L)
+                .build();
+    }
+
+    public static PostDetailResponse testPostDetailResponse() {
+        return PostDetailResponse.builder()
+                .id(1L)
+                .title("제목")
+                .content("내용")
+                .categoryName("후기")
+                .viewCount(10)
+                .postLikes(5)
+                .likedByCurrentMember(true)
+                .memberName("사용자1")
+                .createdAt(new Timestamp(System.currentTimeMillis()))
                 .build();
     }
 

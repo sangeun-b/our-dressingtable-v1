@@ -82,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
         if(!member.getStatus().equals(Status.ACTIVATE)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
 
         }
         return member;
@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
     public Member getActiveMemberEntityByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
         if(!member.getStatus().equals(Status.ACTIVATE)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
         }
         return member;
 
