@@ -57,7 +57,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "refresh token 재발급", description = "refresh token 재발급합니다.")
+    @Operation(summary = "token 재발급", description = "refresh token과 access token을 재발급합니다.")
     public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request, HttpServletRequest httpServletRequest) {
         String token = request.getRefreshToken();
 

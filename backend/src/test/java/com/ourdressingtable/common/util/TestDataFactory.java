@@ -11,6 +11,9 @@ import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
+import com.ourdressingtable.security.dto.LoginRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 
@@ -20,6 +23,7 @@ public class TestDataFactory {
         return Member.builder()
                 .id(id)
                 .email("test@example.com")
+                .password("{noop}Password123!")
                 .phoneNumber("010-1234-5678")
                 .build();
     }
@@ -56,6 +60,13 @@ public class TestDataFactory {
         return WithdrawalMemberRequest.builder()
                 .reason("재가입 예정")
                 .isBlock(false)
+                .build();
+    }
+
+    public static LoginRequest testLoginRequest() {
+        return LoginRequest.builder()
+                .email("test@example.com")
+                .password("Password123!")
                 .build();
     }
 
