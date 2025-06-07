@@ -25,13 +25,13 @@ public class CreateCommentRequest {
     private Long postId;
 
     @Schema(description = "부모 댓글 ID(대댓글인 경우)", example = "2")
-    private int parentId;
+    private Long parentId;
 
     @Builder
-    public CreateCommentRequest(String content, Long postId, int depth) {
+    public CreateCommentRequest(String content, Long postId, Long parentId) {
         this.content = content;
         this.postId = postId;
-        this.parentId = depth;
+        this.parentId = parentId;
     }
 
 

@@ -1,5 +1,6 @@
 package com.ourdressingtable.community.comment.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
@@ -8,7 +9,9 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import com.ourdressingtable.common.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,24 +26,31 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Long createComment(CreateCommentRequest request, Long memberId) {
-        Member member = memberService.getActiveMemberEntityById(memberId);
+    public Long createComment(CreateCommentRequest request) {
+        CustomUserDetails member = SecurityUtil.getCurrentUser();
+        memberService.validateActiveMember(member);
+
+        Member validMember = Member.builder().id(member.getMemberId()).build();
         Post post = postService.getValidPostEntityById(request.getPostId());
 
         Comment parent = null;
         int depth = 0;
         if(request.getParentId() != null) {
-            parent = commentRepository.findById(request.getParentId()).orElseThrow(() -> new OurDressingTableException());
+            parent = commentRepository.findById(request.getParentId()).orElseThrow(() -> new OurDressingTableException(
+                    ErrorCode.COMMENT_NOT_FOUND));
             depth = parent.getDepth() + 1;
         }
 
         Comment comment = Comment.builder()
                 .content(request.getContent())
                 .depth(depth)
-                .member(member)
+                .member(validMember)
                 .post(post)
                 .parent(parent)
                 .build();
+
+        commentRepository.save(comment);
+        return comment.getId();
     }
 
 }
