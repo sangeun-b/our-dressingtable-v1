@@ -2,6 +2,7 @@ package com.ourdressingtable.member.controller;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.CreateMemberResponse;
@@ -68,8 +69,9 @@ public class MemberController {
 
     @PatchMapping("/{memberId}")
     @Operation(summary = "회원 수정", description = "회원 정보를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
-    public ResponseEntity updateMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if(!memberId.equals(customUserDetails.getMemberId())) {
+    public ResponseEntity updateMember(@PathVariable Long memberId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        if(!memberId.equals(currentMemberId)) {
             throw new OurDressingTableException(ErrorCode.FORBIDDEN);
         }
         memberService.updateMember(memberId, updateMemberRequest);
@@ -78,8 +80,9 @@ public class MemberController {
 
     @DeleteMapping("/{memberId}")
     @Operation(summary = "회원 삭제", description = "회원을 삭제합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity deleteMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if(!memberId.equals(customUserDetails.getMemberId())) {
+    public ResponseEntity deleteMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        if(!memberId.equals(currentMemberId)) {
             throw new OurDressingTableException(ErrorCode.FORBIDDEN);
         }
         memberService.withdrawMember(memberId, withdrawalMemberRequest);
@@ -88,8 +91,9 @@ public class MemberController {
 
     @GetMapping("/my-information")
     @Operation(summary = "내 정보 조회", description = "내 정보를 조회합니다.")
-    public ResponseEntity<?> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Member member = memberService.getActiveMemberEntityById(userDetails.getMemberId());
+    public ResponseEntity<?> getMyInformation() {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(currentMemberId);
         MemberResponse response = MemberResponse.builder()
                 .name(member.getName())
                 .email(member.getEmail())
