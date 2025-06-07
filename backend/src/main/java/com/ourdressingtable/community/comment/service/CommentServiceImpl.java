@@ -1,5 +1,6 @@
 package com.ourdressingtable.community.comment.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
@@ -30,7 +31,8 @@ public class CommentServiceImpl implements CommentService {
         Comment parent = null;
         int depth = 0;
         if(request.getParentId() != null) {
-            parent = commentRepository.findById(request.getParentId()).orElseThrow(() -> new OurDressingTableException());
+            parent = commentRepository.findById(request.getParentId()).orElseThrow(() -> new OurDressingTableException(
+                    ErrorCode.COMMENT_NOT_FOUND));
             depth = parent.getDepth() + 1;
         }
 
@@ -41,6 +43,9 @@ public class CommentServiceImpl implements CommentService {
                 .post(post)
                 .parent(parent)
                 .build();
+
+        commentRepository.save(comment);
+        return comment.getId();
     }
 
 }

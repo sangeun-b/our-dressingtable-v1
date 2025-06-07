@@ -26,12 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "댓글", description = "댓글 관련 API")
 public class CommentController {
 
-    private final CommentRepository commentRepository;
     private final CommentService commentService;
 
     @Operation(summary = "댓글 작성", description = "새 댓글을 작성합니다.")
     @PostMapping()
-    public ResponseEntity<CreatePostResponse> createComment(@RequestBody @Valid CreateCommentRequest request, @AuthenticationPrincipal
+    public ResponseEntity<CreateCommentResponse> createComment(@RequestBody @Valid CreateCommentRequest request, @AuthenticationPrincipal
             CustomUserDetails customUserDetails) {
         Long commentId = commentService.createComment(request, customUserDetails.getMemberId());
         return ResponseEntity.created(URI.create("/api/comments/" + commentId)).body(
