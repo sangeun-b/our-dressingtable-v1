@@ -105,7 +105,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void active() {
-        this.status = Status.ACTIVATE;
+        this.status = Status.ACTIVE;
     }
 
     private String getOrDefault(String newValue, String currentValue) {

@@ -3,7 +3,6 @@ package com.ourdressingtable.security.dto;
 import com.ourdressingtable.common.util.AuthorityUtil;
 import com.ourdressingtable.member.domain.Member;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import com.ourdressingtable.member.domain.Role;
@@ -11,7 +10,6 @@ import com.ourdressingtable.member.domain.Status;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
@@ -64,7 +62,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status == Status.ACTIVATE;
+        return status == Status.ACTIVE;
     }
 
     @Override

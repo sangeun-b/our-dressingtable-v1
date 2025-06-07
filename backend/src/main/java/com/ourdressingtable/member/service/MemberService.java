@@ -5,6 +5,7 @@ import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.security.dto.CustomUserDetails;
 
 public interface MemberService {
     Long createMember(CreateMemberRequest createMemberRequest);
@@ -14,4 +15,5 @@ public interface MemberService {
     Member getMemberEntityById(Long id);
     Member getActiveMemberEntityById(Long id);
     Member getActiveMemberEntityByEmail(String email);
+    void validateActiveMember(CustomUserDetails customUserDetails);
 }
