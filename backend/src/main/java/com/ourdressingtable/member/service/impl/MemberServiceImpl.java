@@ -4,15 +4,14 @@ import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
-import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.member.service.WithdrawalMemberService;
+import com.ourdressingtable.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -71,7 +70,6 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
-
     @Override
     public Member getMemberEntityById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
@@ -81,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
     public Member getActiveMemberEntityById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if(!member.getStatus().equals(Status.ACTIVATE)) {
+        if(!member.getStatus().equals(Status.ACTIVE)) {
             throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
 
         }
@@ -91,11 +89,18 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member getActiveMemberEntityByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-        if(!member.getStatus().equals(Status.ACTIVATE)) {
+        if(!member.getStatus().equals(Status.ACTIVE)) {
             throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
         }
         return member;
 
+    }
+
+    @Override
+    public void validateActiveMember(CustomUserDetails customUserDetails) {
+        if (customUserDetails.getStatus() != Status.ACTIVE) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
+        }
     }
 
 }

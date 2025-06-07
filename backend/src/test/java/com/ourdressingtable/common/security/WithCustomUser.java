@@ -17,6 +17,6 @@ public @interface WithCustomUser {
     String email() default "test@example.com";
     String password() default "password";
     Role role() default Role.ROLE_BASIC;
-    Status status() default Status.ACTIVATE;
+    Status status() default Status.ACTIVE;
 
 }

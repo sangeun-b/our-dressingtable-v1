@@ -39,7 +39,7 @@ public class DummyDataInitializer implements CommandLineRunner {
                 .password(encodedPw)
                 .name("김이름")
                 .role(Role.ROLE_BASIC)
-                .status(Status.ACTIVATE)
+                .status(Status.ACTIVE)
                 .build();
         memberRepository.save(member);
 
