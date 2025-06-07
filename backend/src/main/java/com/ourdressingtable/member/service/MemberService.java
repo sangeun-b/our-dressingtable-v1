@@ -10,10 +10,9 @@ import com.ourdressingtable.security.dto.CustomUserDetails;
 public interface MemberService {
     Long createMember(CreateMemberRequest createMemberRequest);
     OtherMemberResponse getOtherMember(Long id);
-    void updateMember(Long id, UpdateMemberRequest updateMemberRequest);
-    void withdrawMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest );
+    void updateMember(UpdateMemberRequest updateMemberRequest);
+    void withdrawMember(WithdrawalMemberRequest withdrawalMemberRequest );
     Member getMemberEntityById(Long id);
     Member getActiveMemberEntityById(Long id);
     Member getActiveMemberEntityByEmail(String email);
-    void validateActiveMember(CustomUserDetails customUserDetails);
 }

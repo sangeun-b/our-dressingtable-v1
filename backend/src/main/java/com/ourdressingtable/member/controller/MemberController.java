@@ -67,25 +67,17 @@ public class MemberController {
 
     }
 
-    @PatchMapping("/{memberId}")
-    @Operation(summary = "회원 수정", description = "회원 정보를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
-    public ResponseEntity updateMember(@PathVariable Long memberId, @RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        if(!memberId.equals(currentMemberId)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
-        }
-        memberService.updateMember(memberId, updateMemberRequest);
+    @PatchMapping()
+    @Operation(summary = "내 정보 수정", description = "내 정보를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity updateMyInformation(@RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
+        memberService.updateMember(updateMemberRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{memberId}")
-    @Operation(summary = "회원 삭제", description = "회원을 삭제합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity deleteMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        if(!memberId.equals(currentMemberId)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
-        }
-        memberService.withdrawMember(memberId, withdrawalMemberRequest);
+    @DeleteMapping()
+    @Operation(summary = "내 계정 삭제", description = "내 계정을 삭제합니다.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity deleteMyAccount(@RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
+        memberService.withdrawMember(withdrawalMemberRequest);
         return ResponseEntity.noContent().build();
     }
 
