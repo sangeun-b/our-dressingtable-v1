@@ -10,6 +10,7 @@ import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import com.ourdressingtable.common.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +21,12 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostService postService;
-    private final MemberService memberService;
 
     @Override
     @Transactional
-    public Long createComment(CreateCommentRequest request, Long memberId) {
-        Member member = memberService.getActiveMemberEntityById(memberId);
+    public Long createComment(CreateCommentRequest request) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = Member.builder().id(memberId).build();
         Post post = postService.getValidPostEntityById(request.getPostId());
 
         Comment parent = null;

@@ -30,9 +30,8 @@ public class CommentController {
 
     @Operation(summary = "댓글 작성", description = "새 댓글을 작성합니다.")
     @PostMapping()
-    public ResponseEntity<CreateCommentResponse> createComment(@RequestBody @Valid CreateCommentRequest request, @AuthenticationPrincipal
-            CustomUserDetails customUserDetails) {
-        Long commentId = commentService.createComment(request, customUserDetails.getMemberId());
+    public ResponseEntity<CreateCommentResponse> createComment(@RequestBody @Valid CreateCommentRequest request) {
+        Long commentId = commentService.createComment(request);
         return ResponseEntity.created(URI.create("/api/comments/" + commentId)).body(
                 CreateCommentResponse.builder().id(commentId).build());
     }
