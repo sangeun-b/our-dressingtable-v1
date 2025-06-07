@@ -2,6 +2,7 @@ package com.ourdressingtable.member.service.impl;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
@@ -35,37 +36,29 @@ public class MemberServiceImpl implements MemberService {
             throw new OurDressingTableException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         String encodedPassword = passwordEncoder.encode(createMemberRequest.getPassword());
-
-        Member member = memberRepository.save(createMemberRequest.toEntity(encodedPassword));
+        Member member = createMemberRequest.toEntity(encodedPassword);
         member.active();
-        return member.getId();
+        return memberRepository.save(member).getId();
     }
 
     @Override
     public OtherMemberResponse getOtherMember(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = getValidatedMember(id, Status.ACTIVE);
         return OtherMemberResponse.fromEntity(member);
     }
 
     @Override
     @Transactional
-    public void updateMember(Long id, UpdateMemberRequest updateMemberRequest) {
-        Member member = memberRepository.findById(id).orElseThrow(()->new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-
+    public void updateMember(UpdateMemberRequest updateMemberRequest) {
+        Member member = getAuthenticatedMember(Status.ACTIVE);
         member.updateMember(updateMemberRequest);
     }
 
     @Override
     @Transactional
-    public void withdrawMember(Long id, WithdrawalMemberRequest withdrawalMemberRequest) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
-            throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
-        }
-
+    public void withdrawMember(WithdrawalMemberRequest withdrawalMemberRequest) {
+        Member member = getAuthenticatedMemberCanDelete();
         member.withdraw();
-
         withdrawalMemberService.createWithdrawalMember(withdrawalMemberRequest, member);
 
     }
@@ -78,29 +71,44 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member getActiveMemberEntityById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if(!member.getStatus().equals(Status.ACTIVE)) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
-
-        }
+        validateStatus(member, Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
         return member;
     }
 
     @Override
     public Member getActiveMemberEntityByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-        if(!member.getStatus().equals(Status.ACTIVE)) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
-        }
+        validateStatus(member, Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
         return member;
 
     }
 
-    @Override
-    public void validateActiveMember(CustomUserDetails customUserDetails) {
-        if (customUserDetails.getStatus() != Status.ACTIVE) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE);
+    private Member getAuthenticatedMember(Status requiredStatus) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = getMemberEntityById(memberId);
+        validateStatus(member, requiredStatus, ErrorCode.MEMBER_NOT_ACTIVE);
+        return member;
+    }
+
+    private Member getValidatedMember(Long id, Status requiredStatus) {
+        Member member = getMemberEntityById(id);
+        validateStatus(member,requiredStatus, ErrorCode.MEMBER_NOT_ACTIVE);
+        return member;
+    }
+
+    private void validateStatus(Member member, Status requiredStatus, ErrorCode errorCode) {
+        if(member.getStatus() != requiredStatus) {
+            throw new OurDressingTableException(errorCode);
         }
     }
 
+    private Member getAuthenticatedMemberCanDelete() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = getMemberEntityById(memberId);
+
+        if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
+            throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
+        }
+        return member;
+    }
 }

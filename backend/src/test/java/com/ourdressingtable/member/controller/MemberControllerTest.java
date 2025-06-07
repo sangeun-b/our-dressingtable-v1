@@ -20,12 +20,14 @@ import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
+import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtAuthenticationFilter;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -138,41 +140,41 @@ public class MemberControllerTest {
         @Test
         public void updateMember_shouldReturnSuccess() throws Exception {
             // given
-            Long memberId = 1L;
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
             // when
-            doNothing().when(memberService).updateMember(memberId,updateMemberRequest);
+            doNothing().when(memberService).updateMember(updateMemberRequest);
 
             // then
-            mockMvc.perform(patch("/api/members/{id}", memberId)
+            mockMvc.perform(patch("/api/members")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateMemberRequest)))
                     .andExpect(status().isNoContent()).andDo(print());
         };
 
-        @DisplayName("회원 정보 수정 - 사용자 불일치")
-        @WithCustomUser
+        @DisplayName("회원 정보 수정 - 탈퇴한 회원")
+        @WithCustomUser(status = Status.WITHDRAWAL)
         @Test
         public void updateMember_shouldReturnError () throws Exception{
             //given
-            Long memberId = 2L;
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
             //when
-            willThrow(new OurDressingTableException(ErrorCode.FORBIDDEN))
-                    .given(memberService).updateMember(memberId,updateMemberRequest);
+            willThrow(new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED))
+                    .given(memberService).updateMember(any(UpdateMemberRequest.class));
 
             //then
-            mockMvc.perform(patch("/api/members/{id}", memberId)
+            mockMvc.perform(patch("/api/members")
             .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateMemberRequest)))
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN.getMessage()))
-                    .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN.getCode()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED.getMessage()))
+                    .andExpect(jsonPath("$.code").value(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED.getCode()))
                     .andDo(print());
+
         }
+
 
     }
 
@@ -187,29 +189,31 @@ public class MemberControllerTest {
             Long memberId = 1L;
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
 
-            mockMvc.perform(delete("/api/members/{id}", memberId)
+            mockMvc.perform(delete("/api/members")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
                     .andExpect(status().isNoContent()).andDo(print());
 
-            verify(memberService).withdrawMember(eq(memberId),any(WithdrawalMemberRequest.class));
+            verify(memberService).withdrawMember(any(WithdrawalMemberRequest.class));
 
         };
 
-        @DisplayName("회원 삭제 실패 - 사용자 불일치")
-        @WithCustomUser
+        @DisplayName("회원 삭제 실패 - 이미 탈퇴한 회원")
+        @WithCustomUser(status = Status.WITHDRAWAL)
         @Test
         public void deleteMember_shouldReturnError () throws Exception{
-            Long targetMemberId = 2L;
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
 
-            mockMvc.perform(delete("/api/members/{id}", targetMemberId)
+            willThrow(new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED))
+                    .given(memberService).withdrawMember(any(WithdrawalMemberRequest.class));
+
+            mockMvc.perform(delete("/api/members")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN.getMessage()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED.getMessage()))
                     .andDo(print());
         }
 

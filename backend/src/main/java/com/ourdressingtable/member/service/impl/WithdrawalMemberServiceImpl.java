@@ -19,6 +19,7 @@ public class WithdrawalMemberServiceImpl implements WithdrawalMemberService {
 
     @Override
     public void createWithdrawalMember(WithdrawalMemberRequest request, Member member) {
+
         boolean isBlocked = member.getStatus() == Status.BLOCK;
 
         WithdrawalMember withdrawalMember = WithdrawalMember.from(member, request, isBlocked);

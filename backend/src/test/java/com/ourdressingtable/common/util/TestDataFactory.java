@@ -23,6 +23,7 @@ public class TestDataFactory {
                 .email("test@example.com")
                 .password("{noop}Password123!")
                 .phoneNumber("010-1234-5678")
+                .status(Status.ACTIVE)
                 .build();
     }
 

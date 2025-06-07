@@ -27,10 +27,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Long createComment(CreateCommentRequest request) {
-        CustomUserDetails member = SecurityUtil.getCurrentUser();
-        memberService.validateActiveMember(member);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(memberId);
 
-        Member validMember = Member.builder().id(member.getMemberId()).build();
         Post post = postService.getValidPostEntityById(request.getPostId());
 
         Comment parent = null;
@@ -44,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = Comment.builder()
                 .content(request.getContent())
                 .depth(depth)
-                .member(validMember)
+                .member(member)
                 .post(post)
                 .parent(parent)
                 .build();

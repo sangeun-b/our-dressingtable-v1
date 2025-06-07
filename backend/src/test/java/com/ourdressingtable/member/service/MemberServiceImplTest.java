@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -134,36 +137,38 @@ public class MemberServiceImplTest {
         public void updateMember_ShouldReturnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
-
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
-            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+            try(MockedStatic<SecurityUtil> mockedStatic = Mockito.mockStatic(SecurityUtil.class)) {
+                mockedStatic.when(SecurityUtil::getCurrentMemberId).thenReturn(1L);
+                when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
-            // when
-            memberService.updateMember(member.getId(),updateMemberRequest);
+                // when
+                memberService.updateMember(updateMemberRequest);
 
-            //then
-            assertEquals(member.getNickname(),"new me");
-
+                //then
+                assertEquals(member.getNickname(), "new me");
+            }
 
         }
 
-        @DisplayName("회원 조회 실패 테스트 - USER NOT FOUND")
+        @DisplayName("회원 정보 수정 실패 테스트 - 탈퇴한 회원")
         @Test
         public void updateMember_ShouldReturnUserNotFoundError() {
             // given
-            Long memberId = 9999L;
-
+            Member member = TestDataFactory.testMember(1L);
+            member.withdraw();
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
-            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+            try(MockedStatic<SecurityUtil> mockedStatic = Mockito.mockStatic(SecurityUtil.class)) {
+                mockedStatic.when(SecurityUtil::getCurrentMemberId).thenReturn(1L);
+                when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
-            // when
-            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberService.updateMember(memberId,updateMemberRequest));
-
-            //then
-            assertEquals(exception.getHttpStatus(), ErrorCode.MEMBER_NOT_FOUND.getHttpStatus());
-
+                // when & then
+                OurDressingTableException exception = assertThrows(OurDressingTableException.class,
+                        () -> memberService.updateMember(updateMemberRequest));
+                assertEquals(ErrorCode.MEMBER_NOT_ACTIVE.getCode(), exception.getCode());
+            }
         }
     }
 
@@ -176,18 +181,19 @@ public class MemberServiceImplTest {
         public void deleteMember_ShouldReturnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
-
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
 
-            given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+            try (MockedStatic<SecurityUtil> mockedSecurityUtil = Mockito.mockStatic(SecurityUtil.class)) {
+                mockedSecurityUtil.when(SecurityUtil::getCurrentMemberId).thenReturn(1L);
+                when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
 
-            // when
-            memberService.withdrawMember(member.getId(),withdrawalMemberRequest);
+                // when
+                memberService.withdrawMember(withdrawalMemberRequest);
 
-            //then
-            assertEquals(Status.WITHDRAWAL, member.getStatus());
-            verify(withdrawalMemberService).createWithdrawalMember(withdrawalMemberRequest, member);
-
+                // then
+                assertEquals(Status.WITHDRAWAL, member.getStatus());
+                verify(withdrawalMemberService).createWithdrawalMember(withdrawalMemberRequest, member);
+            }
 
         }
 
@@ -203,7 +209,7 @@ public class MemberServiceImplTest {
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
 
             assertThrows(OurDressingTableException.class, () -> {
-                memberService.withdrawMember(memberId,withdrawalMemberRequest);
+                memberService.withdrawMember(withdrawalMemberRequest);
             });
 
 
