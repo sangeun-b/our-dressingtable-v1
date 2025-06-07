@@ -12,8 +12,6 @@ import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 import com.ourdressingtable.security.dto.LoginRequest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 
@@ -106,7 +104,7 @@ public class TestDataFactory {
                 .email("user" + memberId + "@example.com")
                 .password("password")
                 .role(Role.ROLE_BASIC)
-                .status(Status.ACTIVATE)
+                .status(Status.ACTIVE)
                 .build();
     }
     public static Post testPost(Long id, Member member) {
