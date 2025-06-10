@@ -8,6 +8,7 @@ import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.controller.PostLikeController;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.service.PostLikeService;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,7 +51,8 @@ public class PostLikeControllerTest {
         public void createPostLike_ReturnSuccess() throws Exception {
             // given
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L, member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
             given(postLikeService.toggleLike(post.getId(), member.getId())).willReturn(true);
 
             // when & then

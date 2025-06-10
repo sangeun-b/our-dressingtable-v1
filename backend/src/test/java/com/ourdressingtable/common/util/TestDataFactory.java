@@ -102,6 +102,13 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static CommunityCategory testCommunityCategory(Long id) {
+        return CommunityCategory.builder()
+                .id(id)
+                .name("자유")
+                .build();
+    }
+
     public static CustomUserDetails testUserDetails(Long memberId) {
         return CustomUserDetails.builder()
                 .memberId(memberId)
@@ -111,13 +118,13 @@ public class TestDataFactory {
                 .status(Status.ACTIVE)
                 .build();
     }
-    public static Post testPost(Long id, Member member) {
+    public static Post testPost(Long id, Member member, CommunityCategory communityCategory) {
         return Post.builder()
                 .id(id)
                 .title("제목")
                 .content("내용")
                 .member(member)
-                .communityCategory(CommunityCategory.builder().id(1L).build())
+                .communityCategory(communityCategory)
                 .build();
     }
 

@@ -59,11 +59,7 @@ public class PostServiceImplTest {
         public void createPost_shouldReturnSuccess() {
             // given
             CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
-
-            CommunityCategory communityCategory = CommunityCategory.builder()
-                    .id(10L)
-                    .name("자유")
-                    .build();
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
 
             Member member = TestDataFactory.testMember(1L);
             given(memberService.getMemberEntityById(member.getId())).willReturn(member);
@@ -103,13 +99,10 @@ public class PostServiceImplTest {
         @Test
         public void updatePost_shouldReturnSuccess() {
             UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
+            Member member = TestDataFactory.testMember(1L);
+            Post post = TestDataFactory.testPost(1L,member, communityCategory);
 
-            Post post = Post.builder()
-                    .title("기존")
-                    .content("내용")
-                    .member(Member.builder().id(1L).build())
-                    .communityCategory(CommunityCategory.builder().id(10L).name("자유").build())
-                    .build();
             ReflectionTestUtils.setField(post, "id", 1L);
 
             CommunityCategory newCategory = CommunityCategory.builder().id(2L).name("기타").build();
@@ -177,7 +170,8 @@ public class PostServiceImplTest {
         @Test
         public void getPost_shouldReturnSuccess() {
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L,member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
+            Post post = TestDataFactory.testPost(1L,member, communityCategory);
 
             given(memberService.getMemberEntityById(member.getId())).willReturn(member);
             given(postRepository.findById(1L)).willReturn(Optional.of(post));
@@ -190,7 +184,9 @@ public class PostServiceImplTest {
         @DisplayName("게시글 ENTITY 조회 실패 - 삭제된 게시글")
         @Test
         public void getPost_shouldReturnPostNotFoundError() {
-             Post post = TestDataFactory.testPost(1L,TestDataFactory.testMember(1L));
+             Member member = TestDataFactory.testMember(1L);
+             CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
+             Post post = TestDataFactory.testPost(1L, member, communityCategory);
              post.markAsDeleted();
 
              given(postRepository.findById(1L)).willReturn(Optional.of(post));
