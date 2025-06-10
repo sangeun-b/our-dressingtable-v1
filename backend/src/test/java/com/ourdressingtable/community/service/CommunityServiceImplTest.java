@@ -99,8 +99,9 @@ public class CommunityServiceImplTest {
         public void updatePost_shouldReturnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
 
-            Post post = TestDataFactory.testPost(1L, member);
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
@@ -120,7 +121,9 @@ public class CommunityServiceImplTest {
         public void updatePost_shouldReturnError() {
             // given
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L, member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
@@ -141,7 +144,9 @@ public class CommunityServiceImplTest {
         public void deletePost_shouldReturnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L, member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
 
@@ -156,7 +161,9 @@ public class CommunityServiceImplTest {
         @Test
         public void deletePost_shouldReturnNoPermissionError () {
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L, member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
 
@@ -175,7 +182,9 @@ public class CommunityServiceImplTest {
         @Test
         public void getPost_shouldReturnSuccess() {
             Member member = TestDataFactory.testMember(1L);
-            Post post = TestDataFactory.testPost(1L, member);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
             boolean liked = true;
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
