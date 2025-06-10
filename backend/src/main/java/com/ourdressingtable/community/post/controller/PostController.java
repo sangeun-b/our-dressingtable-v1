@@ -1,9 +1,10 @@
 package com.ourdressingtable.community.post.controller;
 
-import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.CreatePostResponse;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
+import com.ourdressingtable.community.post.dto.PostResponse;
+import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
@@ -13,12 +14,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,6 +30,7 @@ import java.util.List;
 public class PostController {
 
     private final CommunityService communityService;
+    private final PostService postService;
 
     @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
     @PostMapping()
@@ -44,13 +47,6 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "게시글 단건 조회", description = "게시글을 단건 조회합니다.")
-    @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailResponse> getPost(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Long memberId = customUserDetails != null ? customUserDetails.getMemberId() : null;
-        return ResponseEntity.ok(communityService.getPostDetail(postId, memberId));
-    }
-
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     @DeleteMapping("/{postId}")
     public ResponseEntity deletePost(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -58,4 +54,13 @@ public class PostController {
         return ResponseEntity.noContent().build();
 
     }
+
+    @Operation(summary = "게시글 목록 조회", description = "조건에 따라 게시글 목록을 조회합니다.")
+    @GetMapping
+    public ResponseEntity<Page<PostResponse>> getPosts(
+            @ModelAttribute PostSearchCondition condition,
+            Pageable pageable) {
+        return ResponseEntity.ok(postService.getPosts(condition,pageable));
+    }
+
 }

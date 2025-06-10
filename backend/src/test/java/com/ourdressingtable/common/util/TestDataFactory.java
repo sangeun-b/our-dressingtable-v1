@@ -1,6 +1,7 @@
 package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.community.post.domain.Post;
+import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
@@ -125,6 +126,8 @@ public class TestDataFactory {
                 .content("내용")
                 .member(member)
                 .communityCategory(communityCategory)
+                .isDeleted(false)
+                .likeCount(5)
                 .build();
     }
 
@@ -155,6 +158,14 @@ public class TestDataFactory {
                 .member(member)
                 .build();
 
+    }
+
+    public static PostLike testPostLike(Long id, Member member, Post post) {
+        return PostLike.builder()
+                .id(id)
+                .member(member)
+                .post(post)
+                .build();
     }
 
 }

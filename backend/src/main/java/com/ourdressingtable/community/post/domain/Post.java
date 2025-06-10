@@ -59,13 +59,13 @@ public class Post extends BaseTimeEntity {
     private Timestamp deletedAt;
 
     @Builder
-    public Post(Long id, String title, String content, int viewCount, int likeCount, List<PostLike> postLikes, Member member, CommunityCategory communityCategory, boolean isDeleted) {
+    public Post(Long id, String title, String content, int viewCount, int likeCount, Member member, CommunityCategory communityCategory, boolean isDeleted) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
-        this.postLikes = postLikes;
+        this.postLikes = new ArrayList<>();
         this.member = member;
         this.communityCategory = communityCategory;
         this.isDeleted = isDeleted;
