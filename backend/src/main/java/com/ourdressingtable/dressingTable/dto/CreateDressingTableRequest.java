@@ -17,7 +17,7 @@ public class CreateDressingTableRequest {
     @NotBlank
     private String name;
 
-    @Schema(description = "화장대 이미지", example = "image_url")
+    @Schema(description = "화장대 이미지", example = "https://image.img")
     @URL
     private String imageUrl;
 

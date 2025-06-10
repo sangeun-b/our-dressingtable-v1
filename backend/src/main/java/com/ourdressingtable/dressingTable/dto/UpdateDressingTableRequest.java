@@ -16,7 +16,7 @@ public class UpdateDressingTableRequest {
     @Schema(description = "수정할 화장대 이름", example = "new dt")
     private String name;
 
-    @Schema(description = "화장대 이미지", example = "image_url")
+    @Schema(description = "화장대 이미지", example = "https://new-image.img")
     @URL
     private String imageUrl;
 

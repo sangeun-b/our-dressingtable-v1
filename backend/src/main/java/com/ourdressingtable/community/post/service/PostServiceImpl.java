@@ -2,6 +2,8 @@ package com.ourdressingtable.community.post.service;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
+import com.ourdressingtable.community.post.dto.PostResponse;
+import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
@@ -13,6 +15,8 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +48,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPosts() {
-        return postRepository.findAll().stream().collect(Collectors.toList());
+    public Page<PostResponse> getPosts(PostSearchCondition condition, Pageable pageable) {
+        Page<Post> posts = postRepository.search(condition, pageable);
+        return posts.map(PostResponse::from);
     }
 
     @Override
