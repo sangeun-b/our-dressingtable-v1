@@ -5,6 +5,9 @@ import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.dressingTable.domain.DressingTable;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.member.domain.*;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
@@ -116,6 +119,35 @@ public class TestDataFactory {
                 .member(member)
                 .communityCategory(CommunityCategory.builder().id(1L).build())
                 .build();
+    }
+
+    public static CreateDressingTableRequest testCreateDressingTableRequest() {
+        return CreateDressingTableRequest.builder()
+                .name("이름")
+                .imageUrl("https://image.img")
+                .build();
+    }
+
+    public static CreateDressingTableRequest testCreateDressingTableRequestWithNameNull() {
+        return CreateDressingTableRequest.builder()
+                .imageUrl("https://image.img")
+                .build();
+    }
+
+    public static UpdateDressingTableRequest testUpdateDressingTableRequest() {
+        return UpdateDressingTableRequest.builder()
+                .name("새 이름")
+                .build();
+    }
+
+    public static DressingTable testDressingTable(Long id, Member member) {
+        return DressingTable.builder()
+                .id(id)
+                .name("나의 화장대")
+                .imageUrl("https://image.img")
+                .member(member)
+                .build();
+
     }
 
 }

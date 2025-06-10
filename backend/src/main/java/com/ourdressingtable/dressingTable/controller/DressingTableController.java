@@ -34,7 +34,6 @@ import java.net.URI;
 public class DressingTableController {
 
     private final DressingTableService dressingTableService;
-    private final MemberService memberService;
 
     @PostMapping()
     @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.", security = @SecurityRequirement(name="bearerAuth"))
