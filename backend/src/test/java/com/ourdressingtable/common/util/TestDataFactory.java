@@ -96,9 +96,9 @@ public class TestDataFactory {
                 .content("내용")
                 .categoryName("후기")
                 .viewCount(10)
-                .postLikes(5)
+                .likeCount(5)
                 .likedByCurrentMember(true)
-                .memberName("사용자1")
+                .author("사용자1")
                 .createdAt(new Timestamp(System.currentTimeMillis()))
                 .build();
     }
