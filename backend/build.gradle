@@ -36,20 +36,46 @@ dependencies {
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// log
 	implementation 'ch.qos.logback:logback-classic:1.5.6'
 	implementation 'ch.qos.logback:logback-core:1.5.6'
 	implementation 'org.codehaus.janino:janino:3.1.10' // 버전은 logback-core에 맞게
+
 	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	// api doc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
 	// jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// QueryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+
+}
+
+def querydslDir = "src/main/generated"
+
+tasks.withType(JavaCompile) {
+	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
+
+sourceSets {
+	main.java.srcDirs += [querydslDir]
+}
+
+clean {
+	delete file(querydslDir)
 }
 
 tasks.named('test') {
