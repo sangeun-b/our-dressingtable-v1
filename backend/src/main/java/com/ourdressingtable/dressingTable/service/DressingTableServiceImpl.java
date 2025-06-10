@@ -4,6 +4,7 @@ import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
@@ -31,7 +32,7 @@ public class DressingTableServiceImpl implements DressingTableService {
 
     @Override
     @Transactional
-    public void updateDressingTable(CreateDressingTableRequest dressingTableRequest, Long id, Long memberId) {
+    public void updateDressingTable(UpdateDressingTableRequest dressingTableRequest, Long id, Long memberId) {
         DressingTable dressingTable = dressingTableRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
 
         if(!dressingTable.getMember().getId().equals(memberId)){
@@ -44,5 +45,18 @@ public class DressingTableServiceImpl implements DressingTableService {
         if(StringUtils.hasText(dressingTableRequest.getImageUrl())){
             dressingTable.updateImageUrl(dressingTableRequest.getImageUrl());
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteDressingTable(Long id, Long memberId) {
+        DressingTable dressingTable = dressingTableRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
+
+        if(!dressingTable.getMember().getId().equals(memberId)){
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+
+        dressingTable.markAsDeleted();
     }
 }

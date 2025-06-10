@@ -3,11 +3,13 @@ package com.ourdressingtable.dressingTable.controller;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.service.DressingTableService;
 import com.ourdressingtable.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ public class DressingTableController {
     private final MemberService memberService;
 
     @PostMapping()
-    @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.")
+    @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.", security = @SecurityRequirement(name="bearerAuth"))
     public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Long id = dressingTableService.createDressingTable(dressingTableRequest, currentMemberId);
@@ -49,11 +51,19 @@ public class DressingTableController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.")
-    public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
+    @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid UpdateDressingTableRequest dressingTableRequest) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         dressingTableService.updateDressingTable(dressingTableRequest, id, currentMemberId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "화장대 삭제", description = "사용자의 화장대를 삭제합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity deleteDressingTable(@PathVariable Long id) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        dressingTableService.deleteDressingTable(id, currentMemberId);
         return ResponseEntity.noContent().build();
     }
 }
