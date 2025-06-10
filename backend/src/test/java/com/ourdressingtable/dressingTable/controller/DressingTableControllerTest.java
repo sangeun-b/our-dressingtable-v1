@@ -1,0 +1,148 @@
+package com.ourdressingtable.dressingTable.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.security.WithCustomUser;
+import com.ourdressingtable.common.util.TestDataFactory;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
+import com.ourdressingtable.dressingTable.service.DressingTableService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ActiveProfiles("test")
+@WebMvcTest(controllers = DressingTableController.class)
+@DisplayName("화장대 Controller 테스트")
+public class DressingTableControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private DressingTableService dressingTableService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Nested
+    @DisplayName("화장대 생성 테스트")
+    class CreateDressingTable {
+
+        @DisplayName("화장대 생성 성공")
+        @WithCustomUser
+        @Test
+        public void createDressingTable_returnSuccess() throws Exception {
+            // given
+            CreateDressingTableRequest createDressingTableRequest = TestDataFactory.testCreateDressingTableRequest();
+
+            given(dressingTableService.createDressingTable(any(),anyLong())).willReturn(1L);
+
+            // when & then
+            mockMvc.perform(post("/api/dressing-tables")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createDressingTableRequest)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.id").value(1));
+        }
+
+        @DisplayName("화장대 생성 실패 - BAD REQUEST (이름 없음)")
+        @WithCustomUser
+        @Test
+        public void createDressingTable_returnBadRequest() throws Exception {
+            CreateDressingTableRequest createDressingTableRequest = TestDataFactory.testCreateDressingTableRequestWithNameNull();
+
+            mockMvc.perform(post("/api/dressing-tables")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createDressingTableRequest)))
+                    .andExpect(status().isBadRequest());
+        }
+
+
+    }
+
+    @Nested
+    @DisplayName("화장대 수정 테스트")
+    class UpdateDressingTable {
+        @DisplayName("화장대 수정 성공")
+        @WithCustomUser
+        @Test
+        public void updateDressingTable_returnSuccess() throws Exception {
+            // given
+            UpdateDressingTableRequest updateDressingTableRequest = TestDataFactory.testUpdateDressingTableRequest();
+
+            doNothing().when(dressingTableService)
+                    .updateDressingTable(any(UpdateDressingTableRequest.class),anyLong(),any());
+
+            // when & then
+            mockMvc.perform(patch("/api/dressing-tables/{id}", 1L)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateDressingTableRequest)))
+                    .andExpect(status().isNoContent());
+        }
+
+        @DisplayName("화장대 수정 실패")
+        @WithCustomUser
+        @Test
+        public void updateDressingTable_returnNotFound() throws Exception {
+            UpdateDressingTableRequest updateDressingTableRequest = TestDataFactory.testUpdateDressingTableRequest();
+
+            doThrow(new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND))
+                    .when(dressingTableService).updateDressingTable(any(UpdateDressingTableRequest.class),eq(999L),any());
+
+            mockMvc.perform(patch("/api/dressing-tables/{id}", 999L)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateDressingTableRequest)))
+                    .andExpect(status().isNotFound());
+        }
+    }
+    @Nested
+    @DisplayName("화장대 삭제 테스트")
+    class DeleteDressingTable {
+
+        @DisplayName("화장대 삭제 성공")
+        @WithCustomUser
+        @Test
+        public void deleteDressingTable_returnSuccess() throws Exception {
+            // given
+            doNothing().when(dressingTableService).deleteDressingTable(eq(1L),anyLong());
+
+            // when & then
+            mockMvc.perform(delete("/api/dressing-tables/{id}", 1L)
+                    .with(csrf()))
+                    .andExpect(status().isNoContent());
+
+            verify(dressingTableService).deleteDressingTable(1L,1L);
+        }
+
+        @DisplayName("화장대 삭제 실패 - 권한 없음")
+        @WithCustomUser
+        @Test
+        public void deleteDressingTable_returnForbidden() throws Exception {
+            doThrow(new OurDressingTableException(ErrorCode.FORBIDDEN))
+                    .when(dressingTableService).deleteDressingTable(eq(1L),anyLong());
+
+            mockMvc.perform(delete("/api/dressing-tables/{id}", 1L))
+                    .andExpect(status().isForbidden());
+        }
+    }
+}

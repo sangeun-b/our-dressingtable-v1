@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.URL;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DressingTableRequest {
+public class CreateDressingTableRequest {
 
     @Schema(description = "화장대 이름", example = "my dt", required = true)
     @NotBlank
@@ -22,7 +22,7 @@ public class DressingTableRequest {
     private String imageUrl;
 
     @Builder
-    public DressingTableRequest(String name, String imageUrl) {
+    public CreateDressingTableRequest(String name, String imageUrl) {
         this.name = name;
         this.imageUrl = imageUrl;
     }

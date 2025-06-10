@@ -1,23 +1,21 @@
 package com.ourdressingtable.dressingTable.controller;
 
-import com.ourdressingtable.dressingTable.domain.DressingTable;
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.DressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.service.DressingTableService;
-import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -27,22 +25,44 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/api/dressing-tables")
 @Tag(name = "화장대", description = "화장대 관련 API")
+@ApiResponses({
+        @ApiResponse(responseCode = "201", description = "화장대 생성 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+})
 public class DressingTableController {
 
     private final DressingTableService dressingTableService;
-    private final MemberService memberService;
 
-    @PostMapping("")
-    @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.")
-    public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid DressingTableRequest dressingTableRequest,
-                                                          @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Long id = dressingTableService.createDressingTable(dressingTableRequest, customUserDetails.getMemberId());
+    @PostMapping()
+    @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        Long id = dressingTableService.createDressingTable(dressingTableRequest, currentMemberId);
 
-        URI  location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(id).toUri();
 
         return ResponseEntity.created(location)
                 .body(CreateDressingTableResponse.builder().id(id).build());
 
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid UpdateDressingTableRequest dressingTableRequest) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        dressingTableService.updateDressingTable(dressingTableRequest, id, currentMemberId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "화장대 삭제", description = "사용자의 화장대를 삭제합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    public ResponseEntity deleteDressingTable(@PathVariable Long id) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        dressingTableService.deleteDressingTable(id, currentMemberId);
+        return ResponseEntity.noContent().build();
     }
 }

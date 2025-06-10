@@ -1,13 +1,17 @@
 package com.ourdressingtable.dressingTable.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
-import com.ourdressingtable.dressingTable.dto.DressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +23,40 @@ public class DressingTableServiceImpl implements DressingTableService {
 
     @Override
     @Transactional
-    public Long createDressingTable(DressingTableRequest dressingTableRequest, Long memberId) {
+    public Long createDressingTable(CreateDressingTableRequest dressingTableRequest, Long memberId) {
         Member member = memberService.getActiveMemberEntityById(memberId);
         DressingTable dressingTable = dressingTableRequest.toEntity(member);
         dressingTableRepository.save(dressingTable);
         return dressingTable.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateDressingTable(UpdateDressingTableRequest dressingTableRequest, Long id, Long memberId) {
+        DressingTable dressingTable = dressingTableRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
+
+        if(!dressingTable.getMember().getId().equals(memberId)){
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+
+        if(StringUtils.hasText(dressingTableRequest.getName())){
+            dressingTable.updateName(dressingTableRequest.getName());
+        }
+        if(StringUtils.hasText(dressingTableRequest.getImageUrl())){
+            dressingTable.updateImageUrl(dressingTableRequest.getImageUrl());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteDressingTable(Long id, Long memberId) {
+        DressingTable dressingTable = dressingTableRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
+
+        if(!dressingTable.getMember().getId().equals(memberId)){
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+
+        dressingTable.markAsDeleted();
     }
 }
