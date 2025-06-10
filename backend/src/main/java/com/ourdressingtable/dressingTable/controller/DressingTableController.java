@@ -1,13 +1,10 @@
 package com.ourdressingtable.dressingTable.controller;
 
 import com.ourdressingtable.common.util.SecurityUtil;
-import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.DressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingTable.service.DressingTableService;
-import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,11 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -43,7 +36,7 @@ public class DressingTableController {
 
     @PostMapping()
     @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.")
-    public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid DressingTableRequest dressingTableRequest) {
+    public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Long id = dressingTableService.createDressingTable(dressingTableRequest, currentMemberId);
 
@@ -53,5 +46,14 @@ public class DressingTableController {
         return ResponseEntity.created(location)
                 .body(CreateDressingTableResponse.builder().id(id).build());
 
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.")
+    public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        dressingTableService.updateDressingTable(dressingTableRequest, id, currentMemberId);
+        return ResponseEntity.noContent().build();
     }
 }

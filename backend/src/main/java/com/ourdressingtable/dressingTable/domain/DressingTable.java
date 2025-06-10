@@ -34,4 +34,11 @@ public class DressingTable extends BaseTimeEntity {
         this.imageUrl = imageUrl;
         this.member = member;
     }
+
+    public void updateName(String newName) {
+        this.name = newName;
+    }
+    public void updateImageUrl(String newImageUrl) {
+        this.imageUrl = newImageUrl;
+    }
 }

@@ -1,7 +1,8 @@
 package com.ourdressingtable.dressingTable.service;
 
-import com.ourdressingtable.dressingTable.dto.DressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
 
 public interface DressingTableService {
-    Long createDressingTable(DressingTableRequest dressingTableRequest, Long memberId);
+    Long createDressingTable(CreateDressingTableRequest dressingTableRequest, Long memberId);
+    void updateDressingTable(CreateDressingTableRequest dressingTableRequest, Long id, Long memberId);
 }
