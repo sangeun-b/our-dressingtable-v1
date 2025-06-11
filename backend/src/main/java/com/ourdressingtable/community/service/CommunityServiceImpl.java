@@ -1,5 +1,6 @@
 package com.ourdressingtable.community.service;
 
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
@@ -27,7 +28,8 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     @Transactional
-    public Long createPost(CreatePostRequest createPostRequest, Long memberId) {
+    public Long createPost(CreatePostRequest createPostRequest) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
         if(member == null) {
             throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
@@ -37,19 +39,24 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     @Transactional
-    public void updatePost(Long postId, Long memberId, UpdatePostRequest updatePostRequest) {
-        checkPermission(postId, memberId);
+    public void updatePost(Long postId, UpdatePostRequest updatePostRequest) {
+        checkPermission(postId);
         postService.updatePost(postId, updatePostRequest);
     }
 
     @Override
     @Transactional
-    public void deletePost(Long postId, Long memberId) {
-        checkPermission(postId, memberId);
+    public void deletePost(Long postId) {
+        checkPermission(postId);
         postService.deletePost(postId);
     }
 
-    private void checkPermission(Long postId, Long memberId) {
+    private void checkPermission(Long postId) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(memberId);
+        if(member == null) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
+        }
         Post post = postService.getValidPostEntityById(postId);
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
@@ -57,8 +64,10 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public PostDetailResponse getPostDetail(Long postId, Long memberId) {
+    public PostDetailResponse getPostDetail(Long postId) {
         Post post = postService.getValidPostEntityById(postId);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(memberId);
         boolean liked = false;
         if(memberId != null){
             liked = postLikeService.hasLiked(postId, memberId);

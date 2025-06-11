@@ -52,4 +52,22 @@ public class CommentServiceImpl implements CommentService {
         return comment.getId();
     }
 
+    @Override
+    @Transactional
+    public void deleteComment(Long id) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Comment comment = getValidCommentEntityById(id);
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+        comment.markAsDeleted();
+
+    }
+
+    @Override
+    public Comment getValidCommentEntityById(Long id) {
+        return commentRepository.findById(id).filter(comment -> !comment.isDeleted())
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.COMMENT_NOT_FOUND));
+
+    }
 }

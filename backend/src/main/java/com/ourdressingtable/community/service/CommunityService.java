@@ -6,8 +6,8 @@ import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 
 public interface CommunityService {
 
-    Long createPost(CreatePostRequest createPostRequest, Long memberId);
-    void updatePost(Long postId, Long memberId, UpdatePostRequest updatePostRequest);
-    void deletePost(Long postId, Long memberId);
-    PostDetailResponse getPostDetail(Long postId, Long memberId);
+    Long createPost(CreatePostRequest createPostRequest);
+    void updatePost(Long postId, UpdatePostRequest updatePostRequest);
+    void deletePost(Long postId);
+    PostDetailResponse getPostDetail(Long postId);
 }
