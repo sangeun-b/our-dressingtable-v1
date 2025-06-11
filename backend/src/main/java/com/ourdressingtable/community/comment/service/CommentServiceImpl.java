@@ -4,6 +4,7 @@ import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
+import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
 import com.ourdressingtable.community.comment.repository.CommentRepository;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.service.PostService;
@@ -26,10 +27,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Long createComment(CreateCommentRequest request) {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(memberId);
-
+    public Long createComment(CreateCommentRequest request, Member member) {
         Post post = postService.getValidPostEntityById(request.getPostId());
 
         Comment parent = null;
@@ -48,6 +46,7 @@ public class CommentServiceImpl implements CommentService {
                 .parent(parent)
                 .build();
 
+        comment.setPost(post);
         commentRepository.save(comment);
         return comment.getId();
     }
@@ -55,13 +54,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long id) {
-        Long memberId = SecurityUtil.getCurrentMemberId();
         Comment comment = getValidCommentEntityById(id);
-        if(!comment.getMember().getId().equals(memberId)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
-        }
         comment.markAsDeleted();
 
+    }
+
+    @Override
+    @Transactional
+    public void updateComment(Long id, UpdateCommentRequest request) {
+        Comment comment = getValidCommentEntityById(id);
+        comment.updateContent(request.getContent());
     }
 
     @Override

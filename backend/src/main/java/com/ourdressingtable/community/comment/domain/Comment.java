@@ -1,5 +1,6 @@
 package com.ourdressingtable.community.comment.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.util.BaseTimeEntity;
@@ -35,6 +36,7 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonBackReference
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,5 +67,12 @@ public class Comment extends BaseTimeEntity {
         this.deletedAt = new Timestamp(System.currentTimeMillis());
     }
 
+    public void updateContent(String content) {
+        this.content = content;
+    }
 
+    public void setPost(Post post) {
+        this.post = post;
+        post.getComments().add(this);
+    }
 }

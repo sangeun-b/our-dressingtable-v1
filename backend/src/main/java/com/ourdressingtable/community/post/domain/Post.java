@@ -1,5 +1,7 @@
 package com.ourdressingtable.community.post.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.member.domain.Member;
@@ -51,6 +53,10 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "community_category_id", nullable = false)
     private CommunityCategory communityCategory;
 
+    @OneToMany(mappedBy = "post")
+    @JsonBackReference
+    private List<Comment> comments = new ArrayList<>();
+
     @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
     private boolean isDeleted = false;
@@ -73,22 +79,13 @@ public class Post extends BaseTimeEntity {
 
     }
 
-    public static Post from(Member member, CommunityCategory communityCategory, CreatePostRequest createPostRequest) {
-        return Post.builder()
-                .title(createPostRequest.getTitle())
-                .content(createPostRequest.getContent())
-                .member(member)
-                .communityCategory(communityCategory)
-                .build();
-
-    }
-    public void addMember(Member member) {
-        if(this.member != null) {
-            this.member.getPosts().remove(this);
-        }
-        this.member = member;
-        member.getPosts().add(this);
-    }
+//    public void addMember(Member member) {
+//        if(this.member != null) {
+//            this.member.getPosts().remove(this);
+//        }
+//        this.member = member;
+//        member.getPosts().add(this);
+//    }
 
     public void updateTitle(String title) {
         this.title = title;
@@ -116,6 +113,7 @@ public class Post extends BaseTimeEntity {
         this.isDeleted = true;
         this.deletedAt = Timestamp.valueOf(LocalDateTime.now());
     }
+
 //    @PreRemove
 //    public void onSoftDelete() {
 //        this.deletedAt = new Timestamp(System.currentTimeMillis());
