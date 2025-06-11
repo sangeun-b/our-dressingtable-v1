@@ -70,7 +70,7 @@ public class CommunityServiceImplTest {
             given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
 
             // when
-            Long postId = communityService.createPost(createPostRequest, member.getId());
+            Long postId = communityService.createPost(createPostRequest);
 
             // then
             assertEquals(123L, postId);
@@ -86,7 +86,7 @@ public class CommunityServiceImplTest {
 
             given(memberService.getActiveMemberEntityById(invalidMemberId)).willReturn(null);
             // when & then
-            assertThrows(OurDressingTableException.class, () -> communityService.createPost(createPostRequest, invalidMemberId));
+            assertThrows(OurDressingTableException.class, () -> communityService.createPost(createPostRequest));
         }
 
     }
@@ -108,7 +108,7 @@ public class CommunityServiceImplTest {
             given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             // when
-            communityService.updatePost(1L, 1L, updatePostRequest);
+            communityService.updatePost(1L,  updatePostRequest);
 
             // then
             then(postService).should().updatePost(1L, updatePostRequest);
@@ -131,7 +131,7 @@ public class CommunityServiceImplTest {
 
             // when & then
             assertThrows(OurDressingTableException.class, () -> {
-                communityService.updatePost(1L, 2L, updatePostRequest);
+                communityService.updatePost(1L, updatePostRequest);
             });
         }
     }
@@ -151,7 +151,7 @@ public class CommunityServiceImplTest {
             given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             // when
-            communityService.deletePost(1L,1L);
+            communityService.deletePost(1L);
 
             // then
             verify(postService).deletePost(1L);
@@ -168,7 +168,7 @@ public class CommunityServiceImplTest {
             given(postService.getValidPostEntityById(1L)).willReturn(post);
 
             OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> {
-                communityService.deletePost(1L, 2L);
+                communityService.deletePost(1L);
             });
 
             assertEquals(ErrorCode.NO_PERMISSION_TO_EDIT.getCode(), exception.getCode());
@@ -190,7 +190,7 @@ public class CommunityServiceImplTest {
             given(postService.getValidPostEntityById(1L)).willReturn(post);
             given(postLikeService.hasLiked(post.getId(), member.getId())).willReturn(liked);
 
-            PostDetailResponse response = communityService.getPostDetail(post.getId(), member.getId());
+            PostDetailResponse response = communityService.getPostDetail(post.getId());
 
             assertEquals(post.getId(), response.getId());
             assertEquals(post.getTitle(), response.getTitle());
@@ -202,7 +202,7 @@ public class CommunityServiceImplTest {
             Long postId = 999L;
             given(postService.getValidPostEntityById(postId)).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
 
-            assertThatThrownBy(() ->communityService.getPostDetail(postId,1L)).isInstanceOf(OurDressingTableException.class)
+            assertThatThrownBy(() ->communityService.getPostDetail(postId)).isInstanceOf(OurDressingTableException.class)
                     .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
 
         }

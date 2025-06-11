@@ -33,29 +33,6 @@ public class PostController {
     private final CommunityService communityService;
     private final PostService postService;
 
-    @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
-    @PostMapping()
-    public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest request) {
-        Long id = communityService.createPost(request);
-        return ResponseEntity.created(URI.create("/api/posts/"+id))
-                .body(CreatePostResponse.builder().id(id).build());
-    }
-
-    @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
-    @PatchMapping("/{postId}")
-    public ResponseEntity updatePost(@PathVariable("postId") Long postId, @RequestBody @Valid UpdatePostRequest request) {
-        communityService.updatePost(postId, request);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
-    @DeleteMapping("/{postId}")
-    public ResponseEntity deletePost(@PathVariable Long postId) {
-        communityService.deletePost(postId);
-        return ResponseEntity.noContent().build();
-
-    }
-
     @Operation(summary = "게시글 목록 조회", description = "조건에 따라 게시글 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getPosts(

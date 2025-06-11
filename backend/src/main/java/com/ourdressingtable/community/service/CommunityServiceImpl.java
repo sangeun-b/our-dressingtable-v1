@@ -74,4 +74,11 @@ public class CommunityServiceImpl implements CommunityService {
         }
         return PostDetailResponse.from(post, liked);
     }
+
+    @Override
+    @Transactional
+    public boolean toggleLike(Long postId) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return postLikeService.toggleLike(postId, memberId);
+    }
 }

@@ -10,4 +10,5 @@ public interface CommunityService {
     void updatePost(Long postId, UpdatePostRequest updatePostRequest);
     void deletePost(Long postId);
     PostDetailResponse getPostDetail(Long postId);
+    boolean toggleLike(Long postId);
 }

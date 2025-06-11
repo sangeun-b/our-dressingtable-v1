@@ -29,9 +29,13 @@ public class QComment extends EntityPathBase<Comment> {
     //inherited
     public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
 
+    public final DateTimePath<java.sql.Timestamp> deletedAt = createDateTime("deletedAt", java.sql.Timestamp.class);
+
     public final NumberPath<Integer> depth = createNumber("depth", Integer.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final BooleanPath isDeleted = createBoolean("isDeleted");
 
     public final com.ourdressingtable.member.domain.QMember member;
 
