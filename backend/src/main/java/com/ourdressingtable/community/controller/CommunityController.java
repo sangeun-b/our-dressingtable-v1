@@ -83,7 +83,8 @@ public class CommunityController {
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CreateCommentResponse> createComment(@RequestBody @Valid CreateCommentRequest request) {
         Long commentId = commentService.createComment(request);
-        return ResponseEntity.created(URI.create("/api/comments/" + commentId)).body(
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(commentId).toUri();
+        return ResponseEntity.created(location).body(
                 CreateCommentResponse.builder().id(commentId).build());
     }
 

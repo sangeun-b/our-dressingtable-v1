@@ -1,5 +1,7 @@
 package com.ourdressingtable.common.util;
 
+import com.ourdressingtable.community.comment.domain.Comment;
+import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -165,6 +167,29 @@ public class TestDataFactory {
                 .id(id)
                 .member(member)
                 .post(post)
+                .build();
+    }
+
+    public static CreateCommentRequest testCreateCommentRequest(Long postId) {
+        return CreateCommentRequest.builder()
+                .content("좋아요!")
+                .postId(postId)
+                .parentId(null)
+                .build();
+    }
+
+    public static CreateCommentRequest testCreateCommentRequestWithNull(Long postId) {
+        return CreateCommentRequest.builder()
+                .postId(null)
+                .parentId(null)
+                .build();
+    }
+
+    public static Comment testComment(Long id, Post post, Member member) {
+        return Comment.builder()
+                .content("추천!")
+                .post(post)
+                .member(member)
                 .build();
     }
 
