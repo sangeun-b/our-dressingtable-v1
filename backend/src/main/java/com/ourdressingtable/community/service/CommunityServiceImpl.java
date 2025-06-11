@@ -1,6 +1,10 @@
 package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.common.util.SecurityUtil;
+import com.ourdressingtable.community.comment.domain.Comment;
+import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
+import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
+import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
@@ -25,6 +29,7 @@ public class CommunityServiceImpl implements CommunityService {
     private final CommunityCategoryService communityCategoryService;
     private final MemberService memberService;
     private final PostLikeService postLikeService;
+    private final CommentService commentService;
 
     @Override
     @Transactional
@@ -40,18 +45,18 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional
     public void updatePost(Long postId, UpdatePostRequest updatePostRequest) {
-        checkPermission(postId);
+        checkPostPermission(postId);
         postService.updatePost(postId, updatePostRequest);
     }
 
     @Override
     @Transactional
     public void deletePost(Long postId) {
-        checkPermission(postId);
+        checkPostPermission(postId);
         postService.deletePost(postId);
     }
 
-    private void checkPermission(Long postId) {
+    private void checkPostPermission(Long postId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
         if(member == null) {
@@ -62,6 +67,20 @@ public class CommunityServiceImpl implements CommunityService {
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
         }
     }
+
+    private void checkCommentPermission(Long commentId) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(memberId);
+        if(member == null) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Comment comment = commentService.getValidCommentEntityById(commentId);
+        if(!comment.getMember().getId().equals(memberId)){
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
+        }
+    }
+
+
 
     @Override
     public PostDetailResponse getPostDetail(Long postId) {
@@ -80,5 +99,29 @@ public class CommunityServiceImpl implements CommunityService {
     public boolean toggleLike(Long postId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         return postLikeService.toggleLike(postId, memberId);
+    }
+
+    @Override
+    public Long createComment(CreateCommentRequest createCommentRequest) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberService.getActiveMemberEntityById(memberId);
+        if(member == null) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        return commentService.createComment(createCommentRequest, member);
+    }
+
+    @Override
+    public void deleteComment(Long commentId) {
+        checkCommentPermission(commentId);
+        commentService.deleteComment(commentId);
+
+    }
+
+    @Override
+    public void updateComment(Long commentId, UpdateCommentRequest updateCommentRequest) {
+        checkCommentPermission(commentId);
+        commentService.updateComment(commentId, updateCommentRequest);
+
     }
 }

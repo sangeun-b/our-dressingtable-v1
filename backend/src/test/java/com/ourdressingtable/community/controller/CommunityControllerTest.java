@@ -27,6 +27,7 @@ import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.community.service.CommunityService;
+import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -51,12 +52,6 @@ public class CommunityControllerTest {
 
     @MockBean
     private CommunityService communityService;
-
-    @MockBean
-    private CommentService commentService;
-
-    @MockBean
-    private PostLikeService postLikeService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -238,7 +233,9 @@ public class CommunityControllerTest {
             // given
             Long commentId = 1L;
             CreateCommentRequest request = TestDataFactory.testCreateCommentRequest(1L);
-            given(commentService.createComment(any())).willReturn(commentId);
+            Member member = TestDataFactory.testMember(1L);
+
+            given(communityService.createComment(eq(request))).willReturn(commentId);
 
             performCreateComment(request)
                     .andDo(print())
@@ -254,8 +251,9 @@ public class CommunityControllerTest {
         public void createComment_returnPostNotFoundError() throws Exception {
             // given
             CreateCommentRequest request = TestDataFactory.testCreateCommentRequestWithNull(null);
+            Member member = TestDataFactory.testMember(1L);
 
-            given(commentService.createComment(eq(request))).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+            given(communityService.createComment(eq(request))).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
 
             // when & then
             performCreateComment(request)
@@ -288,7 +286,7 @@ public class CommunityControllerTest {
             Long commentId = 999L;
             Long postId = 1L;
             doThrow(new OurDressingTableException(ErrorCode.COMMENT_NOT_FOUND))
-                    .when(commentService).deleteComment(commentId);
+                    .when(communityService).deleteComment(commentId);
 
             // when & then
             performDeleteComment(commentId, postId)
