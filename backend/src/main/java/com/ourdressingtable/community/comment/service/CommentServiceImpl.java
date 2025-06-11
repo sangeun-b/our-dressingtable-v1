@@ -62,9 +62,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void updateComment(Long id, UpdateCommentRequest request) {
-        if (request.getContent().trim().isEmpty()) {
-            throw new OurDressingTableException(ErrorCode.INVALID_COMMENT_INPUT);
-        }
         Comment comment = getValidCommentEntityById(id);
         comment.updateContent(request.getContent());
     }
