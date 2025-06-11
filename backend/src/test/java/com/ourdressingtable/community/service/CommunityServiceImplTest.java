@@ -1,6 +1,8 @@
 package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.security.TestSecurityConfig;
+import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -13,7 +15,11 @@ import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.security.dto.CustomUserDetails;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +29,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +43,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@Import(TestSecurityConfig.class)
 @DisplayName("Community 테스트")
 public class CommunityServiceImplTest {
 
@@ -51,20 +62,36 @@ public class CommunityServiceImplTest {
     @Mock
     private PostLikeService postLikeService;
 
+    @BeforeEach
+    void setUpSecurityContext() {
+        CustomUserDetails userDetails = CustomUserDetails.builder()
+                .memberId(1L)
+                .email("test@example.com")
+                .password("password")
+                .role(Role.ROLE_BASIC)
+                .status(Status.ACTIVE)
+                .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+
     @Nested
     @DisplayName("게시글 작성 테스트")
     class createPost {
         @DisplayName("게시글 작성 성공")
         @Test
-        public void createPosts_shouldReturnSuccess() {
+        public void createPost_shouldReturnSuccess() {
             // given
             CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
 
             CommunityCategory category = CommunityCategory.builder().id(1L).name("자유").build();
 
             Member member = TestDataFactory.testMember(1L);
-            given(memberService.getActiveMemberEntityById(member.getId())).willReturn(member);
-
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
 
             given(communityCategoryService.getCategoryById(1L)).willReturn(CommunityCategoryResponse.from(category));
             given(postService.createPost(createPostRequest,member.getId())).willReturn(123L);
@@ -79,7 +106,7 @@ public class CommunityServiceImplTest {
 
         @DisplayName("게시글 작성 실패_비회원")
         @Test
-        public void createPosts_shouldReturnError() {
+        public void createPost_shouldReturnError() {
             // given
             Long invalidMemberId = 999L;
             CreatePostRequest createPostRequest = TestDataFactory.testCreatePostRequest();
@@ -106,6 +133,7 @@ public class CommunityServiceImplTest {
             UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
 
             // when
             communityService.updatePost(1L,  updatePostRequest);
@@ -128,7 +156,7 @@ public class CommunityServiceImplTest {
             UpdatePostRequest updatePostRequest = TestDataFactory.testUpdatePostRequest();
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
-
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(null);
             // when & then
             assertThrows(OurDressingTableException.class, () -> {
                 communityService.updatePost(1L, updatePostRequest);
@@ -149,6 +177,7 @@ public class CommunityServiceImplTest {
             Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
 
             // when
             communityService.deletePost(1L);
@@ -160,12 +189,13 @@ public class CommunityServiceImplTest {
         @DisplayName("게시글 삭제 실패 - 작성자 불일치")
         @Test
         public void deletePost_shouldReturnNoPermissionError () {
-            Member member = TestDataFactory.testMember(1L);
+            Member member = TestDataFactory.testMember(2L);
             CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
 
             Post post = TestDataFactory.testPost(1L, member, communityCategory);
 
             given(postService.getValidPostEntityById(1L)).willReturn(post);
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
 
             OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> {
                 communityService.deletePost(1L);
@@ -176,9 +206,9 @@ public class CommunityServiceImplTest {
     }
 
     @Nested
-    @DisplayName("게시글 단건 조회 테스트")
+    @DisplayName("게시글 상세 조회 테스트")
     class getPost {
-        @DisplayName("게시글 단건 조회 성공")
+        @DisplayName("게시글 상세 조회 성공")
         @Test
         public void getPost_shouldReturnSuccess() {
             Member member = TestDataFactory.testMember(1L);
@@ -196,11 +226,12 @@ public class CommunityServiceImplTest {
             assertEquals(post.getTitle(), response.getTitle());
         }
 
-        @DisplayName("게시글 단건 조회 실패_")
+        @DisplayName("게시글 상세 조회 실패 - 미존재 게시물")
         @Test
         public void getPost_shouldReturnError() {
             Long postId = 999L;
             given(postService.getValidPostEntityById(postId)).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(null);
 
             assertThatThrownBy(() ->communityService.getPostDetail(postId)).isInstanceOf(OurDressingTableException.class)
                     .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
