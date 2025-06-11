@@ -1,5 +1,6 @@
 package com.ourdressingtable.community.post.controller;
 
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.CreatePostResponse;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
@@ -34,23 +35,23 @@ public class PostController {
 
     @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
     @PostMapping()
-    public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest request, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Long id = communityService.createPost(request, customUserDetails.getMemberId());
+    public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest request) {
+        Long id = communityService.createPost(request);
         return ResponseEntity.created(URI.create("/api/posts/"+id))
                 .body(CreatePostResponse.builder().id(id).build());
     }
 
     @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
     @PatchMapping("/{postId}")
-    public ResponseEntity updatePost(@PathVariable("postId") Long postId, @RequestBody @Valid UpdatePostRequest request, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        communityService.updatePost(postId, customUserDetails.getMemberId(), request);
+    public ResponseEntity updatePost(@PathVariable("postId") Long postId, @RequestBody @Valid UpdatePostRequest request) {
+        communityService.updatePost(postId, request);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     @DeleteMapping("/{postId}")
-    public ResponseEntity deletePost(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        communityService.deletePost(postId, customUserDetails.getMemberId());
+    public ResponseEntity deletePost(@PathVariable Long postId) {
+        communityService.deletePost(postId);
         return ResponseEntity.noContent().build();
 
     }

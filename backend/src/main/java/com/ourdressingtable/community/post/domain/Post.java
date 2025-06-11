@@ -22,7 +22,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
-@SQLDelete(sql = "UPDATE posts SET is_deleted = true, deleted_at = NOW() WHERE post_id = ?")
+//@SQLDelete(sql = "UPDATE posts SET is_deleted = true, deleted_at = NOW() WHERE post_id = ?")
 @SQLRestriction("is_deleted = false")
 public class Post extends BaseTimeEntity {
 
@@ -69,6 +69,7 @@ public class Post extends BaseTimeEntity {
         this.member = member;
         this.communityCategory = communityCategory;
         this.isDeleted = isDeleted;
+        this.deletedAt = null;
 
     }
 
