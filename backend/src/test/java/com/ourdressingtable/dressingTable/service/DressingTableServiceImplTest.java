@@ -14,6 +14,7 @@ import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
@@ -21,6 +22,7 @@ import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.dto.CustomUserDetails;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -174,7 +176,7 @@ public class DressingTableServiceImplTest {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             Member member = TestDataFactory.testMember(1L);
-            
+
             DressingTable dressingTable = TestDataFactory.testDressingTable(1L, member);
 
             given(dressingTableRepository.findById(1L)).willReturn(Optional.of(dressingTable));
@@ -184,5 +186,35 @@ public class DressingTableServiceImplTest {
                     .hasMessageContaining(ErrorCode.FORBIDDEN.getMessage());
         }
 
+    }
+
+    @Nested
+    @DisplayName("나의 모든 화장대 조회 테스트")
+    class GetAllMyDressingTable {
+
+        @DisplayName("나의 모든 화장대 조회 성공")
+        @Test
+        public void getAllMyDressingTable_shouldReturnSuccess() throws Exception {
+            Member member = TestDataFactory.testMember(1L);
+            List<DressingTable> dressingTableList = List.of(TestDataFactory.testDressingTable(1L, member),
+                                                            TestDataFactory.testDressingTable(2L, member));
+
+            given(dressingTableRepository.findAllByMemberId(1L)).willReturn(dressingTableList);
+
+            List<DressingTableResponse> result = dressingTableService.getAllMyDressingTables();
+
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).getName()).isEqualTo(dressingTableList.get(0).getName());
+        }
+
+        @DisplayName("나의 모든 화장대 조회 실패 - 인증 정보 없음")
+        @Test
+        public void getAllMyDressingTable_shouldReturnUnauthorizedError() throws Exception {
+            SecurityContextHolder.clearContext();
+
+            assertThatThrownBy(() -> dressingTableService.getAllMyDressingTables())
+                    .isInstanceOf(OurDressingTableException.class)
+                    .hasMessageContaining(ErrorCode.UNAUTHORIZED.getMessage());
+        }
     }
 }

@@ -151,7 +151,7 @@ public class DressingTableControllerTest {
     }
 
     @Nested
-    @DisplayName("나의 모든 화장대 조회")
+    @DisplayName("나의 모든 화장대 조회 테스트")
     class GetAllMyDressingTable {
 
         @DisplayName("나의 모든 화장대 조회 성공")
