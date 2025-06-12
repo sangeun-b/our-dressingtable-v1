@@ -5,10 +5,13 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -62,5 +65,13 @@ public class DressingTableServiceImpl implements DressingTableService {
         }
 
         dressingTable.markAsDeleted();
+    }
+
+    @Override
+    public List<DressingTableResponse> getAllMyDressingTables() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<DressingTable> dressingTableList = dressingTableRepository.findAllByMemberId(memberId);
+        return dressingTableList.stream().map(DressingTableResponse::from)
+                .collect(Collectors.toList());
     }
 }
