@@ -1,7 +1,6 @@
 package com.ourdressingtable.member.domain;
 
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
-import com.ourdressingtable.util.BaseTimeEntity;
 import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.MaskingUtil;
 import jakarta.persistence.*;

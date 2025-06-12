@@ -22,7 +22,7 @@ public class QComment extends EntityPathBase<Comment> {
 
     public static final QComment comment = new QComment("comment");
 
-    public final com.ourdressingtable.util.QBaseTimeEntity _super = new com.ourdressingtable.util.QBaseTimeEntity(this);
+    public final com.ourdressingtable.common.util.QBaseTimeEntity _super = new com.ourdressingtable.common.util.QBaseTimeEntity(this);
 
     public final StringPath content = createString("content");
 

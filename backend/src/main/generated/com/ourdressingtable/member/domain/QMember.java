@@ -20,7 +20,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
-    public final com.ourdressingtable.util.QBaseTimeEntity _super = new com.ourdressingtable.util.QBaseTimeEntity(this);
+    public final com.ourdressingtable.common.util.QBaseTimeEntity _super = new com.ourdressingtable.common.util.QBaseTimeEntity(this);
 
     public final EnumPath<AuthType> authType = createEnum("authType", AuthType.class);
 

@@ -22,7 +22,7 @@ public class QDressingTable extends EntityPathBase<DressingTable> {
 
     public static final QDressingTable dressingTable = new QDressingTable("dressingTable");
 
-    public final com.ourdressingtable.util.QBaseTimeEntity _super = new com.ourdressingtable.util.QBaseTimeEntity(this);
+    public final com.ourdressingtable.common.util.QBaseTimeEntity _super = new com.ourdressingtable.common.util.QBaseTimeEntity(this);
 
     //inherited
     public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
