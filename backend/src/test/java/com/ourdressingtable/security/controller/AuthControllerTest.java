@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = AuthController.class)
-@Import(TestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Spring security 테스트")
 public class AuthControllerTest {
