@@ -6,8 +6,10 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.service.DressingTableService;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -126,7 +129,6 @@ public class DressingTableControllerTest {
             // given
             doNothing().when(dressingTableService).deleteDressingTable(eq(1L));
 
-
             // when & then
             mockMvc.perform(delete("/api/dressing-tables/{id}", 1L)
                     .with(csrf()))
@@ -142,8 +144,41 @@ public class DressingTableControllerTest {
             doThrow(new OurDressingTableException(ErrorCode.FORBIDDEN))
                     .when(dressingTableService).deleteDressingTable(eq(1L));
 
-            mockMvc.perform(delete("/api/dressing-tables/{id}", 1L))
+            mockMvc.perform(delete("/api/dressing-tables/{id}", 1L)
+                    .with(csrf()))
                     .andExpect(status().isForbidden());
         }
+    }
+
+    @Nested
+    @DisplayName("나의 모든 화장대 조회")
+    class GetAllMyDressingTable {
+
+        @DisplayName("나의 모든 화장대 조회 성공")
+        @WithCustomUser
+        @Test
+        public void getAllMyDressingTable_returnSuccess() throws Exception {
+            DressingTableResponse firstDressingTableResponse = TestDataFactory.testDressingTableResponse(1L, "첫번째 화장대");
+            DressingTableResponse secondDressingTableResponse = TestDataFactory.testDressingTableResponse(2L, "두번째 화장대");
+            List<DressingTableResponse> dressingTableResponseList = List.of(firstDressingTableResponse, secondDressingTableResponse);
+
+            given(dressingTableService.getAllMyDressingTables()).willReturn(dressingTableResponseList);
+
+            performGetAllMyDressingTable()
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.size()").value(2));
+        }
+
+        @DisplayName("나의 모든 화장대 조회 실패 - 미인증 사용자")
+        @Test
+        public void getAllMyDressingTable_returnMemberError() throws Exception {
+            performGetAllMyDressingTable()
+                    .andExpect(status().isUnauthorized());
+        }
+    }
+
+    private ResultActions performGetAllMyDressingTable() throws Exception {
+        return mockMvc.perform(get("/api/dressing-tables")
+                .with(csrf()));
     }
 }

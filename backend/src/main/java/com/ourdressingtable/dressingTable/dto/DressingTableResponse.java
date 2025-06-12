@@ -15,6 +15,9 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DressingTableResponse {
 
+    @Schema(description = "화장대 id", example = "1")
+    private Long id;
+
     @Schema(description = "화장대 이름", example = "my dt")
     private String name;
 
@@ -22,13 +25,15 @@ public class DressingTableResponse {
     private String imageUrl;
 
     @Builder
-    public DressingTableResponse(String name, String imageUrl) {
+    public DressingTableResponse(Long id, String name, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
     }
 
     public static DressingTableResponse from(DressingTable dressingTable) {
         return DressingTableResponse.builder()
+                .id(dressingTable.getId())
                 .name(dressingTable.getName())
                 .imageUrl(dressingTable.getImageUrl())
                 .build();

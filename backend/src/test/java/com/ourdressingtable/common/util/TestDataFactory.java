@@ -10,6 +10,7 @@ import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.member.domain.*;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
@@ -20,6 +21,7 @@ import com.ourdressingtable.security.dto.CustomUserDetails;
 import com.ourdressingtable.security.dto.LoginRequest;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class TestDataFactory {
 
@@ -149,6 +151,14 @@ public class TestDataFactory {
     public static UpdateDressingTableRequest testUpdateDressingTableRequest() {
         return UpdateDressingTableRequest.builder()
                 .name("새 이름")
+                .build();
+    }
+
+    public static DressingTableResponse testDressingTableResponse(Long id, String name) {
+        return DressingTableResponse.builder()
+                .id(id)
+                .name(name)
+                .imageUrl("https://image.img")
                 .build();
     }
 
