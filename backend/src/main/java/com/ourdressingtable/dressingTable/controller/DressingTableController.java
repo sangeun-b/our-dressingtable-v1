@@ -65,7 +65,7 @@ public class DressingTableController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping()
+    @GetMapping("/mine")
     @Operation(summary = "내 화장대 조회", description = "사용자의 화장대를 조회합니다.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<DressingTableResponse>> getMyDressingTable() {
         return ResponseEntity.ok(dressingTableService.getAllMyDressingTables());

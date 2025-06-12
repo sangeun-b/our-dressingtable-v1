@@ -178,7 +178,7 @@ public class DressingTableControllerTest {
     }
 
     private ResultActions performGetAllMyDressingTable() throws Exception {
-        return mockMvc.perform(get("/api/dressing-tables")
+        return mockMvc.perform(get("/api/dressing-tables/mine")
                 .with(csrf()));
     }
 }
