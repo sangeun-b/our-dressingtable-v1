@@ -38,8 +38,7 @@ public class DressingTableController {
     @PostMapping()
     @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.", security = @SecurityRequirement(name="bearerAuth"))
     public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        Long id = dressingTableService.createDressingTable(dressingTableRequest, currentMemberId);
+        Long id = dressingTableService.createDressingTable(dressingTableRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(id).toUri();
@@ -52,17 +51,15 @@ public class DressingTableController {
     @PatchMapping("/{id}")
     @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
     public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid UpdateDressingTableRequest dressingTableRequest) {
-
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        dressingTableService.updateDressingTable(dressingTableRequest, id, currentMemberId);
+        dressingTableService.updateDressingTable(dressingTableRequest, id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "화장대 삭제", description = "사용자의 화장대를 삭제합니다.", security = @SecurityRequirement(name="bearerAuth"))
     public ResponseEntity deleteDressingTable(@PathVariable Long id) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        dressingTableService.deleteDressingTable(id, currentMemberId);
+        dressingTableService.deleteDressingTable(id);
         return ResponseEntity.noContent().build();
     }
+
 }

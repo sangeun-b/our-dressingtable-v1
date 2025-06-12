@@ -10,13 +10,18 @@ import static org.mockito.BDDMockito.given;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.member.domain.Role;
+import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.security.dto.CustomUserDetails;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,12 +31,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@Import(TestSecurityConfig.class)
 @DisplayName("화장대 Service 테스트")
 public class DressingTableServiceImplTest {
 
@@ -43,6 +53,22 @@ public class DressingTableServiceImplTest {
 
     @Mock
     private MemberService memberService;
+
+    @BeforeEach
+    void setUpSecurityContext() {
+        CustomUserDetails userDetails = CustomUserDetails.builder()
+                .memberId(1L)
+                .email("test@example.com")
+                .password("password")
+                .role(Role.ROLE_BASIC)
+                .status(Status.ACTIVE)
+                .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
 
     @Nested
     @DisplayName("화장대 생성 테스트")
@@ -64,7 +90,7 @@ public class DressingTableServiceImplTest {
                         return dressingTable;
                     });
 
-            Long id = dressingTableService.createDressingTable(createDressingTableRequest, member.getId());
+            Long id = dressingTableService.createDressingTable(createDressingTableRequest);
 
             assertEquals(100L, id);
             then(dressingTableRepository).should().save(any(DressingTable.class));
@@ -74,12 +100,17 @@ public class DressingTableServiceImplTest {
         @Test
         public void createDressingTable_shouldReturnMemberNotFoundError() throws Exception {
             // given
-            Long memberId = 100L;
+            CustomUserDetails userDetails = TestDataFactory.testUserDetails(100L);
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
             CreateDressingTableRequest createDressingTableRequest = TestDataFactory.testCreateDressingTableRequest();
 
-            given(memberService.getActiveMemberEntityById(memberId)).willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+            given(memberService.getActiveMemberEntityById(100L))
+                    .willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
 
-            assertThrows(OurDressingTableException.class, () -> dressingTableService.createDressingTable(createDressingTableRequest,memberId));
+            assertThrows(OurDressingTableException.class, () -> dressingTableService.createDressingTable(createDressingTableRequest));
 
 
         }
@@ -98,7 +129,7 @@ public class DressingTableServiceImplTest {
 
             given(dressingTableRepository.findById(dressingTable.getId())).willReturn(Optional.of(dressingTable));
 
-            dressingTableService.updateDressingTable(updateDressingTableRequest, 1L, member.getId());
+            dressingTableService.updateDressingTable(updateDressingTableRequest, 1L);
 
             assertEquals("새 이름", dressingTable.getName());
         }
@@ -110,7 +141,7 @@ public class DressingTableServiceImplTest {
 
             UpdateDressingTableRequest updateDressingTableRequest = TestDataFactory.testUpdateDressingTableRequest();
 
-            assertThrows(OurDressingTableException.class, () -> dressingTableService.updateDressingTable(updateDressingTableRequest,1L,1L));
+            assertThrows(OurDressingTableException.class, () -> dressingTableService.updateDressingTable(updateDressingTableRequest,1L));
         }
     }
 
@@ -124,9 +155,10 @@ public class DressingTableServiceImplTest {
             Member member = TestDataFactory.testMember(1L);
             DressingTable dressingTable = TestDataFactory.testDressingTable(1L, member);
 
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
             given(dressingTableRepository.findById(1L)).willReturn(Optional.of(dressingTable));
 
-            dressingTableService.deleteDressingTable(1L, member.getId());
+            dressingTableService.deleteDressingTable(1L);
 
             assertThat(dressingTable.isDeleted()).isTrue();
 
@@ -135,13 +167,19 @@ public class DressingTableServiceImplTest {
         @DisplayName("화장대 삭제 실패 - 권한 없음")
         @Test
         public void deleteDressingTable_shouldReturnForbiddenError() throws Exception {
-            Member member = TestDataFactory.testMember(1L);
+            CustomUserDetails customUserDetails = TestDataFactory.testUserDetails(100L);
 
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    customUserDetails,  customUserDetails.getPassword(), customUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            Member member = TestDataFactory.testMember(1L);
+            
             DressingTable dressingTable = TestDataFactory.testDressingTable(1L, member);
 
             given(dressingTableRepository.findById(1L)).willReturn(Optional.of(dressingTable));
 
-            assertThatThrownBy(() -> dressingTableService.deleteDressingTable(1L, 100L))
+            assertThatThrownBy(() -> dressingTableService.deleteDressingTable(1L))
                     .isInstanceOf(OurDressingTableException.class)
                     .hasMessageContaining(ErrorCode.FORBIDDEN.getMessage());
         }

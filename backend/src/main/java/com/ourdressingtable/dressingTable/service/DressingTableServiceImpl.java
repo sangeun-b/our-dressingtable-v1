@@ -2,6 +2,7 @@ package com.ourdressingtable.dressingTable.service;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
@@ -23,7 +24,8 @@ public class DressingTableServiceImpl implements DressingTableService {
 
     @Override
     @Transactional
-    public Long createDressingTable(CreateDressingTableRequest dressingTableRequest, Long memberId) {
+    public Long createDressingTable(CreateDressingTableRequest dressingTableRequest) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
         DressingTable dressingTable = dressingTableRequest.toEntity(member);
         dressingTableRepository.save(dressingTable);
@@ -32,7 +34,8 @@ public class DressingTableServiceImpl implements DressingTableService {
 
     @Override
     @Transactional
-    public void updateDressingTable(UpdateDressingTableRequest dressingTableRequest, Long id, Long memberId) {
+    public void updateDressingTable(UpdateDressingTableRequest dressingTableRequest, Long id) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         DressingTable dressingTable = dressingTableRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
 
         if(!dressingTable.getMember().getId().equals(memberId)){
@@ -49,7 +52,8 @@ public class DressingTableServiceImpl implements DressingTableService {
 
     @Override
     @Transactional
-    public void deleteDressingTable(Long id, Long memberId) {
+    public void deleteDressingTable(Long id) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         DressingTable dressingTable = dressingTableRepository.findById(id)
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
 

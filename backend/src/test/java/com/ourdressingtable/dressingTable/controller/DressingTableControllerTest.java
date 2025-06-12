@@ -51,7 +51,7 @@ public class DressingTableControllerTest {
             // given
             CreateDressingTableRequest createDressingTableRequest = TestDataFactory.testCreateDressingTableRequest();
 
-            given(dressingTableService.createDressingTable(any(),anyLong())).willReturn(1L);
+            given(dressingTableService.createDressingTable(any())).willReturn(1L);
 
             // when & then
             mockMvc.perform(post("/api/dressing-tables")
@@ -89,7 +89,7 @@ public class DressingTableControllerTest {
             UpdateDressingTableRequest updateDressingTableRequest = TestDataFactory.testUpdateDressingTableRequest();
 
             doNothing().when(dressingTableService)
-                    .updateDressingTable(any(UpdateDressingTableRequest.class),anyLong(),any());
+                    .updateDressingTable(any(UpdateDressingTableRequest.class),anyLong());
 
             // when & then
             mockMvc.perform(patch("/api/dressing-tables/{id}", 1L)
@@ -106,7 +106,7 @@ public class DressingTableControllerTest {
             UpdateDressingTableRequest updateDressingTableRequest = TestDataFactory.testUpdateDressingTableRequest();
 
             doThrow(new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND))
-                    .when(dressingTableService).updateDressingTable(any(UpdateDressingTableRequest.class),eq(999L),any());
+                    .when(dressingTableService).updateDressingTable(any(UpdateDressingTableRequest.class),eq(999L));
 
             mockMvc.perform(patch("/api/dressing-tables/{id}", 999L)
                     .with(csrf())
@@ -124,14 +124,15 @@ public class DressingTableControllerTest {
         @Test
         public void deleteDressingTable_returnSuccess() throws Exception {
             // given
-            doNothing().when(dressingTableService).deleteDressingTable(eq(1L),anyLong());
+            doNothing().when(dressingTableService).deleteDressingTable(eq(1L));
+
 
             // when & then
             mockMvc.perform(delete("/api/dressing-tables/{id}", 1L)
                     .with(csrf()))
                     .andExpect(status().isNoContent());
 
-            verify(dressingTableService).deleteDressingTable(1L,1L);
+            verify(dressingTableService).deleteDressingTable(1L);
         }
 
         @DisplayName("화장대 삭제 실패 - 권한 없음")
@@ -139,7 +140,7 @@ public class DressingTableControllerTest {
         @Test
         public void deleteDressingTable_returnForbidden() throws Exception {
             doThrow(new OurDressingTableException(ErrorCode.FORBIDDEN))
-                    .when(dressingTableService).deleteDressingTable(eq(1L),anyLong());
+                    .when(dressingTableService).deleteDressingTable(eq(1L));
 
             mockMvc.perform(delete("/api/dressing-tables/{id}", 1L))
                     .andExpect(status().isForbidden());
