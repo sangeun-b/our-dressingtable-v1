@@ -6,6 +6,8 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.communityCategory.repository.CommunityCategoryRepository;
+import com.ourdressingtable.dressingTable.domain.DressingTable;
+import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.Status;
@@ -28,6 +30,7 @@ public class DummyDataInitializer implements CommandLineRunner {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DressingTableRepository dressingTableRepository;
 
     @Override
     @Transactional
@@ -85,6 +88,14 @@ public class DummyDataInitializer implements CommandLineRunner {
                 .build();
 
         commentRepository.saveAll(List.of(comment1, comment2));
+
+        DressingTable dressingTable = DressingTable.builder()
+                .name("나의 화장대")
+                .imageUrl("https://image.img")
+                .member(member)
+                .build();
+
+        dressingTableRepository.save(dressingTable);
     }
 
 }

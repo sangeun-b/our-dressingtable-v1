@@ -5,7 +5,7 @@ import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.util.BaseTimeEntity;
+import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

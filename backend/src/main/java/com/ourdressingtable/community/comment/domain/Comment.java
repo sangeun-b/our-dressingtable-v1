@@ -3,7 +3,7 @@ package com.ourdressingtable.community.comment.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.util.BaseTimeEntity;
+import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
