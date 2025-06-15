@@ -25,7 +25,7 @@ public class CreatePostRequest {
     @NotNull(message = "카테고리를 선택해주세요.")
     private Long communityCategoryId;
 
-    @Schema(description = "이미지", example = "imageUrl")
+    @Schema(description = "이미지", example = "{https://image1.img, {https://image2.img}")
     private List<String> images;
 
     @Builder

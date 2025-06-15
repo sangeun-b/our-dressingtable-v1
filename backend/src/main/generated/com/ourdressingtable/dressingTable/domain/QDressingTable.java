@@ -37,6 +37,8 @@ public class QDressingTable extends EntityPathBase<DressingTable> {
 
     public final com.ourdressingtable.member.domain.QMember member;
 
+    public final ListPath<com.ourdressingtable.memberCosmetic.domain.MemberCosmetic, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic> memberCosmetics = this.<com.ourdressingtable.memberCosmetic.domain.MemberCosmetic, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic>createList("memberCosmetics", com.ourdressingtable.memberCosmetic.domain.MemberCosmetic.class, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic.class, PathInits.DIRECT2);
+
     public final StringPath name = createString("name");
 
     //inherited
