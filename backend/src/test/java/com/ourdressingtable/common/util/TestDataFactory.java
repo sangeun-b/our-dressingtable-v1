@@ -7,6 +7,7 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
+import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
@@ -123,6 +124,15 @@ public class TestDataFactory {
                 .password("password")
                 .role(Role.ROLE_BASIC)
                 .status(Status.ACTIVE)
+                .build();
+    }
+
+    public static PostSearchCondition testPostSearchCondition(String searchType, String keyword, String category, String sortBy) {
+        return PostSearchCondition.builder()
+                .searchType(searchType)
+                .keyword(keyword)
+                .category(category)
+                .sortBy(sortBy)
                 .build();
     }
     public static Post testPost(Long id, Member member, CommunityCategory communityCategory) {

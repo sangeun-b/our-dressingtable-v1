@@ -2,6 +2,7 @@ package com.ourdressingtable.community.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +14,8 @@ import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.community.post.dto.PostResponse;
+import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.community.post.service.PostServiceImpl;
@@ -22,6 +25,7 @@ import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -168,7 +176,7 @@ public class PostServiceImplTest {
     class getPost {
         @DisplayName("게시글 ENTITY 조회 - 성공")
         @Test
-        public void getPost_shouldReturnSuccess() {
+        public void getPostEntity_shouldReturnSuccess() {
             Member member = TestDataFactory.testMember(1L);
             CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
             Post post = TestDataFactory.testPost(1L,member, communityCategory);
@@ -183,7 +191,7 @@ public class PostServiceImplTest {
         }
         @DisplayName("게시글 ENTITY 조회 실패 - 삭제된 게시글")
         @Test
-        public void getPost_shouldReturnPostNotFoundError() {
+        public void getPostEntity_shouldReturnPostNotFoundError() {
              Member member = TestDataFactory.testMember(1L);
              CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
              Post post = TestDataFactory.testPost(1L, member, communityCategory);
@@ -193,6 +201,39 @@ public class PostServiceImplTest {
 
              assertThatThrownBy(() ->postService.getValidPostEntityById(1L)).isInstanceOf(OurDressingTableException.class)
                      .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
+        }
+    }
+    @Nested
+    @DisplayName("게시글 조회 테스트")
+    class GetPosts {
+        @DisplayName("게시글 조회 성공")
+        @Test
+        public void getPosts_returnSuccess() {
+            PostSearchCondition condition = TestDataFactory.testPostSearchCondition("", "", "","");
+            Pageable pageable = PageRequest.of(0, 10);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(10L);
+            Member member = TestDataFactory.testMember(1L);
+            List<Post> postList = List.of(TestDataFactory.testPost(1L,member,communityCategory), TestDataFactory.testPost(2L,member,communityCategory));
+            Page<Post> postPage = new PageImpl<>(postList, pageable, postList.size());
+
+            given(postRepository.search(condition, pageable)).willReturn(postPage);
+
+            Page<PostResponse> result = postService.getPosts(condition, pageable);
+
+            assertEquals(2, result.getTotalElements());
+            assertEquals("제목", result.getContent().get(0).getTitle());
+
+        }
+        
+        @DisplayName("게시글 조회 실패 - 예외 발생")
+        @Test
+        public void getPosts_returnError() {
+            PostSearchCondition condition = TestDataFactory.testPostSearchCondition("", "", "","");
+            Pageable pageable = PageRequest.of(0, 10);
+
+            given(postRepository.search(condition, pageable)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+
+            assertThrows(OurDressingTableException.class, () -> postService.getPosts(condition, pageable));
         }
     }
 

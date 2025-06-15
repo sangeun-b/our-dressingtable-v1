@@ -20,7 +20,6 @@ public enum ErrorCode {
     ALREADY_WITHDRAW_OR_BLOCKED(HttpStatus.BAD_REQUEST, "M008", "이미 탈퇴 또는 차단된 회원입니다."),
 
     // 인증/인가 관련
-
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
 
@@ -37,6 +36,7 @@ public enum ErrorCode {
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "좋아요 기록이 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "C005", "댓글을 찾을 수 없습니다."),
     INVALID_COMMENT_INPUT(HttpStatus.BAD_REQUEST, "C006", "댓글 내용을 입력해주세요."),
+
     // 화장대 관련
     DRESSING_TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "D001", "화장대를 찾을 수 없습니다.");
 
