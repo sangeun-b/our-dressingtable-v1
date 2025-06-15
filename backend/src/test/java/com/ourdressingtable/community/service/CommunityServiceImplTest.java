@@ -43,7 +43,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@Import(TestSecurityConfig.class)
 @DisplayName("Community 테스트")
 public class CommunityServiceImplTest {
 

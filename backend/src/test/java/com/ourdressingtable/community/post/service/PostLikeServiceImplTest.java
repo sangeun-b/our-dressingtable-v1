@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.domain.post.service;
+package com.ourdressingtable.community.post.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

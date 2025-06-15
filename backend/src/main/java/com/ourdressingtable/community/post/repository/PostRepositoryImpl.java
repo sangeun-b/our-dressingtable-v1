@@ -1,5 +1,7 @@
 package com.ourdressingtable.community.post.repository;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.QPost;
 import com.ourdressingtable.community.post.dto.PostSearchCondition;
@@ -38,10 +40,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     builder.and(post.member.nickname.containsIgnoreCase(condition.getKeyword()));
                     break;
                 case "title_content":
-                default:
-                    builder.and(post.title.containsIgnoreCase(condition.getKeyword()))
-                            .or(post.content.containsIgnoreCase(condition.getKeyword()));
+                    builder.andAnyOf(
+                            post.title.containsIgnoreCase(condition.getKeyword()),
+                            post.content.containsIgnoreCase(condition.getKeyword())
+                    );
                     break;
+                default:
+                    throw new OurDressingTableException(ErrorCode.BAD_REQUEST);
             }
         }
 

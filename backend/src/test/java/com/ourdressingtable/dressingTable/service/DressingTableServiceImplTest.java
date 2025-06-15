@@ -43,7 +43,6 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@Import(TestSecurityConfig.class)
 @DisplayName("화장대 Service 테스트")
 public class DressingTableServiceImplTest {
 
