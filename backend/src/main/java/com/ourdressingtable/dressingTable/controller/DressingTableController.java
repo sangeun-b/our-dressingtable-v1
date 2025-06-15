@@ -3,6 +3,7 @@ package com.ourdressingtable.dressingTable.controller;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableDetailResponse;
 import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.service.DressingTableService;
@@ -28,18 +29,19 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/api/dressing-tables")
 @Tag(name = "화장대", description = "화장대 관련 API")
-@ApiResponses({
-        @ApiResponse(responseCode = "201", description = "화장대 생성 성공"),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-        @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-})
+
 public class DressingTableController {
 
     private final DressingTableService dressingTableService;
 
     @PostMapping()
     @Operation(summary = "화장대 생성", description = "새로운 화장대를 생성합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "화장대 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     public ResponseEntity<CreateDressingTableResponse> addDressingTable(@RequestBody @Valid CreateDressingTableRequest dressingTableRequest) {
         Long id = dressingTableService.createDressingTable(dressingTableRequest);
 
@@ -53,6 +55,12 @@ public class DressingTableController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "화장대 수정", description = "기존 화장대를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "화장대 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     public ResponseEntity updateDressingTable(@PathVariable Long id, @RequestBody @Valid UpdateDressingTableRequest dressingTableRequest) {
         dressingTableService.updateDressingTable(dressingTableRequest, id);
         return ResponseEntity.noContent().build();
@@ -60,6 +68,12 @@ public class DressingTableController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "화장대 삭제", description = "사용자의 화장대를 삭제합니다.", security = @SecurityRequirement(name="bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "화장대 삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     public ResponseEntity deleteDressingTable(@PathVariable Long id) {
         dressingTableService.deleteDressingTable(id);
         return ResponseEntity.noContent().build();
@@ -67,8 +81,25 @@ public class DressingTableController {
 
     @GetMapping("/mine")
     @Operation(summary = "내 화장대 조회", description = "사용자의 화장대를 조회합니다.", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 화장대 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     public ResponseEntity<List<DressingTableResponse>> getMyDressingTable() {
         return ResponseEntity.ok(dressingTableService.getAllMyDressingTables());
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "화장대 상세 조회", description = "화장대 상세 조회를 합니다.", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "화장대 상세 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<DressingTableDetailResponse> getDressingTableDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(dressingTableService.getDressingTableDetail(id));
+    }
 }

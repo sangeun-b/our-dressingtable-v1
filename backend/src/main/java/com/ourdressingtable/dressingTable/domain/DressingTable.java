@@ -2,7 +2,10 @@ package com.ourdressingtable.dressingTable.domain;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
+import com.ourdressingtable.memberCosmetic.domain.MemberCosmetic;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +27,7 @@ public class DressingTable extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dressing_table_id")
     private Long id;
 
     private String name;
@@ -40,6 +44,9 @@ public class DressingTable extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy ="dressingTable", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberCosmetic> memberCosmetics = new ArrayList<>();
 
     @Builder
     public DressingTable(Long id, String name, String imageUrl, Member member, boolean isDeleted, Timestamp deletedAt) {

@@ -5,6 +5,7 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingTable.dto.DressingTableDetailResponse;
 import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
@@ -73,5 +74,12 @@ public class DressingTableServiceImpl implements DressingTableService {
         List<DressingTable> dressingTableList = dressingTableRepository.findAllByMemberId(memberId);
         return dressingTableList.stream().map(DressingTableResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public DressingTableDetailResponse getDressingTableDetail(Long id) {
+        DressingTable dressingTable = dressingTableRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
+        return DressingTableDetailResponse.from(dressingTable);
     }
 }
