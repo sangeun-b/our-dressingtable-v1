@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.domain.post.service;
+package com.ourdressingtable.community.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -52,7 +52,8 @@ public class Comment extends BaseTimeEntity {
 
 
     @Builder
-    public Comment(String content, int depth, Member member, Post post, Comment parent, boolean isDeleted) {
+    public Comment(Long id, String content, int depth, Member member, Post post, Comment parent, boolean isDeleted) {
+        this.id = id;
         this.content = content;
         this.depth = depth;
         this.member = member;

@@ -1,4 +1,4 @@
-package com.ourdressingtable.community.domain.post.controller;
+package com.ourdressingtable.community.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.security.WithCustomUser;

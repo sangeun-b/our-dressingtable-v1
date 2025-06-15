@@ -2,6 +2,7 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
+import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -22,6 +23,7 @@ import com.ourdressingtable.security.dto.LoginRequest;
 
 import java.sql.Timestamp;
 import java.util.List;
+import org.hibernate.sql.Update;
 
 public class TestDataFactory {
 
@@ -188,6 +190,14 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static CreateCommentRequest testCreateCommentRequestWithParent(Long postId, Long parentId) {
+        return CreateCommentRequest.builder()
+                .content("좋아요!")
+                .postId(postId)
+                .parentId(parentId)
+                .build();
+    }
+
     public static CreateCommentRequest testCreateCommentRequestWithNull(Long postId) {
         return CreateCommentRequest.builder()
                 .postId(null)
@@ -195,12 +205,27 @@ public class TestDataFactory {
                 .build();
     }
 
-    public static Comment testComment(Long id, Post post, Member member) {
+    public static UpdateCommentRequest testUpdateCommentRequest(Long commentId) {
+        return UpdateCommentRequest.builder()
+                .content("수정된 내용")
+                .build();
+    }
+
+    public static Comment testComment(Long id) {
         return Comment.builder()
+                .id(id)
                 .content("추천!")
+                .depth(0)
+                .build();
+    }
+
+    public static Comment testCommentWithPostAndMember(Long id, Post post, Member member) {
+        return Comment.builder()
+                .id(id)
+                .content("추천입니다!!")
+                .depth(0)
                 .post(post)
                 .member(member)
                 .build();
     }
-
 }
