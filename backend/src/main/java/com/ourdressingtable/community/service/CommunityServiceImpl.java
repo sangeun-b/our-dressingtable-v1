@@ -8,6 +8,7 @@ import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
+import com.ourdressingtable.community.post.dto.PostResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
@@ -17,6 +18,9 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +34,13 @@ public class CommunityServiceImpl implements CommunityService {
     private final MemberService memberService;
     private final PostLikeService postLikeService;
     private final CommentService commentService;
+    private final PageableArgumentResolver pageableArgumentResolver;
 
     @Override
     @Transactional
     public Long createPost(CreatePostRequest createPostRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
-        if(member == null) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
-        }
         return postService.createPost(createPostRequest, memberId);
     }
 
@@ -59,9 +61,6 @@ public class CommunityServiceImpl implements CommunityService {
     private void checkPostPermission(Long postId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
-        if(member == null) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
-        }
         Post post = postService.getValidPostEntityById(postId);
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
@@ -71,9 +70,6 @@ public class CommunityServiceImpl implements CommunityService {
     private void checkCommentPermission(Long commentId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
-        if(member == null) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
-        }
         Comment comment = commentService.getValidCommentEntityById(commentId);
         if(!comment.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
@@ -105,9 +101,6 @@ public class CommunityServiceImpl implements CommunityService {
     public Long createComment(CreateCommentRequest createCommentRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
-        if(member == null) {
-            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
-        }
         return commentService.createComment(createCommentRequest, member);
     }
 
@@ -123,5 +116,23 @@ public class CommunityServiceImpl implements CommunityService {
         checkCommentPermission(commentId);
         commentService.updateComment(commentId, updateCommentRequest);
 
+    }
+
+    @Override
+    public Page<PostResponse> getMyPosts(Pageable pageable, String sortBy) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return postService.getMyPosts(memberId, pageable, sortBy);
+    }
+
+    @Override
+    public Page<PostResponse> getLikedPosts(Pageable pageable, String sortBy) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return postService.getLikedPosts(memberId, pageable, sortBy);
+    }
+
+    @Override
+    public Page<PostResponse> getCommentedPosts(Pageable pageable, String sortBy) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return postService.getCommentedPosts(memberId, pageable, sortBy);
     }
 }

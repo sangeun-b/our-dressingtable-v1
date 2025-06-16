@@ -14,14 +14,13 @@ import org.springframework.data.domain.Pageable;
 public interface PostService {
     Long createPost(CreatePostRequest request, Long memberId);
     Page<PostResponse> getPosts(PostSearchCondition condition, Pageable pageable);
-    void deletePost(Long postI);
+    void deletePost(Long postId);
     void updatePost(Long postId, UpdatePostRequest request);
     int countPosts();
     int countPostsByCategory(String category);
-    List<Post> getPostsByCategory(String category);
-    List<Post> getPostsByMember(Long memberId);
-    List<Post> getPostsByTitle(String title);
-    List<Post> getPostsByContent(String content);
     Post getPostEntityById(Long id);
     Post getValidPostEntityById(Long id);
+    Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, String sortBy);
+    Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, String sortBy);
+    Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, String sortBy);
 }

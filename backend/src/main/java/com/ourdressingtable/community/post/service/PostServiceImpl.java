@@ -90,26 +90,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostsByCategory(String category) {
-        return List.of();
-    }
-
-    @Override
-    public List<Post> getPostsByMember(Long memberId) {
-        return List.of();
-    }
-
-    @Override
-    public List<Post> getPostsByTitle(String title) {
-        return List.of();
-    }
-
-    @Override
-    public List<Post> getPostsByContent(String content) {
-        return List.of();
-    }
-
-    @Override
     public Post getPostEntityById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
     }
@@ -118,5 +98,20 @@ public class PostServiceImpl implements PostService {
     public Post getValidPostEntityById(Long id) {
         return postRepository.findById(id).filter(post -> !post.isDeleted())
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    @Override
+    public Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, String sortBy) {
+        return postRepository.findMyPosts(memberId, pageable, sortBy).map(PostResponse::from);
+    }
+
+    @Override
+    public Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, String sortBy) {
+        return postRepository.findLikedPosts(memberId, pageable, sortBy).map(PostResponse::from);
+    }
+
+    @Override
+    public Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, String sortBy) {
+        return postRepository.findCommentedPosts(memberId, pageable, sortBy).map(PostResponse::from);
     }
 }
