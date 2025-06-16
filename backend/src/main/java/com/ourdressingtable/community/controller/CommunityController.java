@@ -7,11 +7,7 @@ import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.CreateCommentResponse;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
 import com.ourdressingtable.community.comment.service.CommentService;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.CreatePostResponse;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostLikeResponse;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.security.dto.CustomUserDetails;
@@ -22,16 +18,11 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Slf4j
@@ -42,6 +33,25 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class CommunityController {
 
     private final CommunityService communityService;
+    private final PostService postService;
+
+    @Operation(summary = "내가 작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
+    @GetMapping("/posts/me")
+    public ResponseEntity<Page<PostResponse>> getMyPosts(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getMyPosts(pageable, sortBy));
+    }
+
+    @Operation(summary = "내가 좋아요한 게시글 조회", description = "사용자가 좋아요한 게시글 목록을 조회합니다.")
+    @GetMapping("/posts/me/likes")
+    public ResponseEntity<Page<PostResponse>> getLikedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getLikedPosts(pageable, sortBy));
+    }
+
+    @Operation(summary = "내가 댓글 단 게시글 조회", description = "사용자가 댓글을 작성한 게시글 목록을 조회합니다.")
+    @GetMapping("/posts/me/comment")
+    public ResponseEntity<Page<PostResponse>> getCommentedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getCommentedPosts(pageable, sortBy));
+    }
 
     @Operation(summary = "게시글 상세 조회", description = "로그인 여부에 따라 좋아요 여부를 포함한 게시글 상세정보를 조회합니다.")
     @GetMapping("/posts/{postId}")
