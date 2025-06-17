@@ -228,7 +228,15 @@ public class TestDataFactory {
                 .depth(0)
                 .build();
     }
-
+    public static Comment testCommentWithMemberAndPost(Long id, Member member, Post post) {
+        return Comment.builder()
+                .id(id)
+                .content("추천!")
+                .depth(0)
+                .member(member)
+                .post(post)
+                .build();
+    }
     public static Comment testCommentWithPostAndMember(Long id, Post post, Member member) {
         return Comment.builder()
                 .id(id)

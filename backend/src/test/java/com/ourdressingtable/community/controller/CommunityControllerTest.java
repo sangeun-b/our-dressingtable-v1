@@ -21,13 +21,17 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
+import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.service.CommentService;
+import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
 import com.ourdressingtable.community.post.dto.PostDetailResponse;
+import com.ourdressingtable.community.post.dto.PostResponse;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
-import com.ourdressingtable.community.post.service.PostLikeService;
+import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.service.CommunityService;
+import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import org.hamcrest.Matchers;
@@ -38,11 +42,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.List;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = CommunityController.class)
@@ -194,7 +204,7 @@ public class CommunityControllerTest {
 
     @Nested
     @DisplayName("게시글 좋아요 등록 테스트")
-    class PostLike {
+    class TogglePostLike {
 
         @DisplayName("게시글 좋아요 등록 성공")
         @WithCustomUser
@@ -298,6 +308,124 @@ public class CommunityControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("사용자가 작성한 게시글 조회 테스트")
+    class GetMyPosts {
+
+        @DisplayName("사용자 작성 게시글 조회 성공")
+        @WithCustomUser
+        @Test
+        public void getMyPosts_returnSuccess() throws Exception {
+            Member member = TestDataFactory.testMember(1L);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+            List<PostResponse> postResponseList = List.of(
+                    PostResponse.from(TestDataFactory.testPost(1L, member, communityCategory)),
+                    PostResponse.from(TestDataFactory.testPost(2L, member, communityCategory))
+            );
+
+            Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
+
+            given(communityService.getMyPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+
+            performGetMyPosts()
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].id").value(postResponseList.get(0).getId()));
+
+        }
+        @DisplayName("사용자 작성 게시글 조회 실패 - 내부 서버 오류")
+        @WithCustomUser
+        @Test
+        public void getMyPosts_returnInternalServerError() throws Exception {
+
+            given(communityService.getMyPosts(any(Pageable.class), any(String.class)))
+                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+
+            performGetMyPosts().andExpect(status().isInternalServerError());
+        }
+    }
+
+        @Nested
+        @DisplayName("사용자가 좋아요한 게시글 조회 테스트")
+        class GetLikedPosts {
+
+            @DisplayName("사용자 좋아요 게시글 조회 성공")
+            @WithCustomUser
+            @Test
+            public void getLikedPosts_returnSuccess() throws Exception {
+                Member member = TestDataFactory.testMember(1L);
+                CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+                Post post = TestDataFactory.testPost(1L, member, communityCategory);
+                Post post_second = TestDataFactory.testPost(2L, member, communityCategory);
+                List<PostResponse> postResponseList = List.of(
+                        PostResponse.from(post),
+                        PostResponse.from(post_second)
+                );
+
+                PostLike postLike = TestDataFactory.testPostLike(1L, member, post);
+                PostLike postLike_second = TestDataFactory.testPostLike(2L, member, post_second);
+
+                Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
+
+                given(communityService.getLikedPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+
+                performGetLikedPosts()
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.content[0].id").value(postResponseList.get(0).getId()));
+
+            }
+
+        @DisplayName("사용자 좋아요 게시글 조회 실패 - 유효하지 않는 게시글")
+        @Test
+        public void getMyPosts_returnNotFoundError() throws Exception {
+
+            given(communityService.getLikedPosts(any(Pageable.class), any(String.class)))
+                    .willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
+
+            performGetLikedPosts().andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자가 댓글 단 게시글 조회 테스트")
+    class GetCommentedPosts {
+
+        @DisplayName("사용자 댓글 단 게시글 조회 성공")
+        @WithCustomUser
+        @Test
+        public void getCommentedPosts_returnSuccess() throws Exception {
+            Member member = TestDataFactory.testMember(1L);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
+            Post post_second = TestDataFactory.testPost(2L, member, communityCategory);
+            List<PostResponse> postResponseList = List.of(
+                    PostResponse.from(post),
+                    PostResponse.from(post_second)
+            );
+
+            Comment comment = TestDataFactory.testCommentWithMemberAndPost(1L, member, post);
+
+            Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
+
+            given(communityService.getCommentedPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+
+            performGetCommentedPosts()
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].id").value(postResponseList.get(0).getId()));
+
+        }
+
+        @DisplayName("사용자 댓글 단 게시글 조회 실패 - 내부 서버 오류 ")
+        @Test
+        public void getMyPosts_returnInternalServerError() throws Exception {
+
+            given(communityService.getCommentedPosts(any(Pageable.class), any(String.class)))
+                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+
+            performGetCommentedPosts().andExpect(status().isInternalServerError());
+        }
+    }
+
+
     private ResultActions performCreatePost(CreatePostRequest request) throws Exception {
         return mockMvc.perform(post("/api/community/posts")
                 .with(csrf())
@@ -323,7 +451,7 @@ public class CommunityControllerTest {
     }
 
     private ResultActions performCreatePostLike(Long postId, Long memberId) throws Exception {
-        return mockMvc.perform(post("/api/community/posts/{postId}/like", postId)
+        return mockMvc.perform(post("/api/community/posts/{postId}/likes", postId)
                 .param("memberId", memberId.toString())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON));
@@ -339,5 +467,23 @@ public class CommunityControllerTest {
     private ResultActions performDeleteComment(Long commentId, Long postId) throws Exception {
         return mockMvc.perform(delete("/api/community/posts/{postId}/comments/{commentId}", postId, commentId)
                 .with(csrf()));
+    }
+
+    private ResultActions performGetMyPosts() throws Exception {
+        return mockMvc.perform(get("/api/community/posts/me")
+                .param("page", "0")
+                .param("size", "10"));
+    }
+
+    private ResultActions performGetLikedPosts() throws Exception {
+        return mockMvc.perform(get("/api/community/posts/me/likes")
+                .param("page", "0")
+                .param("size", "10"));
+    }
+
+    private ResultActions performGetCommentedPosts() throws Exception {
+        return mockMvc.perform(get("/api/community/posts/me/comments")
+                .param("page", "0")
+                .param("size", "10"));
     }
 }

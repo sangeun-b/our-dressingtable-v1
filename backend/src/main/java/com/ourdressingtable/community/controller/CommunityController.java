@@ -33,22 +33,21 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class CommunityController {
 
     private final CommunityService communityService;
-    private final PostService postService;
 
-    @Operation(summary = "내가 작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
+    @Operation(summary = "사용자가 작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
     @GetMapping("/posts/me")
     public ResponseEntity<Page<PostResponse>> getMyPosts(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
         return ResponseEntity.ok(communityService.getMyPosts(pageable, sortBy));
     }
 
-    @Operation(summary = "내가 좋아요한 게시글 조회", description = "사용자가 좋아요한 게시글 목록을 조회합니다.")
+    @Operation(summary = "사용자가 좋아요한 게시글 조회", description = "사용자가 좋아요한 게시글 목록을 조회합니다.")
     @GetMapping("/posts/me/likes")
     public ResponseEntity<Page<PostResponse>> getLikedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
         return ResponseEntity.ok(communityService.getLikedPosts(pageable, sortBy));
     }
 
-    @Operation(summary = "내가 댓글 단 게시글 조회", description = "사용자가 댓글을 작성한 게시글 목록을 조회합니다.")
-    @GetMapping("/posts/me/comment")
+    @Operation(summary = "사용자가 댓글 단 게시글 조회", description = "사용자가 댓글을 작성한 게시글 목록을 조회합니다.")
+    @GetMapping("/posts/me/comments")
     public ResponseEntity<Page<PostResponse>> getCommentedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
         return ResponseEntity.ok(communityService.getCommentedPosts(pageable, sortBy));
     }
@@ -83,7 +82,7 @@ public class CommunityController {
     }
 
     @Operation(summary = "좋아요 등록", description = "게시글에 좋아요를 등록합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/posts/{postId}/like")
+    @PostMapping("/posts/{postId}/likes")
     public ResponseEntity<PostLikeResponse> postLike(@PathVariable Long postId) {
         boolean liked = communityService.toggleLike(postId);
         return ResponseEntity.ok(PostLikeResponse.builder().liked(liked).build());
