@@ -1,14 +1,10 @@
 package com.ourdressingtable.community.post.service;
 
 import com.ourdressingtable.community.post.domain.Post;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostResponse;
-import com.ourdressingtable.community.post.dto.PostSearchCondition;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
@@ -101,17 +97,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, String sortBy) {
-        return postRepository.findMyPosts(memberId, pageable, sortBy).map(PostResponse::from);
+    public Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
+        return postRepository.findMyPosts(memberId, pageable, condition).map(PostResponse::from);
     }
 
     @Override
-    public Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, String sortBy) {
-        return postRepository.findLikedPosts(memberId, pageable, sortBy).map(PostResponse::from);
+    public Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
+        return postRepository.findLikedPosts(memberId, pageable, condition).map(PostResponse::from);
     }
 
     @Override
-    public Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, String sortBy) {
-        return postRepository.findCommentedPosts(memberId, pageable, sortBy).map(PostResponse::from);
+    public Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
+        return postRepository.findCommentedPosts(memberId, pageable, condition).map(PostResponse::from);
     }
 }

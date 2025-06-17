@@ -1,6 +1,7 @@
 package com.ourdressingtable.communityCategory.domain;
 
 
+import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "community_categories")
-public class CommunityCategory {
+public class CommunityCategory extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "community_category_id")
@@ -19,9 +20,22 @@ public class CommunityCategory {
 
     private String name;
 
+    private String code;
+
+    private String description;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    private int sort_order;
+
     @Builder
-    public CommunityCategory(Long id, String name) {
+    public CommunityCategory(Long id, String name, String code, String description, int sort_order, boolean isActive) {
         this.id = id;
         this.name = name;
+        this.code = code;
+        this.description = description;
+        this.isActive = isActive;
+        this.sort_order = sort_order;
     }
 }

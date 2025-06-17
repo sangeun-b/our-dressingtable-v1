@@ -1,11 +1,7 @@
 package com.ourdressingtable.community.post.service;
 
 import com.ourdressingtable.community.post.domain.Post;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostResponse;
-import com.ourdressingtable.community.post.dto.PostSearchCondition;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -20,7 +16,7 @@ public interface PostService {
     int countPostsByCategory(String category);
     Post getPostEntityById(Long id);
     Post getValidPostEntityById(Long id);
-    Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, String sortBy);
-    Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, String sortBy);
-    Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, String sortBy);
+    Page<PostResponse> getMyPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition);
+    Page<PostResponse> getLikedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition);
+    Page<PostResponse> getCommentedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition);
 }

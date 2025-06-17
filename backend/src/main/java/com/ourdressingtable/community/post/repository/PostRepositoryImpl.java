@@ -6,6 +6,7 @@ import com.ourdressingtable.community.comment.domain.QComment;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.QPost;
 import com.ourdressingtable.community.post.domain.QPostLike;
+import com.ourdressingtable.community.post.dto.MyPostSearchCondition;
 import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.util.PostSortUtil;
 import com.querydsl.core.BooleanBuilder;
@@ -53,8 +54,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             }
         }
 
-        if(StringUtils.hasText(condition.getCategory())){
-            builder.and(post.communityCategory.name.eq(condition.getCategory()));
+        if(StringUtils.hasText(condition.getCategoryCode())){
+            builder.and(post.communityCategory.name.eq(condition.getCategoryCode()));
         }
 
         OrderSpecifier<?> order = PostSortUtil.getOrderSpecifier(condition.getSortBy(), post);
@@ -78,11 +79,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<Post> findMyPosts(Long memberId, Pageable pageable, String sortBy) {
+    public Page<Post> findMyPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
         QPost post = QPost.post;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.member.id.eq(memberId));
+        if(StringUtils.hasText(condition.getCategoryCode())){
+            builder.and(post.communityCategory.name.eq(condition.getCategoryCode()));
+        }
         List<Post> content = jpaQueryFactory.selectFrom(post)
-                .where(post.member.id.eq(memberId))
-                .orderBy(PostSortUtil.getOrderSpecifier(sortBy, post))
+                .where(builder)
+                .orderBy(PostSortUtil.getOrderSpecifier(condition.getSortBy(), post))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -90,21 +96,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         Long total = jpaQueryFactory
                 .select(post.count())
                 .from(post)
-                .where(post.member.id.eq(memberId))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
     @Override
-    public Page<Post> findLikedPosts(Long memberId, Pageable pageable, String sortBy) {
+    public Page<Post> findLikedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
         QPost post = QPost.post;
         QPostLike postLike = QPostLike.postLike;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.member.id.eq(memberId));
+        if(StringUtils.hasText(condition.getCategoryCode())){
+            builder.and(post.communityCategory.name.eq(condition.getCategoryCode()));
+        }
 
         List<Post> content = jpaQueryFactory.selectFrom(post)
                 .join(postLike).on(postLike.post.eq(post))
-                .where(post.member.id.eq(memberId))
-                .orderBy(PostSortUtil.getOrderSpecifier(sortBy,post))
+                .where(builder)
+                .orderBy(PostSortUtil.getOrderSpecifier(condition.getSortBy(), post))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -112,21 +123,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         Long total = jpaQueryFactory.select(post.count())
                 .from(post)
                 .join(postLike).on(postLike.post.eq(post))
-                .where(postLike.member.id.eq(memberId))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
     @Override
-    public Page<Post> findCommentedPosts(Long memberId, Pageable pageable, String sortBy) {
+    public Page<Post> findCommentedPosts(Long memberId, Pageable pageable, MyPostSearchCondition condition) {
         QPost post = QPost.post;
         QComment comment = QComment.comment;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.member.id.eq(memberId));
+        if(StringUtils.hasText(condition.getCategoryCode())){
+            builder.and(post.communityCategory.name.eq(condition.getCategoryCode()));
+        }
 
         List<Post> content = jpaQueryFactory.selectFrom(post)
                 .join(comment).on(comment.post.eq(post))
-                .where(post.member.id.eq(memberId))
-                .orderBy(PostSortUtil.getOrderSpecifier(sortBy, post))
+                .where(builder)
+                .orderBy(PostSortUtil.getOrderSpecifier(condition.getSortBy(), post))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -134,7 +150,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         Long total = jpaQueryFactory.select(post.count())
                 .from(post)
                 .join(comment).on(comment.post.eq(post))
-                .where(comment.member.id.eq(memberId))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
