@@ -25,10 +25,7 @@ import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostResponse;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
@@ -325,7 +322,7 @@ public class CommunityControllerTest {
 
             Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
 
-            given(communityService.getMyPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+            given(communityService.getMyPosts(any(Pageable.class), any(MyPostSearchCondition.class))).willReturn(responses);
 
             performGetMyPosts()
                     .andExpect(status().isOk())
@@ -337,7 +334,7 @@ public class CommunityControllerTest {
         @Test
         public void getMyPosts_returnInternalServerError() throws Exception {
 
-            given(communityService.getMyPosts(any(Pageable.class), any(String.class)))
+            given(communityService.getMyPosts(any(Pageable.class), any(MyPostSearchCondition.class)))
                     .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
 
             performGetMyPosts().andExpect(status().isInternalServerError());
@@ -366,7 +363,7 @@ public class CommunityControllerTest {
 
                 Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
 
-                given(communityService.getLikedPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+                given(communityService.getLikedPosts(any(Pageable.class), any(MyPostSearchCondition.class))).willReturn(responses);
 
                 performGetLikedPosts()
                         .andExpect(status().isOk())
@@ -378,7 +375,7 @@ public class CommunityControllerTest {
         @Test
         public void getMyPosts_returnNotFoundError() throws Exception {
 
-            given(communityService.getLikedPosts(any(Pageable.class), any(String.class)))
+            given(communityService.getLikedPosts(any(Pageable.class), any(MyPostSearchCondition.class)))
                     .willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
 
             performGetLikedPosts().andExpect(status().isNotFound());
@@ -402,11 +399,13 @@ public class CommunityControllerTest {
                     PostResponse.from(post_second)
             );
 
+
+
             Comment comment = TestDataFactory.testCommentWithMemberAndPost(1L, member, post);
 
             Page<PostResponse> responses = new PageImpl<>(postResponseList, PageRequest.of(0, 1), postResponseList.size());
 
-            given(communityService.getCommentedPosts(any(Pageable.class), any(String.class))).willReturn(responses);
+            given(communityService.getCommentedPosts(any(Pageable.class), any(MyPostSearchCondition.class))).willReturn(responses);
 
             performGetCommentedPosts()
                     .andExpect(status().isOk())
@@ -418,7 +417,7 @@ public class CommunityControllerTest {
         @Test
         public void getMyPosts_returnInternalServerError() throws Exception {
 
-            given(communityService.getCommentedPosts(any(Pageable.class), any(String.class)))
+            given(communityService.getCommentedPosts(any(Pageable.class), any(MyPostSearchCondition.class)))
                     .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
 
             performGetCommentedPosts().andExpect(status().isInternalServerError());

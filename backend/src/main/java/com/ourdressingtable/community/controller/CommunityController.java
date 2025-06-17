@@ -36,20 +36,20 @@ public class CommunityController {
 
     @Operation(summary = "사용자가 작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
     @GetMapping("/posts/me")
-    public ResponseEntity<Page<PostResponse>> getMyPosts(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
-        return ResponseEntity.ok(communityService.getMyPosts(pageable, sortBy));
+    public ResponseEntity<Page<PostResponse>> getMyPosts(@ModelAttribute MyPostSearchCondition condition, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getMyPosts(pageable, condition));
     }
 
     @Operation(summary = "사용자가 좋아요한 게시글 조회", description = "사용자가 좋아요한 게시글 목록을 조회합니다.")
     @GetMapping("/posts/me/likes")
-    public ResponseEntity<Page<PostResponse>> getLikedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
-        return ResponseEntity.ok(communityService.getLikedPosts(pageable, sortBy));
+    public ResponseEntity<Page<PostResponse>> getLikedPost(@ModelAttribute MyPostSearchCondition condition, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getLikedPosts(pageable, condition));
     }
 
     @Operation(summary = "사용자가 댓글 단 게시글 조회", description = "사용자가 댓글을 작성한 게시글 목록을 조회합니다.")
     @GetMapping("/posts/me/comments")
-    public ResponseEntity<Page<PostResponse>> getCommentedPost(@RequestParam(defaultValue = "createdAt") String sortBy, Pageable pageable) {
-        return ResponseEntity.ok(communityService.getCommentedPosts(pageable, sortBy));
+    public ResponseEntity<Page<PostResponse>> getCommentedPost(@ModelAttribute MyPostSearchCondition condition, Pageable pageable) {
+        return ResponseEntity.ok(communityService.getCommentedPosts(pageable, condition));
     }
 
     @Operation(summary = "게시글 상세 조회", description = "로그인 여부에 따라 좋아요 여부를 포함한 게시글 상세정보를 조회합니다.")
