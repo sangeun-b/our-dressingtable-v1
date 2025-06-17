@@ -5,9 +5,8 @@ import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.domain.PostLike;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
@@ -30,11 +29,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -206,10 +212,10 @@ public class CommunityServiceImplTest {
 
     @Nested
     @DisplayName("게시글 상세 조회 테스트")
-    class getPost {
+    class getPosts {
         @DisplayName("게시글 상세 조회 성공")
         @Test
-        public void getPost_shouldReturnSuccess() {
+        public void getPosts_shouldReturnSuccess() {
             Member member = TestDataFactory.testMember(1L);
             CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
 
@@ -227,7 +233,7 @@ public class CommunityServiceImplTest {
 
         @DisplayName("게시글 상세 조회 실패 - 미존재 게시물")
         @Test
-        public void getPost_shouldReturnError() {
+        public void getPosts_shouldReturnError() {
             Long postId = 999L;
             given(postService.getValidPostEntityById(postId)).willThrow(new OurDressingTableException(ErrorCode.POST_NOT_FOUND));
             given(memberService.getActiveMemberEntityById(1L)).willReturn(null);
@@ -235,6 +241,86 @@ public class CommunityServiceImplTest {
             assertThatThrownBy(() ->communityService.getPostDetail(postId)).isInstanceOf(OurDressingTableException.class)
                     .hasMessageContaining(ErrorCode.POST_NOT_FOUND.getMessage());
 
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자가 작성한 게시글 조회 테스트")
+    class getMyPosts {
+        @DisplayName("사용자가 작성한 게시글 조회 성공")
+        @Test
+        public void getMyPosts_shouldReturnSuccess() {
+            MyPostSearchCondition condition = TestDataFactory.testMyPostSearchCondition("");
+            Pageable pageable = PageRequest.of(0, 10);
+            Member member = TestDataFactory.testMember(1L);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
+            Page<Post> postPage = new PageImpl<>(List.of(post), pageable, 1);
+
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
+            given(postService.getMyPosts(1L, pageable, condition)).willReturn(postPage.map(PostResponse::from));
+
+            Page<PostResponse> result = communityService.getMyPosts(pageable, condition);
+
+            assertThat(result).isNotNull();
+            assertEquals(1, result.getTotalElements());
+            assertEquals(post.getId(), result.getContent().get(0).getId());
+
+        }
+
+        @DisplayName("사용자가 작성한 게시글 조회 실패 - 내부 서버 오류")
+        @Test
+        public void getMyPosts_shouldReturnError() {
+            MyPostSearchCondition condition = TestDataFactory.testMyPostSearchCondition("");
+            Pageable pageable = PageRequest.of(0, 10);
+
+            given(postService.getMyPosts(1L, pageable, condition)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+
+            assertThatThrownBy(() -> communityService.getMyPosts(pageable, condition))
+                    .isInstanceOf(OurDressingTableException.class)
+                    .hasMessageContaining(ErrorCode.INTERNAL_SEVER_ERROR.getMessage());;
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자가 좋아요한 게시글 조회 테스트")
+    class getLikedPosts {
+        @DisplayName("사용자가 좋아요한 게시글 조회 성공")
+        @Test
+        public void getLikedPosts_shouldReturnSuccess() {
+            MyPostSearchCondition condition = TestDataFactory.testMyPostSearchCondition("");
+            Pageable pageable = PageRequest.of(0, 10);
+            Member member = TestDataFactory.testMember(1L);
+            CommunityCategory communityCategory = TestDataFactory.testCommunityCategory(1L);
+            Post post = TestDataFactory.testPost(1L, member, communityCategory);
+            PostLike postLike = TestDataFactory.testPostLike(1L, member, post);
+
+            Page<Post> postPage = new PageImpl<>(List.of(post), pageable, 1);
+
+            given(memberService.getActiveMemberEntityById(1L)).willReturn(member);
+            given(postService.getLikedPosts(1L, pageable, condition)).willReturn(postPage.map(PostResponse::from));
+
+            Page<PostResponse> result = communityService.getLikedPosts(pageable, condition);
+
+            assertThat(result).isNotNull();
+            assertEquals(1, result.getTotalElements());
+            assertEquals(post.getId(), result.getContent().get(0).getId());
+
+        }
+
+        @DisplayName("사용자가 좋아요한 게시글 조회 실패 - 내부 서버 오류")
+        @Test
+        public void getMyPosts_shouldReturnError() {
+            MyPostSearchCondition condition = TestDataFactory.testMyPostSearchCondition("");
+            Pageable pageable = PageRequest.of(0, 10);
+            Long invalidId = 999L;
+
+            given(memberService.getActiveMemberEntityById(invalidId)).willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+
+            assertThatThrownBy(() -> communityService.getLikedPosts(pageable, condition))
+                    .isInstanceOf(OurDressingTableException.class)
+                    .hasMessageContaining(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         }
     }
 

@@ -2,10 +2,7 @@ package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostResponse;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,7 +16,8 @@ public interface CommunityService {
     Long createComment(CreateCommentRequest createCommentRequest);
     void updateComment(Long commentId, UpdateCommentRequest updateCommentRequest);
     void deleteComment(Long commentId);
-    Page<PostResponse> getMyPosts(Pageable pageable, String sortBy);
-    Page<PostResponse> getLikedPosts(Pageable pageable, String sortBy);
-    Page<PostResponse> getCommentedPosts(Pageable pageable, String sortBy);
+    Page<PostResponse> getMyPosts(Pageable pageable, MyPostSearchCondition condition);
+    Page<PostResponse> getLikedPosts(Pageable pageable, MyPostSearchCondition condition);
+    Page<PostResponse> getCommentedPosts(Pageable pageable, MyPostSearchCondition condition);
+
 }

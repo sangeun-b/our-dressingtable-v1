@@ -6,10 +6,7 @@ import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
 import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostResponse;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.service.PostLikeService;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.community.post.service.PostService;
@@ -119,20 +116,20 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Page<PostResponse> getMyPosts(Pageable pageable, String sortBy) {
+    public Page<PostResponse> getMyPosts(Pageable pageable, MyPostSearchCondition condition) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return postService.getMyPosts(memberId, pageable, sortBy);
+        return postService.getMyPosts(memberId, pageable, condition);
     }
 
     @Override
-    public Page<PostResponse> getLikedPosts(Pageable pageable, String sortBy) {
+    public Page<PostResponse> getLikedPosts(Pageable pageable, MyPostSearchCondition condition) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return postService.getLikedPosts(memberId, pageable, sortBy);
+        return postService.getLikedPosts(memberId, pageable, condition);
     }
 
     @Override
-    public Page<PostResponse> getCommentedPosts(Pageable pageable, String sortBy) {
+    public Page<PostResponse> getCommentedPosts(Pageable pageable, MyPostSearchCondition condition) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return postService.getCommentedPosts(memberId, pageable, sortBy);
+        return postService.getCommentedPosts(memberId, pageable, condition);
     }
 }
