@@ -44,29 +44,29 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional
     public void updatePost(Long postId, UpdatePostRequest updatePostRequest) {
-        checkPostPermission(postId);
+        validatePostOwner(postId);
         postService.updatePost(postId, updatePostRequest);
     }
 
     @Override
     @Transactional
     public void deletePost(Long postId) {
-        checkPostPermission(postId);
+        validatePostOwner(postId);
         postService.deletePost(postId);
     }
 
-    private void checkPostPermission(Long postId) {
+    private void validatePostOwner(Long postId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(memberId);
+        memberService.getActiveMemberEntityById(memberId);
         Post post = postService.getValidPostEntityById(postId);
         if(!post.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
         }
     }
 
-    private void checkCommentPermission(Long commentId) {
+    private void validateCommentOwner(Long commentId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(memberId);
+        memberService.getActiveMemberEntityById(memberId);
         Comment comment = commentService.getValidCommentEntityById(commentId);
         if(!comment.getMember().getId().equals(memberId)){
             throw new OurDressingTableException(ErrorCode.NO_PERMISSION_TO_EDIT);
@@ -79,7 +79,7 @@ public class CommunityServiceImpl implements CommunityService {
     public PostDetailResponse getPostDetail(Long postId) {
         Post post = postService.getValidPostEntityById(postId);
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(memberId);
+//        Member member = memberService.getActiveMemberEntityById(memberId);
         boolean liked = false;
         if(memberId != null){
             liked = postLikeService.hasLiked(postId, memberId);
@@ -103,14 +103,14 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public void deleteComment(Long commentId) {
-        checkCommentPermission(commentId);
+        validateCommentOwner(commentId);
         commentService.deleteComment(commentId);
 
     }
 
     @Override
     public void updateComment(Long commentId, UpdateCommentRequest updateCommentRequest) {
-        checkCommentPermission(commentId);
+        validateCommentOwner(commentId);
         commentService.updateComment(commentId, updateCommentRequest);
 
     }
