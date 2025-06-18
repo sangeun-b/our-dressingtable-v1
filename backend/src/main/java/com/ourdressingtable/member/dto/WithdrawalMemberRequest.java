@@ -26,8 +26,13 @@ public class WithdrawalMemberRequest {
     @Schema(description = "차단 여부", example = "FALSE")
     private boolean isBlock;
 
+    @Schema(description = "비밀번호 확인", example = "password1!")
+    @NotBlank
+    private String password;
+
     @Builder
-    public WithdrawalMemberRequest(String reason, boolean isBlock) {
+    public WithdrawalMemberRequest(String reason, boolean isBlock, String password) {
+        this.password = password;
         this.reason = reason;
         this.isBlock = isBlock;
     }

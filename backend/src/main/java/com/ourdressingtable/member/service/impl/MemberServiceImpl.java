@@ -6,13 +6,13 @@ import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.member.service.WithdrawalMemberService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,10 +30,13 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public Long createMember(CreateMemberRequest createMemberRequest) {
-        boolean isExists = memberRepository.existsByEmail(createMemberRequest.getEmail());
 
-        if (isExists) {
+        if (memberRepository.existsByEmail(createMemberRequest.getEmail())) {
             throw new OurDressingTableException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
+        if (memberRepository.existsByNickname(createMemberRequest.getNickname())) {
+            throw new OurDressingTableException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
         String encodedPassword = passwordEncoder.encode(createMemberRequest.getPassword());
         Member member = createMemberRequest.toEntity(encodedPassword);
@@ -43,24 +46,33 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public OtherMemberResponse getOtherMember(Long id) {
-        Member member = getValidatedMember(id, Status.ACTIVE);
+        Member member = getMemberByIdAndStatus(id, Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
         return OtherMemberResponse.fromEntity(member);
     }
 
     @Override
     @Transactional
     public void updateMember(UpdateMemberRequest updateMemberRequest) {
-        Member member = getAuthenticatedMember(Status.ACTIVE);
+        Member member = getMemberByIdAndStatus(SecurityUtil.getCurrentMemberId(), Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
         member.updateMember(updateMemberRequest);
     }
 
     @Override
     @Transactional
     public void withdrawMember(WithdrawalMemberRequest withdrawalMemberRequest) {
-        Member member = getAuthenticatedMemberCanDelete();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = getMemberEntityById(memberId);
+
+        if (member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
+            throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
+        }
+
+        if (!passwordEncoder.matches(withdrawalMemberRequest.getPassword(), member.getPassword())) {
+
+            throw new OurDressingTableException(ErrorCode.INVALID_PASSWORD);
+        }
         member.withdraw();
         withdrawalMemberService.createWithdrawalMember(withdrawalMemberRequest, member);
-
     }
 
     @Override
@@ -70,9 +82,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member getActiveMemberEntityById(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
-        validateStatus(member, Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
-        return member;
+        return getMemberByIdAndStatus(id, Status.ACTIVE, ErrorCode.MEMBER_NOT_ACTIVE);
     }
 
     @Override
@@ -83,16 +93,15 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
-    private Member getAuthenticatedMember(Status requiredStatus) {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = getMemberEntityById(memberId);
-        validateStatus(member, requiredStatus, ErrorCode.MEMBER_NOT_ACTIVE);
-        return member;
+    @Override
+    public MemberResponse getMyInfo() {
+        Member member = getActiveMemberEntityById(SecurityUtil.getCurrentMemberId());
+        return MemberResponse.from(member);
     }
 
-    private Member getValidatedMember(Long id, Status requiredStatus) {
+    private Member getMemberByIdAndStatus(Long id, Status status, ErrorCode errorCode) {
         Member member = getMemberEntityById(id);
-        validateStatus(member,requiredStatus, ErrorCode.MEMBER_NOT_ACTIVE);
+        validateStatus(member, status, errorCode);
         return member;
     }
 
@@ -102,13 +111,4 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    private Member getAuthenticatedMemberCanDelete() {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = getMemberEntityById(memberId);
-
-        if(member.getStatus() == Status.BLOCK || member.getStatus() == Status.WITHDRAWAL) {
-            throw new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED);
-        }
-        return member;
-    }
 }

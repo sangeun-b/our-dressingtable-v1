@@ -52,7 +52,7 @@ public class MemberResponse {
         this.role = role;
     }
 
-    public static MemberResponse fromEntity(Member member) {
+    public static MemberResponse from(Member member) {
         return MemberResponse.builder()
                 .email(member.getEmail())
                 .name(member.getName())
