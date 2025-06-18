@@ -41,19 +41,7 @@ public class MemberController {
     @Operation(summary = "회원가입", description = "새로운 회원이 가입합니다.")
     public ResponseEntity<CreateMemberResponse> signupMember(@RequestBody @Valid
     CreateMemberRequest request) {
-        CreateMemberRequest createMemberRequest = CreateMemberRequest.builder()
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .name(request.getName())
-                .nickname(request.getNickname())
-                .phoneNumber(request.getPhoneNumber())
-                .skinType(request.getSkinType())
-                .colorType(request.getColorType())
-                .birthDate(request.getBirthDate())
-                .imageUrl(request.getImageUrl())
-                .build();
-
-        Long id = memberService.createMember(createMemberRequest);
+        Long id = memberService.createMember(request);
         return ResponseEntity.created(URI.create("/api/members/" + id))
                 .body(new CreateMemberResponse(id));
     }
@@ -62,41 +50,27 @@ public class MemberController {
     @GetMapping("/{memberId}")
     @Operation(summary = "다른 회원 조회", description = "다른 회원의 프로필을 조회합니다.")
     public ResponseEntity<OtherMemberResponse> getOtherMember(@PathVariable("memberId") Long memberId) {
-        OtherMemberResponse otherMemberResponse = memberService.getOtherMember(memberId);
-        return ResponseEntity.ok(otherMemberResponse);
+        return ResponseEntity.ok(memberService.getOtherMember(memberId));
 
     }
 
-    @PatchMapping()
+    @PatchMapping("/my-information")
     @Operation(summary = "내 정보 수정", description = "내 정보를 수정합니다.", security = @SecurityRequirement(name="bearerAuth"))
-    public ResponseEntity updateMyInformation(@RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
+    public ResponseEntity<Void> updateMyInformation(@RequestBody @Valid UpdateMemberRequest updateMemberRequest) {
         memberService.updateMember(updateMemberRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/my-account")
     @Operation(summary = "내 계정 삭제", description = "내 계정을 삭제합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity deleteMyAccount(@RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
+    public ResponseEntity<Void> deleteMyAccount(@RequestBody @Valid WithdrawalMemberRequest withdrawalMemberRequest) {
         memberService.withdrawMember(withdrawalMemberRequest);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my-information")
-    @Operation(summary = "내 정보 조회", description = "내 정보를 조회합니다.")
-    public ResponseEntity<?> getMyInformation() {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(currentMemberId);
-        MemberResponse response = MemberResponse.builder()
-                .name(member.getName())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .imageUrl(member.getImageUrl())
-                .phoneNumber(member.getPhoneNumber())
-                .skinType(member.getSkinType())
-                .colorType(member.getColorType())
-                .birthDate(member.getBirthDate())
-                .role(member.getRole().getAuth())
-                .build();
-        return ResponseEntity.ok(response);
+    @Operation(summary = "내 정보 조회", description = "내 정보를 조회합니다.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<MemberResponse> getMyInformation() {
+        return ResponseEntity.ok(memberService.getMyInfo());
     }
 }
