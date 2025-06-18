@@ -5,10 +5,7 @@ import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
-import com.ourdressingtable.community.post.dto.PostSearchCondition;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
+import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.dressingTable.domain.DressingTable;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
@@ -135,6 +132,12 @@ public class TestDataFactory {
                 .sortBy(sortBy)
                 .build();
     }
+
+    public static MyPostSearchCondition testMyPostSearchCondition(String sortBy) {
+        return MyPostSearchCondition.builder()
+                .sortBy(sortBy).build();
+    }
+
     public static Post testPost(Long id, Member member, CommunityCategory communityCategory) {
         return Post.builder()
                 .id(id)
@@ -228,14 +231,13 @@ public class TestDataFactory {
                 .depth(0)
                 .build();
     }
-
-    public static Comment testCommentWithPostAndMember(Long id, Post post, Member member) {
+    public static Comment testCommentWithMemberAndPost(Long id, Member member, Post post) {
         return Comment.builder()
                 .id(id)
-                .content("추천입니다!!")
+                .content("추천!")
                 .depth(0)
-                .post(post)
                 .member(member)
+                .post(post)
                 .build();
     }
 }

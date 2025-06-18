@@ -11,6 +11,9 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class MyPostSearchCondition {
 
+    @Schema(description = "카테고리 코드(ex: FREE, QNA, REVIEW 등)", example = "FREE | QNA")
+    private String categoryCode;
+
     @Schema(description = "정렬 기준", example = "latest | likes | views")
     private String sortBy;
 
@@ -18,7 +21,8 @@ public class MyPostSearchCondition {
     private LocalDate from;
 
     @Builder
-    public MyPostSearchCondition(String category, String sortBy, LocalDate from) {
+    public MyPostSearchCondition(String categoryCode, String sortBy, LocalDate from) {
+        this.categoryCode = categoryCode;
         this.sortBy = sortBy;
         this.from = from;
     }

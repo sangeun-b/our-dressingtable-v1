@@ -49,9 +49,11 @@ public class DummyDataInitializer implements CommandLineRunner {
         // Category 생성
         CommunityCategory free = CommunityCategory.builder()
                 .name("자유게시판")
+                .code("FREE")
                 .build();
         CommunityCategory qna = CommunityCategory.builder()
                 .name("질문")
+                .code("QNA")
                 .build();
 
         List<CommunityCategory> categories = List.of(free, qna);

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -172,6 +173,7 @@ public class DressingTableControllerTest {
         @DisplayName("나의 모든 화장대 조회 실패 - 미인증 사용자")
         @Test
         public void getAllMyDressingTable_returnMemberError() throws Exception {
+            SecurityContextHolder.clearContext();
             performGetAllMyDressingTable()
                     .andExpect(status().isUnauthorized());
         }
