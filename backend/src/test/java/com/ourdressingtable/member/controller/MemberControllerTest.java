@@ -22,6 +22,7 @@ import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
@@ -59,10 +60,10 @@ public class MemberControllerTest {
     @Nested
     @DisplayName("회원 가입 테스트")
     class createMemberTest{
-        @DisplayName("회원 가입 - 성공")
+        @DisplayName("회원 가입 성공")
         @Test
         @WithAnonymousUser
-        public void signupMember_withValidInput_shouldReturnSuccess() throws Exception {
+        public void signupMember_withValidInput_returnSuccess() throws Exception {
             // given
             CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
             Member member = TestDataFactory.testMember(1L);
@@ -80,10 +81,10 @@ public class MemberControllerTest {
 
         }
 
-        @DisplayName("회원 가입 - 실패")
+        @DisplayName("회원 가입 실패")
         @Test
         @WithAnonymousUser
-        public void signupMember_withInvalidInput_shouldReturnError() throws Exception {
+        public void signupMember_withInvalidInput_returnError() throws Exception {
             // given
             CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
 
@@ -103,11 +104,11 @@ public class MemberControllerTest {
 
     @Nested
     @DisplayName("다른 회원 정보 조회 테스트")
-    @WithCustomUser
     class getMemberTest {
-        @DisplayName("다른 회원 정보 조회 - 성공")
+        @DisplayName("다른 회원 정보 조회 성공")
+        @WithCustomUser
         @Test
-        public void getOtherMember_shouldReturnSuccess() throws Exception {
+        public void getOtherMember_returnSuccess() throws Exception {
             //given
             OtherMemberResponse otherMemberResponse = TestDataFactory.testOtherMemberResponse();
             //when
@@ -118,9 +119,10 @@ public class MemberControllerTest {
 
         }
 
-        @DisplayName("다른 회원 정보 조회 - 실패")
+        @DisplayName("다른 회원 정보 조회 실패")
+        @WithCustomUser
         @Test
-        public void getOtherMember_shouldReturnError() throws Exception {
+        public void getOtherMember_returnError() throws Exception {
             // given
             Long memberId = 99L;
             when(memberService.getOtherMember(memberId)).thenThrow(new OurDressingTableException(
@@ -135,10 +137,10 @@ public class MemberControllerTest {
     @Nested
     @DisplayName("회원 정보 수정 테스트")
     class updateMember {
-        @DisplayName("회원 정보 수정 - 성공")
+        @DisplayName("회원 정보 수정 성공")
         @WithCustomUser
         @Test
-        public void updateMember_shouldReturnSuccess() throws Exception {
+        public void updateMember_returnSuccess() throws Exception {
             // given
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
@@ -146,31 +148,31 @@ public class MemberControllerTest {
             doNothing().when(memberService).updateMember(updateMemberRequest);
 
             // then
-            mockMvc.perform(patch("/api/members")
+            mockMvc.perform(patch("/api/members/my-information")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateMemberRequest)))
                     .andExpect(status().isNoContent()).andDo(print());
         };
 
-        @DisplayName("회원 정보 수정 - 탈퇴한 회원")
+        @DisplayName("회원 정보 수정 실패 - 탈퇴한 회원")
         @WithCustomUser(status = Status.WITHDRAWAL)
         @Test
-        public void updateMember_shouldReturnError () throws Exception{
+        public void updateMember_returnError () throws Exception{
             //given
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
 
             //when
-            willThrow(new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED))
+            willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE))
                     .given(memberService).updateMember(any(UpdateMemberRequest.class));
 
             //then
-            mockMvc.perform(patch("/api/members")
+            mockMvc.perform(patch("/api/members/my-information")
             .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateMemberRequest)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED.getMessage()))
-                    .andExpect(jsonPath("$.code").value(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED.getCode()))
+                    .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_NOT_ACTIVE.getMessage()))
+                    .andExpect(jsonPath("$.code").value(ErrorCode.MEMBER_NOT_ACTIVE.getCode()))
                     .andDo(print());
 
         }
@@ -181,15 +183,15 @@ public class MemberControllerTest {
     @Nested
     @DisplayName("회원 삭제 테스트")
     class deleteMember {
-        @DisplayName("회원 삭제 - 성공")
+        @DisplayName("회원 삭제 성공")
         @WithCustomUser
         @Test
-        public void deleteMember_shouldReturnSuccess() throws Exception {
+        public void deleteMember_returnSuccess() throws Exception {
             // given
             Long memberId = 1L;
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
 
-            mockMvc.perform(delete("/api/members")
+            mockMvc.perform(delete("/api/members/my-account")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
@@ -202,13 +204,13 @@ public class MemberControllerTest {
         @DisplayName("회원 삭제 실패 - 이미 탈퇴한 회원")
         @WithCustomUser(status = Status.WITHDRAWAL)
         @Test
-        public void deleteMember_shouldReturnError () throws Exception{
+        public void deleteMember_returnError () throws Exception{
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
 
             willThrow(new OurDressingTableException(ErrorCode.ALREADY_WITHDRAW_OR_BLOCKED))
                     .given(memberService).withdrawMember(any(WithdrawalMemberRequest.class));
 
-            mockMvc.perform(delete("/api/members")
+            mockMvc.perform(delete("/api/members/my-account")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(withdrawalMemberRequest)))
@@ -217,6 +219,37 @@ public class MemberControllerTest {
                     .andDo(print());
         }
 
+    }
+    @Nested
+    @DisplayName("내 정보 조회 테스트")
+    class GetMyInformation {
+        @DisplayName("내 정보 조회 성공")
+        @WithCustomUser
+        @Test
+        public void getMyInformation_returnSuccess() throws Exception {
+            MemberResponse memberResponse = TestDataFactory.testMemberResponse();
+
+            when(memberService.getMyInfo()).thenReturn(memberResponse);
+
+            mockMvc.perform(get("/api/members/my-information")
+                    .with(csrf()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value(memberResponse.getName()))
+                    .andExpect(jsonPath("$.email").value(memberResponse.getEmail()));
+        }
+
+        @DisplayName("내 정보 조회 실패 - 탈퇴 회원")
+        @WithCustomUser(status = Status.WITHDRAWAL)
+        @Test
+        public void getMyInformation_returnError () throws Exception {
+            when(memberService.getMyInfo())
+                    .thenThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_ACTIVE));
+
+            mockMvc.perform(get("/api/members/my-information")
+                    .with(csrf()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_NOT_ACTIVE.getMessage()));
+        }
     }
 
 

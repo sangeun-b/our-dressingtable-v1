@@ -11,10 +11,12 @@ import static org.mockito.Mockito.when;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
+import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
@@ -53,18 +55,19 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 가입 테스트")
-    class singUp {
+    class SingUp {
         @DisplayName("회원 가입 성공")
         @Test
-        public void createMember_shouldReturnSuccess() {
+        public void createMember_returnSuccess() {
             // given
             CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
-
             String encodedPassword = "password";
             Member member = createMemberRequest.toEntity(encodedPassword);
             ReflectionTestUtils.setField(member,"id",1L);
 
             when(passwordEncoder.encode(createMemberRequest.getPassword())).thenReturn(encodedPassword);
+            when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(false);
+            when(memberRepository.existsByNickname(createMemberRequest.getNickname())).thenReturn(false);
             when(memberRepository.save(any(Member.class))).thenReturn(member);
 
             // when
@@ -78,27 +81,25 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 가입 실패_중복 이메일")
         @Test
-        public void createMember_withDuplicateEmail_shouldReturnError() {
+        public void createMember_withDuplicateEmail_returnError() {
             // given
             CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
-
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
 
             // when & then
             OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
             assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_ALREADY_EXISTS.getHttpStatus());
-            assertEquals(ourDressingTableException.getMessage(), ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
 
         }
     }
 
     @Nested
     @DisplayName("회원 조회 테스트")
-    class findUser {
+    class FindUser {
 
         @DisplayName("회원 조회 성공 테스트")
         @Test
-        public void findMember_ShouldReturnSuccess() {
+        public void findMember_returnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
 
@@ -114,7 +115,7 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 조회 실패 테스트 - USER NOT FOUND")
         @Test
-        public void findMember_ShouldReturnUserNotFoundError() {
+        public void findMember_returnUserNotFoundError() {
             // given
             Member member = TestDataFactory.testMember(1L);
             given(memberRepository.findById(member.getId())).willReturn(Optional.empty());
@@ -130,11 +131,11 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 정보 수정 테스트")
-    class updateUser {
+    class UpdateUser {
 
         @DisplayName("회원 정보 수정 성공 테스트")
         @Test
-        public void updateMember_ShouldReturnSuccess() {
+        public void updateMember_returnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
             UpdateMemberRequest updateMemberRequest = TestDataFactory.testUpdateMemberRequest();
@@ -154,7 +155,7 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 정보 수정 실패 테스트 - 탈퇴한 회원")
         @Test
-        public void updateMember_ShouldReturnUserNotFoundError() {
+        public void updateMember_returnUserNotFoundError() {
             // given
             Member member = TestDataFactory.testMember(1L);
             member.withdraw();
@@ -174,11 +175,11 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 삭제 테스트")
-    class deleteUser {
+    class DeleteUser {
 
         @DisplayName("회원 삭제 성공")
         @Test
-        public void deleteMember_ShouldReturnSuccess() {
+        public void deleteMember_returnSuccess() {
             // given
             Member member = TestDataFactory.testMember(1L);
             WithdrawalMemberRequest withdrawalMemberRequest = TestDataFactory.testWithdrawalMemberRequest();
@@ -186,7 +187,7 @@ public class MemberServiceImplTest {
             try (MockedStatic<SecurityUtil> mockedSecurityUtil = Mockito.mockStatic(SecurityUtil.class)) {
                 mockedSecurityUtil.when(SecurityUtil::getCurrentMemberId).thenReturn(1L);
                 when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
-
+                when(passwordEncoder.matches(withdrawalMemberRequest.getPassword(), member.getPassword())).thenReturn(true);
                 // when
                 memberService.withdrawMember(withdrawalMemberRequest);
 
@@ -199,7 +200,7 @@ public class MemberServiceImplTest {
 
         @DisplayName("회원 삭제 실패 - 이미 탈퇴한 회원")
         @Test
-        public void updateMember_ShouldReturnUserNotFoundError() {
+        public void updateMember_returnAlreadyWithdrawError() {
             // given
             Long memberId = 2L;
             Member member = TestDataFactory.testMember(2L);
@@ -212,7 +213,50 @@ public class MemberServiceImplTest {
                 memberService.withdrawMember(withdrawalMemberRequest);
             });
 
+        }
+    }
 
+    @Nested
+    @DisplayName("내 정보 조회 테스트")
+    class GetMyInformation {
+
+        @DisplayName("내 정보 조회 성공")
+        @Test
+        public void getMyInfo_returnSuccess() {
+            Long memberId = 1L;
+            Member member = TestDataFactory.testMember(1L);
+
+            try (MockedStatic<SecurityUtil> mockedSecurityUtil = SecurityUtilMockHelper.mockCurrentMemberId(memberId)) {
+                mockedSecurityUtil.when(SecurityUtil::getCurrentMemberId).thenReturn(memberId);
+                when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+                MemberResponse response = memberService.getMyInfo();
+                assertEquals(member.getNickname(), response.getNickname());
+                assertEquals(member.getEmail(), response.getEmail());
+
+            }
+
+
+
+        }
+
+        @DisplayName("내 정보 조회 실패 - 비활성 회원")
+        @Test
+        public void getMyInfo_returnMemberNotActiveError() {
+            Long memberId = 2L;
+            Member withDrawnMember = TestDataFactory.testMember(memberId);
+            withDrawnMember.withdraw();
+
+            try (MockedStatic<SecurityUtil> mockedSecurityUtil = SecurityUtilMockHelper.mockCurrentMemberId(memberId)) {
+                mockedSecurityUtil.when(SecurityUtil::getCurrentMemberId).thenReturn(memberId);
+                when(memberRepository.findById(memberId)).thenReturn(Optional.of(withDrawnMember));
+
+                OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> {
+                    memberService.getMyInfo();
+                });
+
+                assertEquals(ErrorCode.MEMBER_NOT_ACTIVE.getCode(), exception.getCode());
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.member.domain.*;
 import com.ourdressingtable.member.dto.CreateMemberRequest;
+import com.ourdressingtable.member.dto.MemberResponse;
 import com.ourdressingtable.member.dto.OtherMemberResponse;
 import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
@@ -31,7 +32,10 @@ public class TestDataFactory {
                 .email("test@example.com")
                 .password("{noop}Password123!")
                 .phoneNumber("010-1234-5678")
+                .name("김이름")
+                .nickname("mee")
                 .status(Status.ACTIVE)
+                .role(Role.ROLE_BASIC)
                 .build();
     }
 
@@ -40,6 +44,7 @@ public class TestDataFactory {
                 .id(id)
                 .email(null)
                 .phoneNumber("010-1234-5678")
+                .role(Role.ROLE_BASIC)
                 .build();
     }
     public static CreateMemberRequest testCreateMemberRequest() {
@@ -63,9 +68,21 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static MemberResponse testMemberResponse() {
+        return MemberResponse.builder()
+                .email("test@example.com")
+                .name("김이름")
+                .nickname("mee")
+                .skinType(SkinType.OILY_SKIN)
+                .colorType(ColorType.AUTUMN_WARM)
+                .role(String.valueOf(Role.ROLE_BASIC))
+                .build();
+    }
+
     public static WithdrawalMemberRequest testWithdrawalMemberRequest() {
         return WithdrawalMemberRequest.builder()
                 .reason("재가입 예정")
+                .password("{noop}Password123!")
                 .isBlock(false)
                 .build();
     }
