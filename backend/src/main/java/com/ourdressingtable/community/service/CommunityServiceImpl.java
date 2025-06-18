@@ -37,7 +37,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Transactional
     public Long createPost(CreatePostRequest createPostRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberService.getActiveMemberEntityById(memberId);
+//        Member member = memberService.getActiveMemberEntityById(memberId);
         return postService.createPost(createPostRequest, memberId);
     }
 
