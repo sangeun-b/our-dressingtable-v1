@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -173,8 +174,9 @@ public class DressingTableControllerTest {
         @DisplayName("나의 모든 화장대 조회 실패 - 미인증 사용자")
         @Test
         public void getAllMyDressingTable_returnMemberError() throws Exception {
-            SecurityContextHolder.clearContext();
-            performGetAllMyDressingTable()
+            mockMvc.perform(get("/api/dressing-tables/mine")
+                    .with(csrf())
+                    .with(anonymous()))
                     .andExpect(status().isUnauthorized());
         }
     }
