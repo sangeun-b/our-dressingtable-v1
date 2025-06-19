@@ -4,12 +4,16 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
+import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.security.dto.LoginRequest;
 import com.ourdressingtable.security.dto.LoginResponse;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import com.ourdressingtable.security.dto.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberService memberService;
     private final RedisTokenService redisTokenService;
+    private final EmailVerificationService emailVerificationService;
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인을 합니다.")
@@ -88,6 +93,20 @@ public class AuthController {
             String email = jwtTokenProvider.getEmail(token);
             redisTokenService.deleteTokenInfo(email, "refreshToken", httpServletRequest.getHeader("User-Agent"));
         }
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/verification-code/email")
+    @Operation(summary = "이메일 인증코드 전송", description = "이메일로 인증코드를 전송합니다.")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody @Valid SendEmailVerificationCodeRequest request) {
+        emailVerificationService.sendVerificationEmail(request.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/confirm-verification-code/email")
+    @Operation(summary = "이메일 인증코드 확인", description = "입력한 인증코드가 유효한지 확인합니다.")
+    public ResponseEntity<Void> confirmVerificationCode(@RequestBody @Valid ConfirmEmailVerificationCodeRequest request) {
+        emailVerificationService.confirmVerification(request.getEmail(), request.getVerificationCode());
         return ResponseEntity.noContent().build();
     }
 
