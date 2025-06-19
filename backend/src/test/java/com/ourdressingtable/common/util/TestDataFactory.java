@@ -17,6 +17,8 @@ import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
 import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
+import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 import com.ourdressingtable.security.dto.LoginRequest;
 
@@ -253,6 +255,20 @@ public class TestDataFactory {
                 .depth(0)
                 .member(member)
                 .post(post)
+                .build();
+    }
+
+    public static SendEmailVerificationCodeRequest testSendEmailVerificationCodeRequest() {
+        return SendEmailVerificationCodeRequest.builder()
+                .email("sample@example.com")
+                .build();
+    }
+
+
+    public static ConfirmEmailVerificationCodeRequest testConfirmEmailVerificationCodeRequest () {
+        return ConfirmEmailVerificationCodeRequest .builder()
+                .email("sample@example.com")
+                .verificationCode("123456")
                 .build();
     }
 }

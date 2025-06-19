@@ -8,6 +8,9 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
 import com.ourdressingtable.security.controller.AuthController;
 import com.ourdressingtable.security.dto.LoginRequest;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
@@ -56,6 +59,10 @@ public class AuthControllerTest {
 
     @MockBean
     private RedisTokenService redisTokenService;
+
+    @MockBean
+    private EmailVerificationService emailVerificationService;
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -182,6 +189,38 @@ public class AuthControllerTest {
 
             verify(redisTokenService, never()).blacklistAccessToken(any(), anyLong());
             verify(redisTokenService, never()).deleteTokenInfo(any(), any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증코드 전송 테스트")
+    class SendEmailVerification {
+        @DisplayName("이메일 인증코드 전송 성공")
+        @Test
+        public void sendVerification_returnSuccess() throws Exception {
+            SendEmailVerificationCodeRequest request = TestDataFactory.testSendEmailVerificationCodeRequest();
+
+            mockMvc.perform(post("/api/auth/verification-code/email")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증코드 확인 테스트")
+    class ConfirmEmailVerification {
+        @DisplayName("이메일 인증코드 확인 성공")
+        @Test
+        public void confirmVerification_returnSuccess() throws Exception {
+            ConfirmEmailVerificationCodeRequest request = TestDataFactory.testConfirmEmailVerificationCodeRequest ();
+
+            mockMvc.perform(post("/api/auth/confirm-verification-code/email")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
         }
     }
 }

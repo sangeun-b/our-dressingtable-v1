@@ -100,14 +100,14 @@ public class AuthController {
     @Operation(summary = "이메일 인증코드 전송", description = "이메일로 인증코드를 전송합니다.")
     public ResponseEntity<Void> sendVerificationCode(@RequestBody @Valid SendEmailVerificationCodeRequest request) {
         emailVerificationService.sendVerificationEmail(request.getEmail());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/confirm-verification-code/email")
     @Operation(summary = "이메일 인증코드 확인", description = "입력한 인증코드가 유효한지 확인합니다.")
     public ResponseEntity<Void> confirmVerificationCode(@RequestBody @Valid ConfirmEmailVerificationCodeRequest request) {
         emailVerificationService.confirmVerification(request.getEmail(), request.getVerificationCode());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 
