@@ -1,4 +1,4 @@
-package com.ourdressingtable.security.controller;
+package com.ourdressingtable.security.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.exception.ErrorCode;
@@ -8,6 +8,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.security.controller.AuthController;
 import com.ourdressingtable.security.dto.LoginRequest;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import org.junit.jupiter.api.DisplayName;

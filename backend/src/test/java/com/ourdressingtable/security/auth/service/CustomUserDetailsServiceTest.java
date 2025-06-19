@@ -1,4 +1,4 @@
-package com.ourdressingtable.security.service;
+package com.ourdressingtable.security.auth.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
