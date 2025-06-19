@@ -27,6 +27,7 @@ spring:
     include:
       - db
       - jwt
+      - email
 #       - site
 logging:
   level:
