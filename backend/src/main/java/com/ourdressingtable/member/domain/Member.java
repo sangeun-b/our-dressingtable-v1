@@ -3,7 +3,7 @@ package com.ourdressingtable.member.domain;
 
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
 

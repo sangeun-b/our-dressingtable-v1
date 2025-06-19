@@ -1,14 +1,11 @@
 package com.ourdressingtable.member.service;
 
-import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.dto.CreateMemberRequest;
-import com.ourdressingtable.member.dto.MemberResponse;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
-import com.ourdressingtable.security.dto.CustomUserDetails;
+import com.ourdressingtable.member.dto.request.CreateMemberRequest;
+import com.ourdressingtable.member.dto.response.MemberResponse;
+import com.ourdressingtable.member.dto.response.OtherMemberResponse;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 
 public interface MemberService {
     Long createMember(CreateMemberRequest createMemberRequest);

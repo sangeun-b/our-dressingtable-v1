@@ -1,4 +1,4 @@
-package com.ourdressingtable.member.dto;
+package com.ourdressingtable.member.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;

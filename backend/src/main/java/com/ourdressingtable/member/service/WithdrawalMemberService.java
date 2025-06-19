@@ -1,7 +1,7 @@
 package com.ourdressingtable.member.service;
 
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 
 public interface WithdrawalMemberService {
 

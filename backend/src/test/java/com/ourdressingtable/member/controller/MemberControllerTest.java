@@ -18,17 +18,13 @@ import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
-import com.ourdressingtable.member.domain.SkinType;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.dto.CreateMemberRequest;
-import com.ourdressingtable.member.dto.MemberResponse;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.CreateMemberRequest;
+import com.ourdressingtable.member.dto.response.MemberResponse;
+import com.ourdressingtable.member.dto.response.OtherMemberResponse;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.security.auth.JwtAuthenticationFilter;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,7 +36,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = MemberController.class)
