@@ -15,14 +15,16 @@ import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.dto.CreateMemberRequest;
-import com.ourdressingtable.member.dto.MemberResponse;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.CreateMemberRequest;
+import com.ourdressingtable.member.dto.response.MemberResponse;
+import com.ourdressingtable.member.dto.response.OtherMemberResponse;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
 import java.util.Optional;
+
+import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,9 @@ public class MemberServiceImplTest {
     @Mock
     private WithdrawalMemberService withdrawalMemberService;
 
+    @Mock
+    private EmailVerificationRepository  emailVerificationRepository;
+
     @Nested
     @DisplayName("회원 가입 테스트")
     class SingUp {
@@ -65,6 +70,7 @@ public class MemberServiceImplTest {
             Member member = createMemberRequest.toEntity(encodedPassword);
             ReflectionTestUtils.setField(member,"id",1L);
 
+            when(emailVerificationRepository.isVerified(createMemberRequest.getEmail())).thenReturn(true);
             when(passwordEncoder.encode(createMemberRequest.getPassword())).thenReturn(encodedPassword);
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(false);
             when(memberRepository.existsByNickname(createMemberRequest.getNickname())).thenReturn(false);
@@ -79,16 +85,30 @@ public class MemberServiceImplTest {
 
         }
 
-        @DisplayName("회원 가입 실패_중복 이메일")
+        @DisplayName("회원 가입 실패 - 중복 이메일")
         @Test
         public void createMember_withDuplicateEmail_returnError() {
             // given
             CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
+            when(emailVerificationRepository.isVerified(createMemberRequest.getEmail())).thenReturn(true);
             when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(true);
 
             // when & then
             OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
             assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_ALREADY_EXISTS.getHttpStatus());
+
+        }
+
+        @DisplayName("회원 가입 실패 - 이메일 미인증")
+        @Test
+        public void createMember_withUnverifiedEmail_returnError() {
+            // given
+            CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
+            when(emailVerificationRepository.isVerified(createMemberRequest.getEmail())).thenReturn(false);
+
+            // when & then
+            OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
+            assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_NOT_VERIFIED.getHttpStatus());
 
         }
     }

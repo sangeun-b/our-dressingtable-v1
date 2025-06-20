@@ -1,8 +1,7 @@
-package com.ourdressingtable.member.dto;
+package com.ourdressingtable.member.dto.response;
 
 import com.ourdressingtable.member.domain.ColorType;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.SkinType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;

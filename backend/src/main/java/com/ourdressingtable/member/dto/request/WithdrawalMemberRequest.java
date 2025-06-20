@@ -1,7 +1,5 @@
-package com.ourdressingtable.member.dto;
+package com.ourdressingtable.member.dto.request;
 
-import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.WithdrawalMember;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

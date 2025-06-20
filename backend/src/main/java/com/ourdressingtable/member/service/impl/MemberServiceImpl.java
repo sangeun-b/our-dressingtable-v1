@@ -5,14 +5,15 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.dto.CreateMemberRequest;
-import com.ourdressingtable.member.dto.MemberResponse;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.CreateMemberRequest;
+import com.ourdressingtable.member.dto.response.MemberResponse;
+import com.ourdressingtable.member.dto.response.OtherMemberResponse;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.member.service.WithdrawalMemberService;
+import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,14 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final WithdrawalMemberService withdrawalMemberService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationRepository emailVerificationRepository;
 
     @Override
     @Transactional
     public Long createMember(CreateMemberRequest createMemberRequest) {
-
+        if (!emailVerificationRepository.isVerified(createMemberRequest.getEmail())) {
+            throw new OurDressingTableException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
         if (memberRepository.existsByEmail(createMemberRequest.getEmail())) {
             throw new OurDressingTableException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }

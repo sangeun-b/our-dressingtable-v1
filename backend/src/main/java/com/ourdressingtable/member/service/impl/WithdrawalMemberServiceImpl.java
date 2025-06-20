@@ -3,7 +3,7 @@ package com.ourdressingtable.member.service.impl;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.domain.WithdrawalMember;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.WithdrawalMemberService;
 import lombok.RequiredArgsConstructor;

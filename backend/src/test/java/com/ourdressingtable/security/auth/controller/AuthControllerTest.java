@@ -1,14 +1,17 @@
-package com.ourdressingtable.security.controller;
+package com.ourdressingtable.security.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
+import com.ourdressingtable.security.controller.AuthController;
 import com.ourdressingtable.security.dto.LoginRequest;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -17,13 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -59,6 +59,10 @@ public class AuthControllerTest {
 
     @MockBean
     private RedisTokenService redisTokenService;
+
+    @MockBean
+    private EmailVerificationService emailVerificationService;
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -185,6 +189,53 @@ public class AuthControllerTest {
 
             verify(redisTokenService, never()).blacklistAccessToken(any(), anyLong());
             verify(redisTokenService, never()).deleteTokenInfo(any(), any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증코드 전송 테스트")
+    class SendEmailVerification {
+        @DisplayName("이메일 인증코드 전송 성공")
+        @Test
+        public void sendVerification_returnSuccess() throws Exception {
+            SendEmailVerificationCodeRequest request = TestDataFactory.testSendEmailVerificationCodeRequest();
+
+            mockMvc.perform(post("/api/auth/verification-code/email")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증코드 확인 테스트")
+    class ConfirmEmailVerification {
+        @DisplayName("이메일 인증코드 확인 성공")
+        @Test
+        public void confirmVerification_returnSuccess() throws Exception {
+            ConfirmEmailVerificationCodeRequest request = TestDataFactory.testConfirmEmailVerificationCodeRequest ();
+
+            mockMvc.perform(post("/api/auth/confirm-verification-code/email")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+        }
+
+        @DisplayName("이메일 인증코드 확인 실패 - 인증 코드 불일치")
+        @Test
+        public void confirmVerification_returnBadRequestError() throws Exception {
+            ConfirmEmailVerificationCodeRequest request = TestDataFactory.testConfirmEmailVerificationCodeRequest ();
+
+            doThrow(new OurDressingTableException(ErrorCode.INVALID_VERIFICATION_CDOE))
+                    .when(emailVerificationService).confirmVerification(request.getEmail(), request.getVerificationCode());
+
+            mockMvc.perform(post("/api/auth/confirm-verification-code/email")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
         }
     }
 }

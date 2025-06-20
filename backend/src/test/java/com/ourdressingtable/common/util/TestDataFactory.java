@@ -12,17 +12,17 @@ import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
 import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
 import com.ourdressingtable.member.domain.*;
-import com.ourdressingtable.member.dto.CreateMemberRequest;
-import com.ourdressingtable.member.dto.MemberResponse;
-import com.ourdressingtable.member.dto.OtherMemberResponse;
-import com.ourdressingtable.member.dto.UpdateMemberRequest;
-import com.ourdressingtable.member.dto.WithdrawalMemberRequest;
+import com.ourdressingtable.member.dto.request.CreateMemberRequest;
+import com.ourdressingtable.member.dto.response.MemberResponse;
+import com.ourdressingtable.member.dto.response.OtherMemberResponse;
+import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
+import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
+import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 import com.ourdressingtable.security.dto.LoginRequest;
 
 import java.sql.Timestamp;
-import java.util.List;
-import org.hibernate.sql.Update;
 
 public class TestDataFactory {
 
@@ -255,6 +255,20 @@ public class TestDataFactory {
                 .depth(0)
                 .member(member)
                 .post(post)
+                .build();
+    }
+
+    public static SendEmailVerificationCodeRequest testSendEmailVerificationCodeRequest() {
+        return SendEmailVerificationCodeRequest.builder()
+                .email("sample@example.com")
+                .build();
+    }
+
+
+    public static ConfirmEmailVerificationCodeRequest testConfirmEmailVerificationCodeRequest () {
+        return ConfirmEmailVerificationCodeRequest .builder()
+                .email("sample@example.com")
+                .verificationCode("123456")
                 .build();
     }
 }

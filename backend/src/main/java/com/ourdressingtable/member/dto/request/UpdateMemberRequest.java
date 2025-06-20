@@ -1,4 +1,4 @@
-package com.ourdressingtable.member.dto;
+package com.ourdressingtable.member.dto.request;
 
 import com.ourdressingtable.member.domain.ColorType;
 import com.ourdressingtable.member.domain.Member;

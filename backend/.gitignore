@@ -13,6 +13,7 @@ build/
 ### 환경설정 파일 ###
 application-db.yml
 application-jwt.yml
+application-email.yml
 
 ### DB ###
 .env

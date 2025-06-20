@@ -1,15 +1,11 @@
-package com.ourdressingtable.member.dto;
+package com.ourdressingtable.member.dto.response;
 
 import com.ourdressingtable.member.domain.WithdrawalMember;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
