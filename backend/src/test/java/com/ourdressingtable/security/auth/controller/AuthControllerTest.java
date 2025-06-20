@@ -222,5 +222,20 @@ public class AuthControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
         }
+
+        @DisplayName("이메일 인증코드 확인 실패 - 인증 코드 불일치")
+        @Test
+        public void confirmVerification_returnBadRequestError() throws Exception {
+            ConfirmEmailVerificationCodeRequest request = TestDataFactory.testConfirmEmailVerificationCodeRequest ();
+
+            doThrow(new OurDressingTableException(ErrorCode.INVALID_VERIFICATION_CDOE))
+                    .when(emailVerificationService).confirmVerification(request.getEmail(), request.getVerificationCode());
+
+            mockMvc.perform(post("/api/auth/confirm-verification-code/email")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
+        }
     }
 }
