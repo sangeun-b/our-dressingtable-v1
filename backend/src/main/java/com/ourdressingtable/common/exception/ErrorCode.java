@@ -28,6 +28,7 @@ public enum ErrorCode {
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "A004", "이메일 인증이 완료되지 않았습니다."),
     EXPIRED_VERIFICATION_CDOE(HttpStatus.BAD_REQUEST, "A005", "만료된 인증 코드입니다."),
     INVALID_VERIFICATION_CDOE(HttpStatus.BAD_REQUEST, "A006", "잘못된 인증 코드입니다."),
+    HASHING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A007", "토큰 해싱에 실패했습니다."),
     
     // BAD_REQUEST
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "B001", "잘못된 접근입니다."),
