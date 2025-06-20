@@ -4,11 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,11 +75,13 @@ public class RedisTokenServiceTest {
         @Test
         public void token_returnSuccess() {
             // given
-            Map<Object, Object> data = Map.of("token", "correct-token", "ip", "127.0.0.1", "ua", "User-Agent");
+            String rawToken = "correct-token";
+            String hashedToken = hashToken(rawToken);
+            Map<Object, Object> data = Map.of("token", hashedToken, "ip", "127.0.0.1", "ua", "User-Agent");
             when(hashOperations.entries(anyString())).thenReturn(data);
 
             // when
-            boolean result = redisTokenService.validate("test@exampl.com", "correct-token", "127.0.0.1", "User-Agent", "refreshToken");
+            boolean result = redisTokenService.validate("test@exampl.com", rawToken, "127.0.0.1", "User-Agent", "refreshToken");
 
             // then
             assertTrue(result);
@@ -95,13 +101,24 @@ public class RedisTokenServiceTest {
         @DisplayName("토큰 검증 실패 - 토큰 불일치")
         void validate_tokenMismatch_shouldThrowUnauthorized() {
             // given
-            Map<Object, Object> data = Map.of("token", "wrong-token", "ip", "127.0.0.1", "ua", "User-Agent");
+            String hashedWrongToken = hashToken("wrong-token");
+            Map<Object, Object> data = Map.of("token", hashedWrongToken, "ip", "127.0.0.1", "ua", "User-Agent");
             when(hashOperations.entries(anyString())).thenReturn(data);
 
             // then
             assertThrows(OurDressingTableException.class, () -> {
                 redisTokenService.validate("test@example.com", "correct-token", "127.0.0.1", "User-Agent", "refreshToken");
             });
+        }
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = md.digest(token.getBytes());
+            return Base64.getEncoder().encodeToString(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Hashing failed", e);
         }
     }
 

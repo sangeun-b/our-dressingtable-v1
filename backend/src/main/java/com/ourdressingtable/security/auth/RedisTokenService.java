@@ -2,6 +2,9 @@ package com.ourdressingtable.security.auth;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +33,10 @@ public class RedisTokenService {
     public void saveTokenInfo(String email, String token, String ip, String ua, String type) {
         String deviceId = getDeviceId(ua);
         String redisKey = generateKey(email, type, deviceId);
+        String hashedToken = hashToken(token);
+
         Map<String, String> data = Map.of(
-                "token", token,
+                "token", hashedToken,
                 "ip", ip,
                 "ua", ua
         );
@@ -46,13 +51,14 @@ public class RedisTokenService {
         if(data.isEmpty()) {
             throw new OurDressingTableException(ErrorCode.UNAUTHORIZED);
         }
-        if(!token.equals(data.get("token"))) {
+        String hashedToken = hashToken(token);
+        if(!hashedToken.equals(data.get("token"))) {
             throw new OurDressingTableException(ErrorCode.UNAUTHORIZED);
         }
         if(!ip.equals(data.get("ip")) || !ua.equals(data.get("ua"))) {
             throw new OurDressingTableException(ErrorCode.FORBIDDEN);
         }
-        return token.equals(data.get("token"));
+        return true;
     }
 
     public void deleteTokenInfo(String email, String type, String ua) {
@@ -77,5 +83,15 @@ public class RedisTokenService {
             throw new OurDressingTableException(ErrorCode.UNAUTHORIZED);
         }
         return false;
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = md.digest(token.getBytes());
+            return Base64.getEncoder().encodeToString(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 Algorithm Not Supported", e);
+        }
     }
 }
