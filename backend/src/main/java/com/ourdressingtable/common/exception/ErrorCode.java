@@ -34,7 +34,7 @@ public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "B001", "잘못된 접근입니다."),
 
     // INTERNAL_SEVER_ERROR
-    INTERNAL_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버 에러입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버 에러입니다."),
 
     // 커뮤니티 관련
     COMMUNITY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "카테고리를 찾을 수 없습니다."),

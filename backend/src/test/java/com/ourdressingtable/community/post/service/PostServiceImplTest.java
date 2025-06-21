@@ -2,7 +2,6 @@ package com.ourdressingtable.community.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,7 +9,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
-import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.CreatePostRequest;
@@ -18,7 +16,6 @@ import com.ourdressingtable.community.post.dto.PostResponse;
 import com.ourdressingtable.community.post.dto.PostSearchCondition;
 import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.repository.PostRepository;
-import com.ourdressingtable.community.post.service.PostServiceImpl;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
 import com.ourdressingtable.common.exception.ErrorCode;
@@ -231,7 +228,7 @@ public class PostServiceImplTest {
             PostSearchCondition condition = TestDataFactory.testPostSearchCondition("", "", "","");
             Pageable pageable = PageRequest.of(0, 10);
 
-            given(postRepository.search(condition, pageable)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+            given(postRepository.search(condition, pageable)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR));
 
             assertThrows(OurDressingTableException.class, () -> postService.getPosts(condition, pageable));
         }

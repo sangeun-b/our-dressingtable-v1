@@ -1,8 +1,6 @@
 package com.ourdressingtable.community.service;
 
 import com.ourdressingtable.common.exception.ErrorCode;
-import com.ourdressingtable.common.security.TestSecurityConfig;
-import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
@@ -29,11 +27,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +37,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -267,11 +262,11 @@ public class CommunityServiceImplTest {
                 MyPostSearchCondition condition = TestDataFactory.testMyPostSearchCondition("");
                 Pageable pageable = PageRequest.of(0, 10);
 
-                given(postService.getMyPosts(1L, pageable, condition)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+                given(postService.getMyPosts(1L, pageable, condition)).willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR));
 
                 assertThatThrownBy(() -> communityService.getMyPosts(pageable, condition))
                         .isInstanceOf(OurDressingTableException.class)
-                        .hasMessageContaining(ErrorCode.INTERNAL_SEVER_ERROR.getMessage());
+                        .hasMessageContaining(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
                 ;
             }
         }
