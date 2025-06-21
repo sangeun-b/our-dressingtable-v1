@@ -41,7 +41,7 @@ public class WithdrawalMember {
     private Member member;
 
     @Builder
-    public WithdrawalMember(Long id, String hashedEmail, String maskedEmail, String hashedPhone, String maskedPhone, String reason, boolean isBlock, Member member) {
+    public WithdrawalMember(Long id, String hashedEmail, String maskedEmail, String hashedPhone, String maskedPhone, String reason, boolean isBlock, Member member, Timestamp withdrewAt) {
         this.id = id;
         this.hashedEmail = hashedEmail;
         this.maskedEmail = maskedEmail;
@@ -50,6 +50,7 @@ public class WithdrawalMember {
         this.reason = reason;
         this.isBlock = isBlock;
         this.member = member;
+        this.withdrewAt = withdrewAt;
     }
 
     public static WithdrawalMember from(Member member, WithdrawalMemberRequest withdrawalMemberRequest, boolean isBlock) {
