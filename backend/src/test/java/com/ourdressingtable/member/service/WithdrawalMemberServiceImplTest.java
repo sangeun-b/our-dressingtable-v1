@@ -1,11 +1,16 @@
 package com.ourdressingtable.member.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.WithdrawalMemberRepository;
 import com.ourdressingtable.member.service.impl.WithdrawalMemberServiceImpl;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@DisplayName("WithdrawalMemberService 테스트")
+@DisplayName("탈퇴 회원 테스트")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class WithdrawalMemberServiceImplTest {
@@ -34,7 +40,7 @@ public class WithdrawalMemberServiceImplTest {
     private WithdrawalMemberRepository withdrawalMemberRepository;
 
     @Nested
-    @DisplayName("탈퇴 회원 테스트")
+    @DisplayName("탈퇴 회원 저장 테스트")
     class createWithdrawalMemberTest {
 
         @DisplayName("탈퇴 회원 저장 성공")
@@ -70,4 +76,70 @@ public class WithdrawalMemberServiceImplTest {
 
         }
     }
+
+    @Nested
+    @DisplayName("탈퇴 회원 통과 테스트")
+    class validateWithDrawlMember {
+
+        @DisplayName("탈퇴 회원 통과 성공 - 회원 이력 없는 회원")
+        @Test
+        void validateWithdrawalMember_returnSuccess() {
+            String email = "sample@example.com";
+            String hashedEmail = HashUtil.hash(email);
+            when(withdrawalMemberRepository.findByHashedEmail(hashedEmail))
+                    .thenReturn(Optional.empty());
+
+            assertDoesNotThrow(() -> withdrawalMemberService.validateWithdrawalMember(email));
+        }
+
+        @DisplayName("탈퇴 회원 통과 실패 - BLOCK된 탈퇴 회원")
+        @Test
+        void validateWithdrawalMember_withBlock_returnError() {
+            String email = "sample@example.com";
+            String hashedEmail = HashUtil.hash(email);
+            WithdrawalMember withdrawalMember = TestDataFactory.testWithdrawalMember(email, LocalDateTime.now().plusDays(100),true);
+
+            when(withdrawalMemberRepository.findByHashedEmail(hashedEmail))
+                    .thenReturn(Optional.of(withdrawalMember));
+
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () ->
+                    withdrawalMemberService.validateWithdrawalMember(email));
+
+            assertEquals(ErrorCode.WITHDRAWN_BLOCK_MEMBER_RESTRICTED.getCode(), exception.getCode());
+
+        }
+
+        @DisplayName("탈퇴 회원 통과 성공 - 90일 초과 탈퇴자")
+        @Test
+        void validateWithdrawalMember_after90Days_returnSuccess() {
+            String email = "sample@example.com";
+            String hashedEmail = HashUtil.hash(email);
+            WithdrawalMember withdrawalMember = TestDataFactory.testWithdrawalMember(email,
+                    LocalDateTime.now().minusDays(111), false);
+            when(withdrawalMemberRepository.findByHashedEmail(hashedEmail))
+                    .thenReturn(Optional.of(withdrawalMember));
+
+            assertDoesNotThrow(() -> withdrawalMemberService.validateWithdrawalMember(email));
+        }
+
+        @DisplayName("탈퇴 회원 통과 실패 - 90일 이내 탈퇴자")
+        @Test
+        void validateWithdrawalMember_within90Days_returnError() {
+
+            String email = "sample@example.com";
+            String hashedEmail = HashUtil.hash(email);
+            WithdrawalMember withdrawalMember = TestDataFactory.testWithdrawalMember(email,
+                    LocalDateTime.now().minusDays(20), false);
+            when(withdrawalMemberRepository.findByHashedEmail(hashedEmail))
+                    .thenReturn(Optional.of(withdrawalMember));
+        
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class,
+                    () -> withdrawalMemberService.validateWithdrawalMember(email));
+            assertEquals(ErrorCode.WITHDRAWN_MEMBER_RESTRICTED.getCode(), exception.getCode());
+            assertTrue(exception.getMessage().contains("재가입 가능일"));
+        }
+        
+    }
 }
+
+
