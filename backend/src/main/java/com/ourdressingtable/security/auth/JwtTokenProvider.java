@@ -89,7 +89,7 @@ public class JwtTokenProvider {
             throw new OurDressingTableException(ErrorCode.BAD_REQUEST, e);
         } catch (Exception e) {
             log.warn("[validateToken] 기타 JWT 오류: {}", e.getMessage());
-            throw new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR, e);
+            throw new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR, e);
         }
     }
 

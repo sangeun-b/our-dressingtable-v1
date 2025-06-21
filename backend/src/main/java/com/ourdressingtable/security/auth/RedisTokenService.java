@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +19,18 @@ import org.springframework.stereotype.Service;
 public class RedisTokenService {
 
     private final StringRedisTemplate redisTemplate;
-    private final long EXPIRE_TIME = 7 * 24 * 60 * 60L; // 7일
+    private static final long EXPIRE_TIME = 7 * 24 * 60 * 60L; // 7일
+    private static final String PREFIX_BLACKLIST = "blacklist:";
+
 
     private String generateKey(String email, String type, String deviceId) {
         return email + ":" + type + ":" + deviceId;
     }
 
     private String getDeviceId(String ua) {
-        if(ua == null)
-            return "default-device";
+        if(ua == null || ua.isBlank()) {
+            return UUID.randomUUID().toString();
+        }
         return Integer.toHexString(ua.hashCode());
     }
 
@@ -64,21 +68,21 @@ public class RedisTokenService {
     public void deleteTokenInfo(String email, String type, String ua) {
         String deviceId = getDeviceId(ua);
         String redisKey = generateKey(email, type, deviceId);
-        log.info("Redis Token Delete Start:", redisKey);
+        log.info("Redis Token Delete Start: {}", redisKey);
         Boolean result = redisTemplate.delete(redisKey);
         if(!result) {
             log.warn("Redis Token Delete Fail: email={}, type={}, deviceId={}", email, type, deviceId);
-            throw new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR);
+            throw new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-        log.info("Redis Token Delete End:", redisKey);
+        log.info("Redis Token Delete End: {}", redisKey);
     }
 
     public void blacklistAccessToken(String accessToken, long expireTime) {
-        redisTemplate.opsForValue().set("blacklist:"+accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(PREFIX_BLACKLIST+accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
     }
 
     public boolean isBlacklisted(String accessToken) {
-        boolean blacklisted = redisTemplate.hasKey("blacklist:" + accessToken);
+        boolean blacklisted = redisTemplate.hasKey(PREFIX_BLACKLIST + accessToken);
         if(blacklisted) {
             throw new OurDressingTableException(ErrorCode.UNAUTHORIZED);
         }

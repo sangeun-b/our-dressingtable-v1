@@ -23,7 +23,6 @@ import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
-import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.domain.PostLike;
@@ -335,7 +334,7 @@ public class CommunityControllerTest {
         public void getMyPosts_returnInternalServerError() throws Exception {
 
             given(communityService.getMyPosts(any(Pageable.class), any(MyPostSearchCondition.class)))
-                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR));
 
             performGetMyPosts().andExpect(status().isInternalServerError());
         }
@@ -418,7 +417,7 @@ public class CommunityControllerTest {
         public void getMyPosts_returnInternalServerError() throws Exception {
 
             given(communityService.getCommentedPosts(any(Pageable.class), any(MyPostSearchCondition.class)))
-                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR));
 
             performGetCommentedPosts().andExpect(status().isInternalServerError());
         }

@@ -2,22 +2,15 @@ package com.ourdressingtable.community.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.security.TestSecurityConfig;
-import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
-import com.ourdressingtable.community.post.controller.PostController;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
-import com.ourdressingtable.community.post.dto.PostDetailResponse;
 import com.ourdressingtable.community.post.dto.PostResponse;
 import com.ourdressingtable.community.post.dto.PostSearchCondition;
-import com.ourdressingtable.community.post.dto.UpdatePostRequest;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.communityCategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Status;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,8 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,7 +31,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -94,7 +84,7 @@ public class PostControllerTest {
         @Test
         public void getPosts_returnInternalServerError() throws Exception {
             given(postService.getPosts(any(PostSearchCondition.class), any(Pageable.class)))
-                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SEVER_ERROR));
+                    .willThrow(new OurDressingTableException(ErrorCode.INTERNAL_SERVER_ERROR));
 
             mockMvc.perform(get("/api/posts")
                     .param("keyword", "테스트")
