@@ -13,7 +13,9 @@ import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeReq
 import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
 import com.ourdressingtable.security.controller.AuthController;
 import com.ourdressingtable.security.dto.LoginRequest;
+import com.ourdressingtable.security.dto.PasswordResetRequest;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
+import com.ourdressingtable.security.dto.ResetPasswordEmailRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,8 +33,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("Spring security 테스트")
+@DisplayName("Spring security API 테스트")
 public class AuthControllerTest {
 
     @Autowired
@@ -68,7 +69,7 @@ public class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Nested
-    @DisplayName("로그인 테스트")
+    @DisplayName("로그인 API 테스트")
     class Login {
         @DisplayName("로그인 성공")
         @Test
@@ -108,7 +109,7 @@ public class AuthControllerTest {
     }
 
     @Nested
-    @DisplayName("refresh token 테스트")
+    @DisplayName("refresh token API 테스트")
     class RefreshToken {
         @DisplayName("token 발급 성공 - 유효한 refreshToken이면 새로운 토큰 반환")
         @Test
@@ -153,7 +154,7 @@ public class AuthControllerTest {
     }
 
     @Nested
-    @DisplayName("로그아웃 테스트")
+    @DisplayName("로그아웃 API 테스트")
     class logout {
         @DisplayName("로그아웃 성공")
         @Test
@@ -193,7 +194,7 @@ public class AuthControllerTest {
     }
 
     @Nested
-    @DisplayName("이메일 인증코드 전송 테스트")
+    @DisplayName("이메일 인증코드 전송 API 테스트")
     class SendEmailVerification {
         @DisplayName("이메일 인증코드 전송 성공")
         @Test
@@ -209,7 +210,7 @@ public class AuthControllerTest {
     }
 
     @Nested
-    @DisplayName("이메일 인증코드 확인 테스트")
+    @DisplayName("이메일 인증코드 확인 API 테스트")
     class ConfirmEmailVerification {
         @DisplayName("이메일 인증코드 확인 성공")
         @Test
@@ -237,5 +238,79 @@ public class AuthControllerTest {
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
         }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 재설정 요청 API 테스트")
+    class PasswordReset {
+
+        @DisplayName("비밀번호 재설정 요청 성공")
+        @Test
+        public void resetPasswordRequest_returnSuccess() throws Exception {
+            ResetPasswordEmailRequest request = TestDataFactory.testResetPasswordEmailRequest("test@example.com");
+
+            mockMvc.perform(post("/api/auth/reset-password/request")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+        }
+
+        @DisplayName("비밀번호 재설정 요청 실패 - 인증되지않는 이메일")
+        @Test
+        public void resetPasswordRequest_returnEmailNotVerifiedError() throws Exception {
+            String email = "notverifiedemail@example.com";
+
+            doThrow(new OurDressingTableException(ErrorCode.EMAIL_NOT_VERIFIED))
+                    .when(memberService)
+                    .verifyResettableEmail(email);
+
+            ResetPasswordEmailRequest request = TestDataFactory.testResetPasswordEmailRequest(email);
+
+            mockMvc.perform(post("/api/auth/reset-password/request")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
+        }
+
+
+    }
+
+    @Nested
+    @DisplayName("비밀번호 재설정 API 테스트")
+    class PasswordResetConfirm {
+
+        @DisplayName("비밀번호 재설정 성공")
+        @Test
+        public void resetPassword_returnSuccess() throws Exception {
+            PasswordResetRequest request = TestDataFactory.testPasswordResetRequest("test@example.com","newPassword123!");
+            mockMvc.perform(post("/api/auth/reset-password/request")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+        }
+
+        @DisplayName("비밀번호 재설정 실패 - 존재하지 않는 회원")
+        @Test
+        public void confirmResetPassword_returnSuccess() throws Exception {
+            String email = "unknown@example.com";
+            String password = "newPassword123!!!!!";
+
+            willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND))
+                    .given(memberService)
+                    .resetPassword(email, password);
+
+            PasswordResetRequest request = TestDataFactory.testPasswordResetRequest(email, password);
+
+            mockMvc.perform(post("/api/auth/reset-password/confirm")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isNotFound());
+        }
+
+
     }
 }

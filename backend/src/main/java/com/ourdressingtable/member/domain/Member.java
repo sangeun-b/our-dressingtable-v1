@@ -96,6 +96,10 @@ public class Member extends BaseTimeEntity {
         this.imageUrl = getOrDefault(updateMemberRequest.getImageUrl(),this.imageUrl);
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     public void withdraw() {
         this.status = Status.WITHDRAWAL;
     }
