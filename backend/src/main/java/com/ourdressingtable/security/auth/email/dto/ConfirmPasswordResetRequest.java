@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class ConfirmPasswordResetRequest {
 
-    @Schema(description = "이메일", example = "sample@example.com")
+    @Schema(description = "토큰", example = "validtoken")
     @NotBlank(message = "토큰을 입력해주세요.")
     private String token;
 
