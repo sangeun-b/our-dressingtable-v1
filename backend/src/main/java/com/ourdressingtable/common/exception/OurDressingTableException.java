@@ -22,4 +22,10 @@ public class OurDressingTableException extends RuntimeException {
         this.httpStatus = errorCode.getHttpStatus();
         this.code = errorCode.getCode();
     }
+
+    public OurDressingTableException(ErrorCode errorCode, String msg) {
+        super(msg);
+        this.httpStatus = errorCode.getHttpStatus();
+        this.code = errorCode.getCode();
+    }
 }

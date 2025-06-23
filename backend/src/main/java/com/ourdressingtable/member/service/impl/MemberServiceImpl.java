@@ -32,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public Long createMember(CreateMemberRequest createMemberRequest) {
+
         if (!emailVerificationRepository.isVerified(createMemberRequest.getEmail())) {
             throw new OurDressingTableException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
@@ -42,6 +43,9 @@ public class MemberServiceImpl implements MemberService {
         if (memberRepository.existsByNickname(createMemberRequest.getNickname())) {
             throw new OurDressingTableException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
+
+        withdrawalMemberService.validateWithdrawalMember(createMemberRequest.getEmail());
+
         String encodedPassword = passwordEncoder.encode(createMemberRequest.getPassword());
         Member member = createMemberRequest.toEntity(encodedPassword);
         member.active();

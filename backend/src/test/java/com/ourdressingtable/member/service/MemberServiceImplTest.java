@@ -1,20 +1,24 @@
 package com.ourdressingtable.member.service;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
+import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.request.CreateMemberRequest;
 import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
@@ -22,6 +26,7 @@ import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
@@ -85,6 +90,7 @@ public class MemberServiceImplTest {
 
         }
 
+
         @DisplayName("회원 가입 실패 - 중복 이메일")
         @Test
         public void createMember_withDuplicateEmail_returnError() {
@@ -110,6 +116,25 @@ public class MemberServiceImplTest {
             OurDressingTableException ourDressingTableException = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
             assertEquals(ourDressingTableException.getHttpStatus(), ErrorCode.EMAIL_NOT_VERIFIED.getHttpStatus());
 
+        }
+
+        @DisplayName("회원 가입 실패 - 90일 이내 탈퇴 회원")
+        @Test
+        public void createMember_withRecentlyWithdrawnEmail_returnError() {
+            CreateMemberRequest createMemberRequest = TestDataFactory.testCreateMemberRequest();
+
+            when(emailVerificationRepository.isVerified(createMemberRequest.getEmail())).thenReturn(true);
+            when(memberRepository.existsByEmail(createMemberRequest.getEmail())).thenReturn(false);
+            when(memberRepository.existsByNickname(createMemberRequest.getNickname())).thenReturn(false);
+
+            doThrow(new OurDressingTableException(ErrorCode.WITHDRAWN_MEMBER_RESTRICTED, "재가입 가능일: 2025년 09월 18일"))
+                    .when(withdrawalMemberService)
+                    .validateWithdrawalMember(createMemberRequest.getEmail());
+
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () -> memberService.createMember(createMemberRequest));
+
+            assertEquals(exception.getHttpStatus(), ErrorCode.WITHDRAWN_MEMBER_RESTRICTED.getHttpStatus());
+            assertTrue(exception.getMessage().contains("재가입 가능일"));
         }
     }
 
