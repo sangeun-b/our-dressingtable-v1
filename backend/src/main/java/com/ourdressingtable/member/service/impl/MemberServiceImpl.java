@@ -115,4 +115,23 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    @Override
+    public void verifyResettableEmail(String email) {
+        if(!emailVerificationRepository.isVerified(email)) {
+            throw new OurDressingTableException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        if(!memberRepository.existsByEmail(email)) {
+            throw new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void resetPassword(String email, String newPassword) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        member.updatePassword(encodedPassword);
+
+    }
 }
