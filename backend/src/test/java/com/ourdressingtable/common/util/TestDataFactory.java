@@ -25,6 +25,7 @@ import com.ourdressingtable.security.dto.PasswordResetRequest;
 import com.ourdressingtable.security.dto.ResetPasswordEmailRequest;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class TestDataFactory {
 
@@ -86,6 +87,19 @@ public class TestDataFactory {
                 .reason("재가입 예정")
                 .password("{noop}Password123!")
                 .isBlock(false)
+                .build();
+    }
+
+    public static WithdrawalMember testWithdrawalMember(String email, LocalDateTime withdrewAt, boolean isBlock) {
+        return WithdrawalMember.builder()
+                .hashedEmail(HashUtil.hash(email))
+                .maskedEmail(MaskingUtil.maskedEmail(email))
+                .hashedPhone(HashUtil.hash("010-1234-5678"))
+                .maskedPhone(MaskingUtil.maskedPhone("010-1234-5678"))
+                .reason("테스트")
+                .isBlock(isBlock)
+                .withdrewAt(Timestamp.valueOf(withdrewAt))
+                .member(testMember(99L))
                 .build();
     }
 
