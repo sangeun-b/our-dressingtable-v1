@@ -21,6 +21,8 @@ import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCode
 import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.security.dto.CustomUserDetails;
 import com.ourdressingtable.security.dto.LoginRequest;
+import com.ourdressingtable.security.dto.PasswordResetRequest;
+import com.ourdressingtable.security.dto.ResetPasswordEmailRequest;
 
 import java.sql.Timestamp;
 
@@ -269,6 +271,19 @@ public class TestDataFactory {
         return ConfirmEmailVerificationCodeRequest .builder()
                 .email("sample@example.com")
                 .verificationCode("123456")
+                .build();
+    }
+
+    public static ResetPasswordEmailRequest testResetPasswordEmailRequest(String email) {
+        return ResetPasswordEmailRequest.builder()
+                .email(email)
+                .build();
+    }
+
+    public static PasswordResetRequest testPasswordResetRequest(String email, String password) {
+        return PasswordResetRequest.builder()
+                .email(email)
+                .newPassword(password)
                 .build();
     }
 }
