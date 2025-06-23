@@ -1,4 +1,4 @@
-package com.ourdressingtable.security.dto;
+package com.ourdressingtable.security.auth.email.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -11,21 +11,20 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class PasswordResetRequest {
+public class ConfirmPasswordResetRequest {
 
-    @Schema(description = "이메일", example = "sample@gmail.com")
-    @NotBlank(message = "이메일을 입려해주세요.")
-    @Email(message = "올바른 이메일 형식이 아닙니다.")
-    private String email;
+    @Schema(description = "이메일", example = "sample@example.com")
+    @NotBlank(message = "토큰을 입력해주세요.")
+    private String token;
 
 
     @Schema(description = "새 비밀번호", example = "passwordme!!")
-    @NotBlank(message = "새로운 비밀번호를 입려해주세요.")
+    @NotBlank(message = "새로운 비밀번호를 입력해주세요.")
     private String newPassword;
 
     @Builder
-    public PasswordResetRequest(String email, String newPassword) {
-        this.email = email;
+    public ConfirmPasswordResetRequest(String token, String newPassword) {
+        this.token = token;
         this.newPassword = newPassword;
     }
 }

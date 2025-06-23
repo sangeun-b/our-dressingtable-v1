@@ -1,4 +1,4 @@
-package com.ourdressingtable.security.dto;
+package com.ourdressingtable.security.auth.email.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
