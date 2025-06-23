@@ -11,11 +11,12 @@ import com.ourdressingtable.security.auth.RedisTokenService;
 import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
 import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
+import com.ourdressingtable.security.auth.email.service.ResetPasswordEmailService;
 import com.ourdressingtable.security.controller.AuthController;
 import com.ourdressingtable.security.dto.LoginRequest;
-import com.ourdressingtable.security.dto.PasswordResetRequest;
+import com.ourdressingtable.security.auth.email.dto.ConfirmPasswordResetRequest;
 import com.ourdressingtable.security.dto.RefreshTokenRequest;
-import com.ourdressingtable.security.dto.ResetPasswordEmailRequest;
+import com.ourdressingtable.security.auth.email.dto.ResetPasswordEmailRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -64,6 +64,8 @@ public class AuthControllerTest {
     @MockBean
     private EmailVerificationService emailVerificationService;
 
+    @MockBean
+    private ResetPasswordEmailService resetPasswordEmailService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -256,14 +258,14 @@ public class AuthControllerTest {
                     .andExpect(status().isOk());
         }
 
-        @DisplayName("비밀번호 재설정 요청 실패 - 인증되지않는 이메일")
+        @DisplayName("비밀번호 재설정 요청 실패 - 존재하지 않는 이메일")
         @Test
         public void resetPasswordRequest_returnEmailNotVerifiedError() throws Exception {
             String email = "notverifiedemail@example.com";
 
-            doThrow(new OurDressingTableException(ErrorCode.EMAIL_NOT_VERIFIED))
-                    .when(memberService)
-                    .verifyResettableEmail(email);
+            willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND))
+                    .given(resetPasswordEmailService)
+                    .sendResetLink(email);
 
             ResetPasswordEmailRequest request = TestDataFactory.testResetPasswordEmailRequest(email);
 
@@ -271,7 +273,7 @@ public class AuthControllerTest {
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isNotFound());
         }
 
 
@@ -284,25 +286,25 @@ public class AuthControllerTest {
         @DisplayName("비밀번호 재설정 성공")
         @Test
         public void resetPassword_returnSuccess() throws Exception {
-            PasswordResetRequest request = TestDataFactory.testPasswordResetRequest("test@example.com","newPassword123!");
-            mockMvc.perform(post("/api/auth/reset-password/request")
+            ConfirmPasswordResetRequest request = TestDataFactory.testPasswordResetRequest("valid-token","newPassword123!");
+            mockMvc.perform(post("/api/auth/reset-password/confirm")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
         }
 
-        @DisplayName("비밀번호 재설정 실패 - 존재하지 않는 회원")
+        @DisplayName("비밀번호 재설정 실패 - 만료된 토큰")
         @Test
         public void confirmResetPassword_returnSuccess() throws Exception {
-            String email = "unknown@example.com";
+            String token = "expired-token";
             String password = "newPassword123!!!!!";
 
             willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND))
-                    .given(memberService)
-                    .resetPassword(email, password);
+                    .given(resetPasswordEmailService)
+                    .resetPassword(token, password);
 
-            PasswordResetRequest request = TestDataFactory.testPasswordResetRequest(email, password);
+            ConfirmPasswordResetRequest request = TestDataFactory.testPasswordResetRequest(token, password);
 
             mockMvc.perform(post("/api/auth/reset-password/confirm")
                     .with(csrf())

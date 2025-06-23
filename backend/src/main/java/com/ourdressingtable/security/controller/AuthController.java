@@ -4,9 +4,12 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.security.auth.JwtTokenProvider;
 import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.security.auth.email.dto.ConfirmPasswordResetRequest;
+import com.ourdressingtable.security.auth.email.dto.ResetPasswordEmailRequest;
 import com.ourdressingtable.security.auth.email.service.EmailVerificationService;
 import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
 import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
+import com.ourdressingtable.security.auth.email.service.ResetPasswordEmailService;
 import com.ourdressingtable.security.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +36,7 @@ public class AuthController {
     private final MemberService memberService;
     private final RedisTokenService redisTokenService;
     private final EmailVerificationService emailVerificationService;
+    private final ResetPasswordEmailService resetPasswordEmailService;
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인을 합니다.")
@@ -110,14 +114,14 @@ public class AuthController {
     @PostMapping("/reset-password/request")
     @Operation(summary = "비밀번호 재설정 요청",  description = "입력한 이메일이 인증된 경우 비밀번호 재설정을 요청합니다.")
     public ResponseEntity<Void> requestPasswordReset(@RequestBody @Valid ResetPasswordEmailRequest request) {
-        memberService.verifyResettableEmail(request.getEmail());
+        resetPasswordEmailService.sendResetLink(request.getEmail());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password/confirm")
     @Operation(summary = "비밀번호 재설정", description = "새로운 비밀번호로 변경합니다.")
-    public ResponseEntity<Void> confirmPasswordReset(@RequestBody @Valid PasswordResetRequest request) {
-        memberService.resetPassword(request.getEmail(), request.getNewPassword());
+    public ResponseEntity<Void> confirmPasswordReset(@RequestBody @Valid ConfirmPasswordResetRequest request) {
+        resetPasswordEmailService.resetPassword(request.getToken(),request.getNewPassword());
         return ResponseEntity.ok().build();
     }
 

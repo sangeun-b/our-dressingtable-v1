@@ -18,6 +18,4 @@ public interface MemberService {
     Member getActiveMemberEntityById(Long id);
     Member getActiveMemberEntityByEmail(String email);
     MemberResponse getMyInfo();
-    void verifyResettableEmail(@NotBlank(message = "이메일을 입려해주세요.") @Email(message = "올바른 이메일 형식이 아닙니다.") String email);
-    void resetPassword(@NotBlank(message = "이메일을 입려해주세요.") @Email(message = "올바른 이메일 형식이 아닙니다.") String email, @NotBlank(message = "새로운 비밀번호를 입려해주세요.") String newPassword);
 }
