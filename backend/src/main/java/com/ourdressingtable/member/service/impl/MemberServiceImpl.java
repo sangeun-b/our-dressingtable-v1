@@ -123,6 +123,6 @@ public class MemberServiceImpl implements MemberService {
     public String getEmailByNameAndPhone(String name, String phone) {
         return memberRepository.findByNameAndPhoneNumber(name,phone)
                 .map(Member::getEmail)
-                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_EMAIL_NOT_FOUND));
     }
 }

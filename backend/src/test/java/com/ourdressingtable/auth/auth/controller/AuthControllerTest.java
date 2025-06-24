@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.MaskingUtil;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
@@ -326,6 +327,7 @@ public class AuthControllerTest {
         public void findEmailById_returnSuccess() throws Exception {
             FindEmailRequest request = TestDataFactory.testFindEmailRequest("김이름", "010-1234-5678");
             String expectedEmail = "test@example.com";
+            String maskedEmail = MaskingUtil.maskedEmail(expectedEmail);
 
             given(memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber()))
                     .willReturn(expectedEmail);
@@ -335,7 +337,7 @@ public class AuthControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value(expectedEmail));
+                    .andExpect(jsonPath("$.email").value(maskedEmail));
         }
 
         @DisplayName("이메일(ID) 찾기 실패 - 존재하지 않는 회원")
@@ -344,13 +346,14 @@ public class AuthControllerTest {
             FindEmailRequest request = TestDataFactory.testFindEmailRequest("비회원", "010-1234-5678");
 
             given(memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber()))
-                    .willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+                    .willThrow(new OurDressingTableException(ErrorCode.MEMBER_EMAIL_NOT_FOUND));
 
             mockMvc.perform(post("/api/auth/find-email")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.email").value("가입된 이메일이 존재하지 않거나 확인할 수 없습니다."));
 
         }
 

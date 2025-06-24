@@ -1,6 +1,8 @@
 package com.ourdressingtable.auth.controller;
 
 import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.util.MaskingUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.auth.service.JwtTokenProvider;
@@ -148,9 +150,14 @@ public class AuthController {
     @PostMapping("/find-email")
     @Operation(summary = "이메일(ID) 찾기", description = "이름과 전화번호로 이메일(ID)를 찾습니다.")
     public ResponseEntity<FindEmailResponse> findEmail(@RequestBody @Valid FindEmailRequest request) {
-        String email = memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber());
-        FindEmailResponse response = FindEmailResponse.builder().email(email).build();
-        return ResponseEntity.ok(response);
+        try {
+            String email = memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber());
+            String maskedEmail = MaskingUtil.maskedEmail(email);
+            FindEmailResponse response = FindEmailResponse.builder().email(maskedEmail).build();
+            return ResponseEntity.ok(response);
+        } catch (OurDressingTableException ex) {
+            return ResponseEntity.ok(FindEmailResponse.builder().email(ErrorCode.MEMBER_EMAIL_NOT_FOUND.getMessage()).build());
+        }
 
     }
 

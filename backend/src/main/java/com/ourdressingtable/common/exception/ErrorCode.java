@@ -21,6 +21,7 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "M009", "이미 사용중인 닉네임입니다."),
     WITHDRAWN_MEMBER_RESTRICTED(HttpStatus.FORBIDDEN, "M010", "탈퇴한 회원은 일정 기간 내 재가입할 수 없습니다."),
     WITHDRAWN_BLOCK_MEMBER_RESTRICTED(HttpStatus.FORBIDDEN, "M11", "차단 당한 회원은 재가입 할 수 없습니다."),
+    MEMBER_EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "M12", "가입된 이메일이 존재하지 않거나 확인할 수 없습니다."),
 
     // 인증/인가 관련
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다."),
