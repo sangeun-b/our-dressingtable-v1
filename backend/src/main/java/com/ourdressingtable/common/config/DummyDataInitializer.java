@@ -41,6 +41,7 @@ public class DummyDataInitializer implements CommandLineRunner {
                 .email("sample@gmail.com")
                 .password(encodedPw)
                 .name("김이름")
+                .phoneNumber("010-1234-5678")
                 .role(Role.ROLE_BASIC)
                 .status(Status.ACTIVE)
                 .build();

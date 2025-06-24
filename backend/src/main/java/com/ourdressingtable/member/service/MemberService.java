@@ -18,4 +18,5 @@ public interface MemberService {
     Member getActiveMemberEntityById(Long id);
     Member getActiveMemberEntityByEmail(String email);
     MemberResponse getMyInfo();
+    String findEmailByNameAndPhone(String name, String phone);
 }
