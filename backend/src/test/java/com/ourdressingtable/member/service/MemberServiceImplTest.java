@@ -39,11 +39,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.redisson.api.RedissonClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@DisplayName("회원 서비스 테스트")
 public class MemberServiceImplTest {
 
     @InjectMocks
@@ -334,7 +336,7 @@ public class MemberServiceImplTest {
             OurDressingTableException exception = assertThrows(OurDressingTableException.class, () ->
                     memberService.getEmailByNameAndPhone(name, phone));
 
-            assertEquals(ErrorCode.MEMBER_NOT_FOUND.getCode(), exception.getCode());
+            assertEquals(ErrorCode.MEMBER_EMAIL_NOT_FOUND.getCode(), exception.getCode());
 
         }
 
