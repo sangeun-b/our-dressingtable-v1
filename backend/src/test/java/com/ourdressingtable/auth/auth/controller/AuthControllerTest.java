@@ -1,6 +1,7 @@
 package com.ourdressingtable.auth.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.TestDataFactory;
@@ -72,7 +73,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("로그인 API 테스트")
-    class Login {
+    class LoginTest {
         @DisplayName("로그인 성공")
         @Test
         public void login_shouldReturnSuccess() throws Exception {
@@ -112,7 +113,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("refresh token API 테스트")
-    class RefreshToken {
+    class RefreshTokenTest {
         @DisplayName("token 발급 성공 - 유효한 refreshToken이면 새로운 토큰 반환")
         @Test
         public void refreshToken_shouldReturnSuccess() throws Exception {
@@ -157,7 +158,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("로그아웃 API 테스트")
-    class logout {
+    class logoutTest {
         @DisplayName("로그아웃 성공")
         @Test
         public void logout_shouldReturnSuccess() throws Exception {
@@ -197,7 +198,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("이메일 인증코드 전송 API 테스트")
-    class SendEmailVerification {
+    class SendEmailVerificationTest {
         @DisplayName("이메일 인증코드 전송 성공")
         @Test
         public void sendVerification_returnSuccess() throws Exception {
@@ -213,7 +214,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("이메일 인증코드 확인 API 테스트")
-    class ConfirmEmailVerification {
+    class ConfirmEmailVerificationTest {
         @DisplayName("이메일 인증코드 확인 성공")
         @Test
         public void confirmVerification_returnSuccess() throws Exception {
@@ -244,7 +245,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("비밀번호 재설정 요청 API 테스트")
-    class PasswordReset {
+    class PasswordResetTest {
 
         @DisplayName("비밀번호 재설정 요청 성공")
         @Test
@@ -281,7 +282,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("비밀번호 재설정 API 테스트")
-    class PasswordResetConfirm {
+    class PasswordResetConfirmTest {
 
         @DisplayName("비밀번호 재설정 성공")
         @Test
@@ -314,5 +315,56 @@ public class AuthControllerTest {
         }
 
 
+    }
+
+    @Nested
+    @DisplayName("이메일(ID) 찾기 API 테스트")
+    class FindEmailTest {
+
+        @DisplayName("이메일(ID) 찾기 성공")
+        @Test
+        public void findEmailById_returnSuccess() throws Exception {
+            FindEmailRequest request = TestDataFactory.testFindEmailRequest("김이름", "010-1234-5678");
+            String expectedEmail = "test@example.com";
+
+            given(memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber()))
+                    .willReturn(expectedEmail);
+
+            mockMvc.perform(post("/api/auth/find-email")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.email").value(expectedEmail));
+        }
+
+        @DisplayName("이메일(ID) 찾기 실패 - 존재하지 않는 회원")
+        @Test
+        public void findEmailById_returnMemberNotFoundError() throws Exception {
+            FindEmailRequest request = TestDataFactory.testFindEmailRequest("비회원", "010-1234-5678");
+
+            given(memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber()))
+                    .willThrow(new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
+
+            mockMvc.perform(post("/api/auth/find-email")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isNotFound());
+
+        }
+
+        @DisplayName("이메일(ID) 찾기 실패 - 이름 미입력")
+        @Test
+        public void findEmailById_returnBadRequestError() throws Exception {
+            FindEmailRequest request = TestDataFactory.testFindEmailRequest("", "010-1234-5678");
+
+            mockMvc.perform(post("/api/auth/find-email")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
+
+        }
     }
 }

@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -129,7 +128,7 @@ public class AuthController {
     @PostMapping("/find-email")
     @Operation(summary = "이메일(ID) 찾기", description = "이름과 전화번호로 이메일(ID)를 찾습니다.")
     public ResponseEntity<FindEmailResponse> findEmail(@RequestBody @Valid FindEmailRequest request) {
-        String email = memberService.findEmailByNameAndPhone(request.getName(), request.getPhoneNumber());
+        String email = memberService.getEmailByNameAndPhone(request.getName(), request.getPhoneNumber());
         FindEmailResponse response = FindEmailResponse.builder().email(email).build();
         return ResponseEntity.ok(response);
 

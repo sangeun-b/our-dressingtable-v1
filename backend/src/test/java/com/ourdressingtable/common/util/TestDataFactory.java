@@ -1,5 +1,6 @@
 package com.ourdressingtable.common.util;
 
+import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
@@ -299,5 +300,9 @@ public class TestDataFactory {
                 .token(token)
                 .newPassword(password)
                 .build();
+    }
+
+    public static FindEmailRequest testFindEmailRequest(String name, String phone) {
+        return FindEmailRequest.builder().name(name).phoneNumber(phone).build();
     }
 }

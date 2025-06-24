@@ -63,7 +63,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 가입 테스트")
-    class SingUp {
+    class SingUpTest {
         @DisplayName("회원 가입 성공")
         @Test
         public void createMember_returnSuccess() {
@@ -138,7 +138,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 조회 테스트")
-    class FindUser {
+    class FindMemberTest {
 
         @DisplayName("회원 조회 성공 테스트")
         @Test
@@ -174,7 +174,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 정보 수정 테스트")
-    class UpdateUser {
+    class UpdateMemberTest {
 
         @DisplayName("회원 정보 수정 성공 테스트")
         @Test
@@ -218,7 +218,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 삭제 테스트")
-    class DeleteUser {
+    class DeleteMemberTest {
 
         @DisplayName("회원 삭제 성공")
         @Test
@@ -261,7 +261,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("내 정보 조회 테스트")
-    class GetMyInformation {
+    class GetMyInformationTest {
 
         @DisplayName("내 정보 조회 성공")
         @Test
@@ -301,5 +301,42 @@ public class MemberServiceImplTest {
                 assertEquals(ErrorCode.MEMBER_NOT_ACTIVE.getCode(), exception.getCode());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("이메일(ID) 찾기 테스트")
+    class GetEmailTest {
+
+        @DisplayName("이메일(ID) 찾기 성공")
+        @Test
+        public void getEmailByNameAndPhone_returnSuccess() {
+            String name = "김이름";
+            String phone = "010-1234-5678";
+            String expectedEmail = "test@example.com";
+
+            Member member = TestDataFactory.testMember(1L);
+
+            given(memberRepository.findByNameAndPhoneNumber(name, phone)).willReturn(Optional.of(member));
+
+            String result = memberService.getEmailByNameAndPhone(name, phone);
+            assertEquals(expectedEmail, result);
+
+        }
+
+        @DisplayName("이메일(ID) 찾기 실패 - 존재하지 않는 회원")
+        @Test
+        public void getEmailByNameAndPhone_returnMemberNotFoundError() {
+            String name = "비회원";
+            String phone = "010-5555-5678";
+
+            given(memberRepository.findByNameAndPhoneNumber(name, phone)).willReturn(Optional.empty());
+
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () ->
+                    memberService.getEmailByNameAndPhone(name, phone));
+
+            assertEquals(ErrorCode.MEMBER_NOT_FOUND.getCode(), exception.getCode());
+
+        }
+
     }
 }

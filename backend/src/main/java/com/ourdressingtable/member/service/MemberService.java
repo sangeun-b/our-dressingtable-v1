@@ -6,8 +6,6 @@ import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
 import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 public interface MemberService {
     Long createMember(CreateMemberRequest createMemberRequest);
@@ -18,5 +16,5 @@ public interface MemberService {
     Member getActiveMemberEntityById(Long id);
     Member getActiveMemberEntityByEmail(String email);
     MemberResponse getMyInfo();
-    String findEmailByNameAndPhone(String name, String phone);
+    String getEmailByNameAndPhone(String name, String phone);
 }
