@@ -18,7 +18,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
+import com.ourdressingtable.auth.dto.CustomUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -12,13 +12,11 @@ import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.request.CreateMemberRequest;
 import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
@@ -26,10 +24,10 @@ import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
-import java.time.LocalDateTime;
+
 import java.util.Optional;
 
-import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
+import com.ourdressingtable.auth.email.repository.EmailVerificationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

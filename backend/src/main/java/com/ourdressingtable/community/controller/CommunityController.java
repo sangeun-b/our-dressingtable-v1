@@ -1,16 +1,10 @@
 package com.ourdressingtable.community.controller;
 
-import com.ourdressingtable.common.exception.ErrorCode;
-import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.CreateCommentResponse;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
-import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.dto.*;
-import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

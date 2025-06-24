@@ -17,12 +17,12 @@ import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
 import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
-import com.ourdressingtable.security.auth.email.dto.ConfirmEmailVerificationCodeRequest;
-import com.ourdressingtable.security.auth.email.dto.SendEmailVerificationCodeRequest;
-import com.ourdressingtable.security.dto.CustomUserDetails;
-import com.ourdressingtable.security.dto.LoginRequest;
-import com.ourdressingtable.security.auth.email.dto.ConfirmPasswordResetRequest;
-import com.ourdressingtable.security.auth.email.dto.ResetPasswordEmailRequest;
+import com.ourdressingtable.auth.email.dto.ConfirmEmailVerificationCodeRequest;
+import com.ourdressingtable.auth.email.dto.SendEmailVerificationCodeRequest;
+import com.ourdressingtable.auth.dto.CustomUserDetails;
+import com.ourdressingtable.auth.dto.LoginRequest;
+import com.ourdressingtable.auth.email.dto.ConfirmPasswordResetRequest;
+import com.ourdressingtable.auth.email.dto.ResetPasswordEmailRequest;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

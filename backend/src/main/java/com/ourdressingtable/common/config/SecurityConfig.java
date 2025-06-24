@@ -1,17 +1,15 @@
 package com.ourdressingtable.common.config;
 
-import com.ourdressingtable.security.auth.JwtAuthenticationFilter;
-import com.ourdressingtable.security.auth.JwtTokenProvider;
-import com.ourdressingtable.security.auth.RedisTokenService;
+import com.ourdressingtable.auth.filter.JwtAuthenticationFilter;
+import com.ourdressingtable.auth.service.JwtTokenProvider;
+import com.ourdressingtable.auth.service.RedisTokenService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer.JwtConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
