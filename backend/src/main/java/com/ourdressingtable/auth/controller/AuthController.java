@@ -1,5 +1,6 @@
 package com.ourdressingtable.auth.controller;
 
+import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.auth.service.JwtTokenProvider;
@@ -12,10 +13,12 @@ import com.ourdressingtable.auth.email.dto.SendEmailVerificationCodeRequest;
 import com.ourdressingtable.auth.email.service.ResetPasswordEmailService;
 import com.ourdressingtable.auth.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.janino.Token;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,22 +57,33 @@ public class AuthController {
 
         redisTokenService.saveTokenInfo(member.getEmail(), accessToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"accessToken");
         redisTokenService.saveTokenInfo(member.getEmail(), refreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"),"refreshToken");
-        return ResponseEntity.ok(LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).memberId(member.getId()).email(member.getEmail()).name(member.getName()).nickname(member.getNickname()).imageUrl(member.getImageUrl()).build());
+
+        LoginResponse response = LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .imageUrl(member.getImageUrl())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "token 재발급", description = "refresh token과 access token을 재발급합니다.")
+    @Operation(summary = "token 재발급", description = "refresh token과 access token을 재발급합니다.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request, HttpServletRequest httpServletRequest) {
         String token = request.getRefreshToken();
 
         if(!jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(ErrorCode.UNAUTHORIZED.getHttpStatus()).build();
         }
 
         String email = jwtTokenProvider.getEmail(token);
         boolean isValid = redisTokenService.validate(email, token, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
-        if(!isValid) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if(!isValid) return ResponseEntity.status(ErrorCode.UNAUTHORIZED.getHttpStatus()).build();
 
         Member member = memberService.getActiveMemberEntityByEmail(email);
 
@@ -78,21 +92,27 @@ public class AuthController {
 
         redisTokenService.saveTokenInfo(email, newRefreshToken, httpServletRequest.getRemoteAddr(), httpServletRequest.getHeader("User-Agent"), "refreshToken");
 
-        return ResponseEntity.ok(TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
+        TokenResponse response = TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "로그아웃", description = "로그아웃을 합니다.")
+    @Operation(summary = "로그아웃", description = "로그아웃을 합니다.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity logout(HttpServletRequest httpServletRequest) {
         log.info("[logout] 호출");
         String token = jwtTokenProvider.resolveToken(httpServletRequest);
-        log.info("[logout] token = {} " + token + "");
+        log.info("[logout] token = {} ", token);
         if(token != null && jwtTokenProvider.validateToken(token)) {
             long remaining = jwtTokenProvider.getExpirationTime(token);
             redisTokenService.blacklistAccessToken(token, remaining);
 
             String email = jwtTokenProvider.getEmail(token);
             redisTokenService.deleteTokenInfo(email, "refreshToken", httpServletRequest.getHeader("User-Agent"));
+            // 전체 기기 로그아웃이면 아래처럼 키만으로 삭제
+            // redisTokenService.deleteTokenInfo(email);
         }
         return ResponseEntity.noContent().build();
     }
