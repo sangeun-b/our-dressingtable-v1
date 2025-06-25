@@ -13,7 +13,7 @@ import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.member.service.WithdrawalMemberService;
-import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
+import com.ourdressingtable.auth.email.repository.EmailVerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -119,4 +119,10 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    @Override
+    public String getEmailByNameAndPhone(String name, String phone) {
+        return memberRepository.findByNameAndPhoneNumber(name,phone)
+                .map(Member::getEmail)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_EMAIL_NOT_FOUND));
+    }
 }

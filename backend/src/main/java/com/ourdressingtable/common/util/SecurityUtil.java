@@ -2,7 +2,7 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.security.dto.CustomUserDetails;
+import com.ourdressingtable.auth.dto.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

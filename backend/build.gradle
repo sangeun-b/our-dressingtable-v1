@@ -64,6 +64,11 @@ dependencies {
 	// email
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	// rate limiting
+	implementation 'com.bucket4j:bucket4j-core:8.5.0'
+	implementation 'com.bucket4j:bucket4j-redis:8.5.0'
+	implementation 'org.redisson:redisson:3.28.0'
+
 
 }
 

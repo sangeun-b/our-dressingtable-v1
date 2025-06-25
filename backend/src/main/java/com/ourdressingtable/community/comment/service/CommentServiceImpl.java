@@ -10,9 +10,7 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
-import com.ourdressingtable.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import com.ourdressingtable.common.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -12,13 +12,11 @@ import static org.mockito.Mockito.when;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
-import com.ourdressingtable.member.domain.WithdrawalMember;
 import com.ourdressingtable.member.dto.request.CreateMemberRequest;
 import com.ourdressingtable.member.dto.response.MemberResponse;
 import com.ourdressingtable.member.dto.response.OtherMemberResponse;
@@ -26,10 +24,10 @@ import com.ourdressingtable.member.dto.request.UpdateMemberRequest;
 import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.impl.MemberServiceImpl;
-import java.time.LocalDateTime;
+
 import java.util.Optional;
 
-import com.ourdressingtable.security.auth.email.repository.EmailVerificationRepository;
+import com.ourdressingtable.auth.email.repository.EmailVerificationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,11 +39,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.redisson.api.RedissonClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@DisplayName("회원 서비스 테스트")
 public class MemberServiceImplTest {
 
     @InjectMocks
@@ -65,7 +65,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 가입 테스트")
-    class SingUp {
+    class SingUpTest {
         @DisplayName("회원 가입 성공")
         @Test
         public void createMember_returnSuccess() {
@@ -140,7 +140,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 조회 테스트")
-    class FindUser {
+    class FindMemberTest {
 
         @DisplayName("회원 조회 성공 테스트")
         @Test
@@ -176,7 +176,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 정보 수정 테스트")
-    class UpdateUser {
+    class UpdateMemberTest {
 
         @DisplayName("회원 정보 수정 성공 테스트")
         @Test
@@ -220,7 +220,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("회원 삭제 테스트")
-    class DeleteUser {
+    class DeleteMemberTest {
 
         @DisplayName("회원 삭제 성공")
         @Test
@@ -263,7 +263,7 @@ public class MemberServiceImplTest {
 
     @Nested
     @DisplayName("내 정보 조회 테스트")
-    class GetMyInformation {
+    class GetMyInformationTest {
 
         @DisplayName("내 정보 조회 성공")
         @Test
@@ -303,5 +303,42 @@ public class MemberServiceImplTest {
                 assertEquals(ErrorCode.MEMBER_NOT_ACTIVE.getCode(), exception.getCode());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("이메일(ID) 찾기 테스트")
+    class GetEmailTest {
+
+        @DisplayName("이메일(ID) 찾기 성공")
+        @Test
+        public void getEmailByNameAndPhone_returnSuccess() {
+            String name = "김이름";
+            String phone = "010-1234-5678";
+            String expectedEmail = "test@example.com";
+
+            Member member = TestDataFactory.testMember(1L);
+
+            given(memberRepository.findByNameAndPhoneNumber(name, phone)).willReturn(Optional.of(member));
+
+            String result = memberService.getEmailByNameAndPhone(name, phone);
+            assertEquals(expectedEmail, result);
+
+        }
+
+        @DisplayName("이메일(ID) 찾기 실패 - 존재하지 않는 회원")
+        @Test
+        public void getEmailByNameAndPhone_returnMemberNotFoundError() {
+            String name = "비회원";
+            String phone = "010-5555-5678";
+
+            given(memberRepository.findByNameAndPhoneNumber(name, phone)).willReturn(Optional.empty());
+
+            OurDressingTableException exception = assertThrows(OurDressingTableException.class, () ->
+                    memberService.getEmailByNameAndPhone(name, phone));
+
+            assertEquals(ErrorCode.MEMBER_EMAIL_NOT_FOUND.getCode(), exception.getCode());
+
+        }
+
     }
 }
