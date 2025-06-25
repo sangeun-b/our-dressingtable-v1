@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.command.CommandAsyncExecutor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
 
 import java.time.Duration;
 
@@ -30,16 +32,13 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(!request.getRequestURI().equals("/api/auth/find-email")){
-            return true;
-        }
-
         String ip = getClientIpAddress(request);
         String key = "rate-limit:find-email:" + ip;
 
         try {
-            CommandAsyncExecutor commandExecutor = (CommandAsyncExecutor) redissonClient;
-            RedissonBasedProxyManager proxyManager = RedissonBasedProxyManager.builderFor(commandExecutor).build();
+            Redisson redisson = (Redisson) redissonClient;
+            CommandAsyncExecutor executor = redisson.getCommandExecutor();
+            RedissonBasedProxyManager proxyManager = RedissonBasedProxyManager.builderFor(executor).withExpirationStrategy(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofMinutes(5))).build();
 
             BucketConfiguration configuration = BucketConfiguration.builder().addLimit(limit).build();
 
