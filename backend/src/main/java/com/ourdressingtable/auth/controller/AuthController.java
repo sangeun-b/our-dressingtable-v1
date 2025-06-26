@@ -1,5 +1,6 @@
 package com.ourdressingtable.auth.controller;
 
+import com.ourdressingtable.auth.service.LoginRateLimitService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.MaskingUtil;
@@ -42,12 +43,24 @@ public class AuthController {
     private final RedisTokenService redisTokenService;
     private final EmailVerificationService emailVerificationService;
     private final ResetPasswordEmailService resetPasswordEmailService;
+    private final LoginRateLimitService loginRateLimitService;
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인을 합니다.")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        String ip = httpServletRequest.getRemoteAddr();
+
+        loginRateLimitService.checkLimit(request.getEmail(), ip);
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (Exception e) {
+            loginRateLimitService.onLoginFail(request.getEmail(), ip);
+            throw new OurDressingTableException(ErrorCode.LOGIN_FAIL);
+        }
+
+        loginRateLimitService.onLoginSuccess(request.getEmail(), ip);
 
         Member member = memberService.getActiveMemberEntityByEmail(request.getEmail());
 

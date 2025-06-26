@@ -26,12 +26,16 @@ public enum ErrorCode {
     // 인증/인가 관련
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "A003", "비밀번호가 맞지않습니다."),
+    LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "A003", "이메일 또는 비밀번호가 일치하지 않습니다."),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "A004", "이메일 인증이 완료되지 않았습니다."),
     EXPIRED_VERIFICATION_CDOE(HttpStatus.BAD_REQUEST, "A005", "만료된 인증 코드입니다."),
     INVALID_VERIFICATION_CDOE(HttpStatus.BAD_REQUEST, "A006", "잘못된 인증 코드입니다."),
     HASHING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A007", "토큰 해싱에 실패했습니다."),
-    
+
+    // TOO_MANY_REQUEST
+    TOO_MANY_LOGIN_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "T001", "잠시 후 로그인 시도해주십시오."),
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "T002", "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."),
+
     // BAD_REQUEST
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "B001", "잘못된 접근입니다."),
 
