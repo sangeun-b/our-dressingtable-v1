@@ -14,11 +14,14 @@ import org.redisson.api.RedissonClient;
 import org.redisson.command.CommandAsyncExecutor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @Profile("!test")
@@ -28,14 +31,27 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     private final RedissonClient redissonClient;
 
-    private final Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(5)));
+    private static final Bandwidth DEFAULT_LIMIT = Bandwidth.classic(20, Refill.greedy(20, Duration.ofMinutes(1)));
+
+    private static final Map<String, Bandwidth>  URL_LIMIT = Map.of(
+            "/api/auth/find-email", Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1))),
+            "/api/auth/verification-code/email", Bandwidth.classic(3, Refill.greedy(3, Duration.ofMinutes(3))),
+            "/api/auth/confirm-verification-code/email", Bandwidth.classic(10, Refill.greedy(10, Duration.ofMinutes(10))),
+            "/api/reset-password/request", Bandwidth.classic(3, Refill.greedy(3, Duration.ofMinutes(5)))
+    );
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String path = request.getRequestURI();
+        if(!URL_LIMIT.containsKey(path)) {
+            return true;
+        }
         String ip = getClientIpAddress(request);
-        String key = "rate-limit:find-email:" + ip;
+        String userId = getAuthenticatedUserId();
+        String key = "rate-limit:" + path + ":" + (userId != null ? "user:" + userId : "ip:" + ip);
 
         try {
+            Bandwidth limit = URL_LIMIT.getOrDefault(key, DEFAULT_LIMIT);
             Redisson redisson = (Redisson) redissonClient;
             CommandAsyncExecutor executor = redisson.getCommandExecutor();
             RedissonBasedProxyManager proxyManager = RedissonBasedProxyManager.builderFor(executor).withExpirationStrategy(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofMinutes(5))).build();
@@ -56,6 +72,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             log.error("Rate limit error for IP: {}", ip, e);
             return true;
         }
+    }
+
+    private String getAuthenticatedUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            return auth.getName();
+        }
+        return null;
     }
 
     /**
