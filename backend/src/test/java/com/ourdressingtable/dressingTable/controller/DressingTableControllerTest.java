@@ -3,6 +3,7 @@ package com.ourdressingtable.dressingTable.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
+import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
@@ -16,9 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -34,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WebMvcTest(controllers = DressingTableController.class)
 @DisplayName("화장대 Controller 테스트")
+@Import(TestSecurityConfig.class)
 public class DressingTableControllerTest {
 
     @Autowired
@@ -175,7 +179,6 @@ public class DressingTableControllerTest {
         @Test
         public void getAllMyDressingTable_returnMemberError() throws Exception {
             mockMvc.perform(get("/api/dressing-tables/mine")
-                    .with(csrf())
                     .with(anonymous()))
                     .andExpect(status().isUnauthorized());
         }
