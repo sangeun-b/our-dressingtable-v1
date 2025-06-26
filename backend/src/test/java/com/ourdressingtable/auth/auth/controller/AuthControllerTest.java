@@ -2,6 +2,7 @@ package com.ourdressingtable.auth.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.auth.dto.FindEmailRequest;
+import com.ourdressingtable.auth.service.LoginRateLimitService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
@@ -73,6 +74,9 @@ public class AuthControllerTest {
 
     @MockBean
     private ResetPasswordEmailService resetPasswordEmailService;
+
+    @MockBean
+    private LoginRateLimitService loginRateLimitService;
 
     @Autowired
     private ObjectMapper objectMapper;

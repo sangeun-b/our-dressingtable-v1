@@ -1,5 +1,6 @@
 package com.ourdressingtable.common.interceptor;
 
+import com.ourdressingtable.common.exception.ErrorCode;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
@@ -13,7 +14,6 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.command.CommandAsyncExecutor;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -62,9 +62,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
             if(!bucket.tryConsume(1)) {
                 log.warn("Rate limit exceeded for IP: {}", ip);
-                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                response.setStatus(ErrorCode.TOO_MANY_REQUESTS.getHttpStatus().value());
                 response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"message\":\"요청이 너무 많습니다. 잠시 후 다시 시도해주세요.\"}");
+                response.getWriter().write(
+                        String.format("{\"message\":\"%s\", \"code\":\"%s\"}",
+                                ErrorCode.TOO_MANY_REQUESTS.getMessage(),
+                                ErrorCode.TOO_MANY_REQUESTS.getCode()));
                 return false;
             }
             return true;

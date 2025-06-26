@@ -77,7 +77,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (!passwordEncoder.matches(withdrawalMemberRequest.getPassword(), member.getPassword())) {
 
-            throw new OurDressingTableException(ErrorCode.INVALID_PASSWORD);
+            throw new OurDressingTableException(ErrorCode.LOGIN_FAIL);
         }
         member.withdraw();
         withdrawalMemberService.createWithdrawalMember(withdrawalMemberRequest, member);
