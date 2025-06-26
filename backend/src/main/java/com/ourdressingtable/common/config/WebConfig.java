@@ -15,6 +15,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(rateLimitInterceptor)
-                .addPathPatterns("/api/auth/find-email");
+                .addPathPatterns("/api/auth/find-email",
+                        "/api/auth/verification-code/email",
+                        "/api/auth/confirm-verification-code/email",
+                        "/api/reset-password/request");
     }
 }
