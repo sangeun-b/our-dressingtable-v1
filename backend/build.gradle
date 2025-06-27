@@ -70,6 +70,12 @@ dependencies {
 	implementation 'com.bucket4j:bucket4j_jdk8-redis:8.5.0'
 	implementation 'org.redisson:redisson:3.28.0'
 
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// JSON 메시지 직렬화/역직렬화
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 }
 
 def querydslDir = "src/main/generated"
