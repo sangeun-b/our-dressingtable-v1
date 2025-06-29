@@ -1,0 +1,35 @@
+package com.ourdressingtable.chat.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.sql.Timestamp;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Schema(description = "채팅방 응답 DTO")
+@Getter
+@Setter
+@EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ChatroomResponse {
+
+    @Schema(description = "생성된 채팅방 ID", example = "1")
+    private Long id;
+
+    @Schema(description = "채팅방 이름", example = "우리의 첫 채팅방")
+    private String name;
+
+    @Schema(description = "채팅방 생성 시각")
+    private Timestamp createdAt;
+
+    @Builder
+    public ChatroomResponse(Long id, String name, Timestamp createdAt){
+        this.id = id;
+        this.name = name;
+        this.createdAt = createdAt;
+    }
+
+}

@@ -51,7 +51,15 @@ public enum ErrorCode {
     INVALID_COMMENT_INPUT(HttpStatus.BAD_REQUEST, "C006", "댓글 내용을 입력해주세요."),
 
     // 화장대 관련
-    DRESSING_TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "D001", "화장대를 찾을 수 없습니다.");
+    DRESSING_TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "D001", "화장대를 찾을 수 없습니다."),
+
+    // 채팅 관련
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "Z001", "채팅방을 찾을 수 없습니다."),
+    CHAT_NOT_FOUND(HttpStatus.NOT_FOUND, "Z002", "채팅방 참여 정보가 없습니다."),
+    NO_CHAT_WITH_MYSELF(HttpStatus.BAD_REQUEST, "Z003", "자기 자신과는 채팅할 수 없습니다."),
+
+    // KAFKA 관련
+    KAFKA_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "K001", "Kafka 메시지 직렬화 실패");
 
     private final HttpStatus httpStatus;
     private final String code;

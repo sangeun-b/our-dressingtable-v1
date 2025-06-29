@@ -47,6 +47,17 @@ public class DummyDataInitializer implements CommandLineRunner {
                 .build();
         memberRepository.save(member);
 
+        String second_encodedPw = passwordEncoder.encode("Password123!@@@@@@@?");
+        Member second_member = Member.builder()
+                .email("test@gmail.com")
+                .password(second_encodedPw)
+                .name("김이번")
+                .phoneNumber("010-7777-8765")
+                .role(Role.ROLE_BASIC)
+                .status(Status.ACTIVE)
+                .build();
+        memberRepository.save(second_member);
+
         // Category 생성
         CommunityCategory free = CommunityCategory.builder()
                 .name("자유게시판")
