@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Comments")
+@Table(name = "comments")
 @Where(clause = "is_deleted = false")
 public class Comment extends BaseTimeEntity {
 
