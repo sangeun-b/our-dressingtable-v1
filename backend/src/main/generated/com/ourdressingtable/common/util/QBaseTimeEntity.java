@@ -19,7 +19,10 @@ public class QBaseTimeEntity extends EntityPathBase<BaseTimeEntity> {
 
     public static final QBaseTimeEntity baseTimeEntity = new QBaseTimeEntity("baseTimeEntity");
 
-    public final DateTimePath<java.sql.Timestamp> createdAt = createDateTime("createdAt", java.sql.Timestamp.class);
+    public final QCreatedAtEntity _super = new QCreatedAtEntity(this);
+
+    //inherited
+    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
 
     public final DateTimePath<java.sql.Timestamp> updatedAt = createDateTime("updatedAt", java.sql.Timestamp.class);
 
