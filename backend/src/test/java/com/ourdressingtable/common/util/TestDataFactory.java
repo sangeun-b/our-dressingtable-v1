@@ -1,6 +1,8 @@
 package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.auth.dto.FindEmailRequest;
+import com.ourdressingtable.chat.domain.Chat;
+import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
@@ -305,4 +307,21 @@ public class TestDataFactory {
     public static FindEmailRequest testFindEmailRequest(String name, String phone) {
         return FindEmailRequest.builder().name(name).phoneNumber(phone).build();
     }
+
+    public static Chatroom testChatroom(Long id) {
+        return Chatroom.builder()
+                .id(id)
+                .name(null)
+                .build();
+    }
+
+    public static Chat testChat(Long id, Chatroom chatroom, Member member) {
+        return Chat.builder()
+                .id(id)
+                .chatroom(chatroom)
+                .member(member)
+                .isActive(true)
+                .build();
+    }
+
 }
