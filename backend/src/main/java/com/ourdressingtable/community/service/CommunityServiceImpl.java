@@ -95,6 +95,7 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    @Transactional
     public Long createComment(CreateCommentRequest createCommentRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
