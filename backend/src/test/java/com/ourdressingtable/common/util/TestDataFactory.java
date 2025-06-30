@@ -3,6 +3,9 @@ package com.ourdressingtable.common.util;
 import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
+import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatroomResponse;
+import com.ourdressingtable.chat.dto.CreateOneToOneChatRequest;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
@@ -324,4 +327,20 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static CreateOneToOneChatRequest testCreateOneToOneChatRequest(Long id) {
+        return new CreateOneToOneChatRequest(id);
+    }
+
+    public static ChatroomResponse testChatroomResponse(Long id) {
+        return ChatroomResponse.builder()
+                .id(id)
+                .name(null)
+                .build();
+    }
+
+    public static ChatMemberResponse testChatMemberResponse(Long id) {
+        return ChatMemberResponse.builder()
+                .memberId(id)
+                .build();
+    }
 }
