@@ -24,7 +24,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "chats",
         uniqueConstraints = @UniqueConstraint(columnNames = {"chatroom_id","member_id"})
 )
-public class Chat {
+public class  Chat {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "chat_id")

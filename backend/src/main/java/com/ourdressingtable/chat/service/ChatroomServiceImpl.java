@@ -55,11 +55,12 @@ public class ChatroomServiceImpl implements ChatroomService {
                     .joinAt(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
-            redisTemplate.opsForSet().add("chatroom:"+chatroomId+"members:"+memberId.toString());
+            redisTemplate.opsForSet().add("chatroom:"+chatroomId+":members"+memberId.toString());
         }
     }
 
     @Override
+    @Transactional
     public void leaveChatroom(Long chatroomId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Chat chat = chatRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
@@ -69,7 +70,17 @@ public class ChatroomServiceImpl implements ChatroomService {
             chat.updateActive(false);
         }
 
-        redisTemplate.opsForSet().remove("chatroom:"+chatroomId+"members:"+memberId.toString());
+        String redisKey = "chatroom:" + chatroomId + ":members";
+        redisTemplate.opsForSet().remove(redisKey, memberId.toString());
+//        redisTemplate.opsForSet().remove("chatroom:"+chatroomId+":members"+memberId.toString());
+
+        List<Chat> allChats = chatRepository.findAllByChatroomId(chatroomId);
+        boolean isOneToOne = allChats.size() == 2;
+        boolean  allInactive = allChats.stream().allMatch(c -> !c.isActive());
+
+        if(isOneToOne && allInactive) {
+            chatroomRepository.deleteById(chatroomId);
+        }
     }
 
     @Override
