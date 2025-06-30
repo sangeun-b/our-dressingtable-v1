@@ -2,7 +2,7 @@ package com.ourdressingtable.community.post.dto;
 
 import com.ourdressingtable.community.post.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -35,10 +35,10 @@ public class PostResponse {
     private String author;
 
     @Schema(description = "게시글 생성일", example = "2025년 3월 1일 13:25")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Builder
-    public PostResponse(Long id, String title, String categoryName, int viewCount, int likeCount, String author, Timestamp createdAt) {
+    public PostResponse(Long id, String title, String categoryName, int viewCount, int likeCount, String author, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.categoryName = categoryName;

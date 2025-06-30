@@ -29,7 +29,7 @@ public class QMessage extends EntityPathBase<Message> {
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

@@ -1,9 +1,8 @@
 package com.ourdressingtable.community.post.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.*;
-
-import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -27,5 +26,15 @@ public class PostSummaryResponse {
     private String memberName;
 
     @Schema(description = "게시글 생성일", example = "2025년 3월 1일 13:25")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
+
+    @Builder
+    public  PostSummaryResponse(Long id, String title, String categoryName, int viewCount, String memberName, LocalDateTime createdAt) {
+        this.id = id;
+        this.title = title;
+        this.categoryName = categoryName;
+        this.viewCount = viewCount;
+        this.memberName = memberName;
+        this.createdAt = createdAt;
+    }
 }

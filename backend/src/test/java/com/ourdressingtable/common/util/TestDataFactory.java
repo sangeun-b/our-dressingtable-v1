@@ -30,7 +30,6 @@ import com.ourdressingtable.auth.dto.LoginRequest;
 import com.ourdressingtable.auth.email.dto.ConfirmPasswordResetRequest;
 import com.ourdressingtable.auth.email.dto.ResetPasswordEmailRequest;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class TestDataFactory {
@@ -104,7 +103,7 @@ public class TestDataFactory {
                 .maskedPhone(MaskingUtil.maskedPhone("010-1234-5678"))
                 .reason("테스트")
                 .isBlock(isBlock)
-                .withdrewAt(Timestamp.valueOf(withdrewAt))
+                .withdrewAt(withdrewAt)
                 .member(testMember(99L))
                 .build();
     }
@@ -142,7 +141,7 @@ public class TestDataFactory {
                 .likeCount(5)
                 .likedByCurrentMember(true)
                 .author("사용자1")
-                .createdAt(new Timestamp(System.currentTimeMillis()))
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 

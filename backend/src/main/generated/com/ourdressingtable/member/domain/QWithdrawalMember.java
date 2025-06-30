@@ -38,7 +38,7 @@ public class QWithdrawalMember extends EntityPathBase<WithdrawalMember> {
 
     public final StringPath reason = createString("reason");
 
-    public final DateTimePath<java.sql.Timestamp> withdrewAt = createDateTime("withdrewAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> withdrewAt = createDateTime("withdrewAt", java.time.LocalDateTime.class);
 
     public QWithdrawalMember(String variable) {
         this(WithdrawalMember.class, forVariable(variable), INITS);

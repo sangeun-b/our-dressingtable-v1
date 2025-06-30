@@ -3,7 +3,6 @@ package com.ourdressingtable.common.util;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,10 +16,10 @@ public class CreatedAtEntity {
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
+        this.createdAt = LocalDateTime.now();
     }
 }

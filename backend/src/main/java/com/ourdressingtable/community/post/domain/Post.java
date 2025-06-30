@@ -15,7 +15,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class Post extends BaseTimeEntity {
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
-    private Timestamp deletedAt;
+    private LocalDateTime deletedAt;
 
     @Builder
     public Post(Long id, String title, String content, int viewCount, int likeCount, Member member, CommunityCategory communityCategory, boolean isDeleted) {
@@ -111,7 +110,7 @@ public class Post extends BaseTimeEntity {
 
     public void markAsDeleted() {
         this.isDeleted = true;
-        this.deletedAt = Timestamp.valueOf(LocalDateTime.now());
+        this.deletedAt = LocalDateTime.now();
     }
 
 //    @PreRemove

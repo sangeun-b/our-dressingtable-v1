@@ -11,7 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class MessageRead {
     private boolean isRead = false;
 
     @Column(name = "read_at")
-    private Timestamp readAt;
+    private LocalDateTime readAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id", nullable = false)
@@ -46,7 +46,7 @@ public class MessageRead {
     private Member member;
 
     @Builder
-    public MessageRead(boolean isRead, Timestamp readAt, Message message, Member member) {
+    public MessageRead(boolean isRead, LocalDateTime readAt, Message message, Member member) {
         this.isRead = isRead;
         this.readAt = readAt;
         this.message = message;

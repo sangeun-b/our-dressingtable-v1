@@ -1,7 +1,7 @@
 package com.ourdressingtable.chat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,10 +23,10 @@ public class ChatroomResponse {
     private String name;
 
     @Schema(description = "채팅방 생성 시각")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Builder
-    public ChatroomResponse(Long id, String name, Timestamp createdAt){
+    public ChatroomResponse(Long id, String name, LocalDateTime createdAt){
         this.id = id;
         this.name = name;
         this.createdAt = createdAt;

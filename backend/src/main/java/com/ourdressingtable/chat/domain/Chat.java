@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,7 +31,7 @@ public class Chat {
     private Long id;
 
     @Column(name = "join_at", nullable = false)
-    private Timestamp joinAt;
+    private LocalDateTime joinAt;
 
     @Column(name = "is_active")
     @ColumnDefault("true")
@@ -47,7 +46,7 @@ public class Chat {
     private Member member;
 
     @Builder
-    public Chat(Long id, Timestamp joinAt, boolean isActive, Chatroom chatroom, Member member) {
+    public Chat(Long id, LocalDateTime joinAt, boolean isActive, Chatroom chatroom, Member member) {
         this.id = id;
         this.joinAt = joinAt;
         this.isActive = isActive;

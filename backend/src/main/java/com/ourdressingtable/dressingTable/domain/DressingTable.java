@@ -4,6 +4,7 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.memberCosmetic.domain.MemberCosmetic;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -12,10 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import com.ourdressingtable.common.util.BaseTimeEntity;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.sql.Timestamp;
 
 @Entity
 @Getter
@@ -39,7 +37,7 @@ public class DressingTable extends BaseTimeEntity {
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
-    private Timestamp deletedAt;
+    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -49,7 +47,7 @@ public class DressingTable extends BaseTimeEntity {
     private List<MemberCosmetic> memberCosmetics = new ArrayList<>();
 
     @Builder
-    public DressingTable(Long id, String name, String imageUrl, Member member, boolean isDeleted, Timestamp deletedAt) {
+    public DressingTable(Long id, String name, String imageUrl, Member member, boolean isDeleted, LocalDateTime deletedAt) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -67,6 +65,6 @@ public class DressingTable extends BaseTimeEntity {
 
     public void markAsDeleted() {
         this.isDeleted = true;
-        this.deletedAt = new Timestamp(System.currentTimeMillis());
+        this.deletedAt = LocalDateTime.now();
     }
 }

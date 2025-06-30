@@ -31,9 +31,9 @@ public class QPost extends EntityPathBase<Post> {
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final DateTimePath<java.sql.Timestamp> deletedAt = createDateTime("deletedAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -48,7 +48,7 @@ public class QPost extends EntityPathBase<Post> {
     public final StringPath title = createString("title");
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> updatedAt = _super.updatedAt;
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public final NumberPath<Integer> viewCount = createNumber("viewCount", Integer.class);
 

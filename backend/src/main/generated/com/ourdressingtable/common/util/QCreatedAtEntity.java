@@ -19,7 +19,7 @@ public class QCreatedAtEntity extends EntityPathBase<CreatedAtEntity> {
 
     public static final QCreatedAtEntity createdAtEntity = new QCreatedAtEntity("createdAtEntity");
 
-    public final DateTimePath<java.sql.Timestamp> createdAt = createDateTime("createdAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public QCreatedAtEntity(String variable) {
         super(CreatedAtEntity.class, forVariable(variable));
