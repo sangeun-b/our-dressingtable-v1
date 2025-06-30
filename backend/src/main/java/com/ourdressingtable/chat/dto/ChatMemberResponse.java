@@ -1,7 +1,7 @@
 package com.ourdressingtable.chat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -20,10 +20,10 @@ public class ChatMemberResponse {
     private Long memberId;
 
     @Schema(description = "채팅방 참여 시각")
-    private Timestamp joinAt;
+    private LocalDateTime joinAt;
 
     @Builder
-    public ChatMemberResponse(Long memberId, Timestamp joinAt) {
+    public ChatMemberResponse(Long memberId, LocalDateTime joinAt) {
         this.memberId = memberId;
         this.joinAt = joinAt;
     }

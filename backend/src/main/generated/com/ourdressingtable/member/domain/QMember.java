@@ -29,7 +29,7 @@ public class QMember extends EntityPathBase<Member> {
     public final EnumPath<ColorType> colorType = createEnum("colorType", ColorType.class);
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final StringPath email = createString("email");
 
@@ -58,7 +58,7 @@ public class QMember extends EntityPathBase<Member> {
     public final EnumPath<Status> status = createEnum("status", Status.class);
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> updatedAt = _super.updatedAt;
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QMember(String variable) {
         super(Member.class, forVariable(variable));

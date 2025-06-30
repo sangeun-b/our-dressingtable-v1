@@ -27,9 +27,9 @@ public class QComment extends EntityPathBase<Comment> {
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final DateTimePath<java.sql.Timestamp> deletedAt = createDateTime("deletedAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Integer> depth = createNumber("depth", Integer.class);
 
@@ -44,7 +44,7 @@ public class QComment extends EntityPathBase<Comment> {
     public final com.ourdressingtable.community.post.domain.QPost post;
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> updatedAt = _super.updatedAt;
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QComment(String variable) {
         this(Comment.class, forVariable(variable), INITS);

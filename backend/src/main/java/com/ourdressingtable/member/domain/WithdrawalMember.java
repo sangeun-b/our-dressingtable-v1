@@ -5,7 +5,6 @@ import com.ourdressingtable.common.util.HashUtil;
 import com.ourdressingtable.common.util.MaskingUtil;
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,14 +33,14 @@ public class WithdrawalMember {
     private boolean isBlock;
 
     @Column(name = "withdrew_at")
-    private Timestamp withdrewAt;
+    private LocalDateTime withdrewAt;
 
     @OneToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Builder
-    public WithdrawalMember(Long id, String hashedEmail, String maskedEmail, String hashedPhone, String maskedPhone, String reason, boolean isBlock, Member member, Timestamp withdrewAt) {
+    public WithdrawalMember(Long id, String hashedEmail, String maskedEmail, String hashedPhone, String maskedPhone, String reason, boolean isBlock, Member member, LocalDateTime withdrewAt) {
         this.id = id;
         this.hashedEmail = hashedEmail;
         this.maskedEmail = maskedEmail;
@@ -67,7 +66,7 @@ public class WithdrawalMember {
 
     @PrePersist
     public void prePersist() {
-        this.withdrewAt = Timestamp.valueOf(LocalDateTime.now());
+        this.withdrewAt = LocalDateTime.now();
     }
 
 }

@@ -25,9 +25,9 @@ public class QDressingTable extends EntityPathBase<DressingTable> {
     public final com.ourdressingtable.common.util.QBaseTimeEntity _super = new com.ourdressingtable.common.util.QBaseTimeEntity(this);
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final DateTimePath<java.sql.Timestamp> deletedAt = createDateTime("deletedAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -42,7 +42,7 @@ public class QDressingTable extends EntityPathBase<DressingTable> {
     public final StringPath name = createString("name");
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> updatedAt = _super.updatedAt;
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QDressingTable(String variable) {
         this(DressingTable.class, forVariable(variable), INITS);

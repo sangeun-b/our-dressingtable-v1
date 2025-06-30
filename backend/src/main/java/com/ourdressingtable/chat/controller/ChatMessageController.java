@@ -20,7 +20,7 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/send")
     public void sendMessage(ChatMessage chatMessage) {
-        kafkaChatProducer.sendMessage("chat-topic", chatMessage);
+        kafkaChatProducer.sendMessage("chat-message", chatMessage);
     }
 
 

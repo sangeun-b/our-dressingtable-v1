@@ -7,14 +7,13 @@ import com.ourdressingtable.chat.domain.repository.ChatroomRepository;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.chat.dto.CreateChatroomRequest;
+import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
-import jakarta.persistence.EntityNotFoundException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -53,14 +52,15 @@ public class ChatroomServiceImpl implements ChatroomService {
                     .chatroom(chatroom)
                     .member(member)
                     .isActive(true)
-                    .joinAt(Timestamp.valueOf(LocalDateTime.now()))
+                    .joinAt(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
-            redisTemplate.opsForSet().add("chatroom:"+chatroomId+"members:"+memberId.toString());
+            redisTemplate.opsForSet().add("chatroom:"+chatroomId+":members"+memberId.toString());
         }
     }
 
     @Override
+    @Transactional
     public void leaveChatroom(Long chatroomId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Chat chat = chatRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
@@ -70,7 +70,17 @@ public class ChatroomServiceImpl implements ChatroomService {
             chat.updateActive(false);
         }
 
-        redisTemplate.opsForSet().remove("chatroom:"+chatroomId+"members:"+memberId.toString());
+        String redisKey = "chatroom:" + chatroomId + ":members";
+        redisTemplate.opsForSet().remove(redisKey, memberId.toString());
+//        redisTemplate.opsForSet().remove("chatroom:"+chatroomId+":members"+memberId.toString());
+
+        List<Chat> allChats = chatRepository.findAllByChatroomId(chatroomId);
+        boolean isOneToOne = allChats.size() == 2;
+        boolean  allInactive = allChats.stream().allMatch(c -> !c.isActive());
+
+        if(isOneToOne && allInactive) {
+            chatroomRepository.deleteById(chatroomId);
+        }
     }
 
     @Override
@@ -122,7 +132,7 @@ public class ChatroomServiceImpl implements ChatroomService {
                     .chatroom(newChatroom)
                     .member(memberService.getMemberEntityById(id))
                     .isActive(true)
-                    .joinAt(Timestamp.valueOf(LocalDateTime.now()))
+                    .joinAt(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
             String redisKey = "chatroom:" + newChatroom.getId() + ":members";
@@ -135,5 +145,12 @@ public class ChatroomServiceImpl implements ChatroomService {
     public Chatroom getChatroomEntityById(Long chatroomId) {
         return chatroomRepository.findById(chatroomId).orElseThrow(() -> new OurDressingTableException(
                 ErrorCode.CHATROOM_NOT_FOUND));
+    }
+
+    @Override
+    public List<OneToOneChatroomSummaryResponse> getMyOneToOneChatrooms() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<OneToOneChatroomSummaryResponse> chatrooms = chatroomRepository.findOneToOneChatroomsByMemberId(memberId);
+        return chatrooms;
     }
 }

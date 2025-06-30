@@ -14,6 +14,7 @@ import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.repository.ChatRepository;
 import com.ourdressingtable.chat.domain.repository.ChatroomRepository;
+import com.ourdressingtable.chat.dto.ChatMemberResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
@@ -24,6 +25,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +89,7 @@ public class ChatroomServiceImplTest {
 
     @Nested
     @DisplayName("1:1 채팅방 생성 테스트")
-    class createOneToOneChatroomTest {
+    class CreateOneToOneChatroomTest {
 
         @DisplayName("1:1 채팅방 생성 성공")
         @Test
@@ -134,6 +136,72 @@ public class ChatroomServiceImplTest {
 
     }
 
+    @Nested
+    @DisplayName("채팅방 나가기 테스트")
+    class LeaveChatroomTest {
 
+        @DisplayName("채팅방 나가기 성공")
+        @Test
+        public void leaveChatroom_returnSuccess() {
+            Chatroom room = TestDataFactory.testChatroom(1L);
+            Member member = TestDataFactory.testMember(1L);
+            Chat chat = TestDataFactory.testChat(1L,room,member);
+            given(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
+                    .willReturn(Optional.of(chat));
+
+            chatroomService.leaveChatroom(chat.getId());
+
+            verify(redisTemplate.opsForSet()).remove("chatroom:1members:1");
+        }
+
+        @DisplayName("채팅방 나가기 실패 - 미존재 채팅방")
+        @Test
+        public void leaveChatroom_returnError() {
+            Chatroom room = TestDataFactory.testChatroom(1L);
+            Member member = TestDataFactory.testMember(1L);
+
+           when(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
+                   .thenReturn(Optional.empty());
+           assertThrows(OurDressingTableException.class, () -> chatroomService.leaveChatroom(room.getId()));
+        }
+
+
+    }
+
+
+    @Nested
+    @DisplayName("참여 회원 조회 테스트")
+    class GetActiveChatMemberTest {
+
+        @DisplayName("참여 회원 조회 성공")
+        @Test
+        public void leaveChatroom_returnSuccess() {
+            Chatroom room = TestDataFactory.testChatroom(1L);
+            Member member = TestDataFactory.testMember(1L);
+            Chat chat = TestDataFactory.testChat(1L, room, member);
+            when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
+                    .thenReturn(List.of(chat));
+
+            List<ChatMemberResponse> result = chatroomService.getActiveChatMembers(room.getId());
+
+            assertEquals(1, result.size());
+        }
+
+        @DisplayName("참여 회원 조회 실패 - 미존재 채팅방")
+        @Test
+        public void leaveChatroom_returnError() {
+            Chatroom room = TestDataFactory.testChatroom(1L);
+
+            when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
+                    .thenThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND));
+
+            assertThatThrownBy(() -> chatroomService.getActiveChatMembers(room.getId()))
+                    .isInstanceOf(OurDressingTableException.class)
+                    .hasMessageContaining(ErrorCode.CHAT_NOT_FOUND.getMessage());
+
+        }
+
+
+    }
 
 }

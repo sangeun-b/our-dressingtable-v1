@@ -5,6 +5,7 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
-
-import java.sql.Timestamp;
 
 @Entity
 @Getter
@@ -48,7 +47,7 @@ public class Comment extends BaseTimeEntity {
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
-    private Timestamp deletedAt;
+    private LocalDateTime deletedAt;
 
 
     @Builder
@@ -65,7 +64,7 @@ public class Comment extends BaseTimeEntity {
 
     public void markAsDeleted() {
         this.isDeleted = true;
-        this.deletedAt = new Timestamp(System.currentTimeMillis());
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void updateContent(String content) {

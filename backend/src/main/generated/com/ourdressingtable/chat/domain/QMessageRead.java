@@ -30,7 +30,7 @@ public class QMessageRead extends EntityPathBase<MessageRead> {
 
     public final QMessage message;
 
-    public final DateTimePath<java.sql.Timestamp> readAt = createDateTime("readAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> readAt = createDateTime("readAt", java.time.LocalDateTime.class);
 
     public QMessageRead(String variable) {
         this(MessageRead.class, forVariable(variable), INITS);

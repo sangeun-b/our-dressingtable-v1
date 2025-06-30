@@ -3,6 +3,9 @@ package com.ourdressingtable.common.util;
 import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
+import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatroomResponse;
+import com.ourdressingtable.chat.dto.CreateOneToOneChatRequest;
 import com.ourdressingtable.community.comment.domain.Comment;
 import com.ourdressingtable.community.comment.dto.CreateCommentRequest;
 import com.ourdressingtable.community.comment.dto.UpdateCommentRequest;
@@ -27,7 +30,6 @@ import com.ourdressingtable.auth.dto.LoginRequest;
 import com.ourdressingtable.auth.email.dto.ConfirmPasswordResetRequest;
 import com.ourdressingtable.auth.email.dto.ResetPasswordEmailRequest;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class TestDataFactory {
@@ -101,7 +103,7 @@ public class TestDataFactory {
                 .maskedPhone(MaskingUtil.maskedPhone("010-1234-5678"))
                 .reason("테스트")
                 .isBlock(isBlock)
-                .withdrewAt(Timestamp.valueOf(withdrewAt))
+                .withdrewAt(withdrewAt)
                 .member(testMember(99L))
                 .build();
     }
@@ -139,7 +141,7 @@ public class TestDataFactory {
                 .likeCount(5)
                 .likedByCurrentMember(true)
                 .author("사용자1")
-                .createdAt(new Timestamp(System.currentTimeMillis()))
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
@@ -324,4 +326,20 @@ public class TestDataFactory {
                 .build();
     }
 
+    public static CreateOneToOneChatRequest testCreateOneToOneChatRequest(Long id) {
+        return new CreateOneToOneChatRequest(id);
+    }
+
+    public static ChatroomResponse testChatroomResponse(Long id) {
+        return ChatroomResponse.builder()
+                .id(id)
+                .name(null)
+                .build();
+    }
+
+    public static ChatMemberResponse testChatMemberResponse(Long id) {
+        return ChatMemberResponse.builder()
+                .memberId(id)
+                .build();
+    }
 }

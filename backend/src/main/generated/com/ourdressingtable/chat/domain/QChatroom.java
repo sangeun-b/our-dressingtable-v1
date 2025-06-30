@@ -22,7 +22,7 @@ public class QChatroom extends EntityPathBase<Chatroom> {
     public final com.ourdressingtable.common.util.QCreatedAtEntity _super = new com.ourdressingtable.common.util.QCreatedAtEntity(this);
 
     //inherited
-    public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

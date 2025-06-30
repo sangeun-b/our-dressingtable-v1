@@ -45,7 +45,7 @@ public class WithdrawalMemberServiceImpl implements WithdrawalMemberService {
                 throw new OurDressingTableException(ErrorCode.WITHDRAWN_BLOCK_MEMBER_RESTRICTED);
             }
 
-            LocalDateTime withdrewAt = member.getWithdrewAt().toLocalDateTime();
+            LocalDateTime withdrewAt = member.getWithdrewAt();
             LocalDateTime availableAt = withdrewAt.plusDays(90);
             if(withdrewAt.plusDays(90).isAfter(LocalDateTime.now())) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");

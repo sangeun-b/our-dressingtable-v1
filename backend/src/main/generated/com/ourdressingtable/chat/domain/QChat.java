@@ -28,7 +28,7 @@ public class QChat extends EntityPathBase<Chat> {
 
     public final BooleanPath isActive = createBoolean("isActive");
 
-    public final DateTimePath<java.sql.Timestamp> joinAt = createDateTime("joinAt", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.LocalDateTime> joinAt = createDateTime("joinAt", java.time.LocalDateTime.class);
 
     public final com.ourdressingtable.member.domain.QMember member;
 
