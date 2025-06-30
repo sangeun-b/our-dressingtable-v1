@@ -30,7 +30,7 @@ public class ChatMessage {
     @NotNull(message = "채팅방 ID는 필수입니다.")
     private Long chatroomId;
 
-    @Schema(description = "발신자의 회원 ID", example = "101")
+    @Schema(description = "발신자의 회원 ID", example = "1")
     @NotNull(message = "발신자 ID는 필수 입니다.")
     private Long senderId;
 
