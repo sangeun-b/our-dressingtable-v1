@@ -28,6 +28,8 @@ public class QChatroom extends EntityPathBase<Chatroom> {
 
     public final StringPath name = createString("name");
 
+    public final EnumPath<ChatroomType> type = createEnum("type", ChatroomType.class);
+
     public QChatroom(String variable) {
         super(Chatroom.class, forVariable(variable));
     }

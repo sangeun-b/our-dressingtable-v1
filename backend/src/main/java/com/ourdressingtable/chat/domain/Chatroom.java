@@ -3,6 +3,8 @@ package com.ourdressingtable.chat.domain;
 import com.ourdressingtable.common.util.CreatedAtEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,10 +27,15 @@ public class Chatroom extends CreatedAtEntity {
 
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chatroom_type", nullable = false)
+    private ChatroomType type;
+
     @Builder
-    public Chatroom(Long id, String name) {
+    public Chatroom(Long id, String name, ChatroomType type) {
         this.id = id;
         this.name = name;
+        this.type = type;
     }
 
 }
