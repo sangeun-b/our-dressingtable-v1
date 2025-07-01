@@ -1,6 +1,7 @@
 package com.ourdressingtable.chat.domain.repository;
 
 import com.ourdressingtable.chat.domain.Chatroom;
+import com.ourdressingtable.chat.domain.ChatroomType;
 import com.ourdressingtable.chat.domain.Message;
 import com.ourdressingtable.chat.domain.QChat;
 import com.ourdressingtable.chat.domain.QChatroom;
@@ -38,15 +39,13 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
 
         List<Chatroom> chatrooms = queryFactory
                 .selectFrom(chatroom)
-                .where(
-                        chatroom.id.in(oneToOneChatroomIds),
+                .where(chatroom.type.eq(ChatroomType.ONE_TO_ONE),
                         chatroom.id.in(
                                 JPAExpressions
                                         .select(chat.chatroom.id)
                                         .from(chat)
                                         .where(chat.member.id.eq(memberId), chat.isActive.eq(true))
-                        )
-                )
+                        ))
                 .fetch();
         return chatrooms.stream().map(cr -> {
             Member target = queryFactory

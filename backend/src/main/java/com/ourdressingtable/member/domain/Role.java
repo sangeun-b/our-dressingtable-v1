@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum Role {
     ROLE_BASIC(0,"ROLE_BASIC", "일반회원"),
     ROLE_PRO(1, "ROLE_PRO", "유료회원"),
-    ROLE_ADMIN(1,"ROLE_ADMIN", "관리자");
+    ROLE_ADMIN(2,"ROLE_ADMIN", "관리자");
 
     private final int code;
     private final String auth;
