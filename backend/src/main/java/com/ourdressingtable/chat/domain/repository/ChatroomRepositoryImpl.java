@@ -10,9 +10,14 @@ import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.QMember;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -29,14 +34,17 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
         QMember member = QMember.member;
         QMessage message = QMessage.message;
 
+        // 1:1 채팅방 ID 조회
         List<Long> oneToOneChatroomIds = queryFactory
                 .select(chat.chatroom.id)
                 .from(chat)
-                .where(chat.isActive.eq(true))
                 .groupBy(chat.chatroom.id)
                 .having(chat.count().eq(2L))
                 .fetch();
 
+        if(oneToOneChatroomIds.isEmpty()) return List.of();
+
+        // 현재 회원이 참여 중인 채팅방 목록 조회
         List<Chatroom> chatrooms = queryFactory
                 .selectFrom(chatroom)
                 .where(chatroom.type.eq(ChatroomType.ONE_TO_ONE),
@@ -45,31 +53,55 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
                                         .select(chat.chatroom.id)
                                         .from(chat)
                                         .where(chat.member.id.eq(memberId), chat.isActive.eq(true))
-                        ))
+                        ),
+                        chatroom.id.in(oneToOneChatroomIds))
                 .fetch();
+
+        List<Long> chatroomIds = chatrooms.stream().map(Chatroom::getId).toList();
+
+        // Target Member 조회 (채팅방당 상대방 1명씩)
+        List<Tuple> targetMemberTuples = queryFactory
+                .select(chat.chatroom.id, member)
+                .from(chat)
+                .join(chat.member, member)
+                .where(chat.chatroom.id.in(chatroomIds),
+                        member.id.ne(memberId),
+                        chat.isActive.eq(true))
+                .fetch();
+
+        Map<Long, Member> targetMemberMap = targetMemberTuples.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(chat.chatroom.id),
+                        tuple -> tuple.get(member)
+                ));
+
+        // 마지막 메시지 조회
+        List<Tuple> lastMessages = queryFactory
+                .select(message.chatroom.id, message)
+                .from(message)
+                .where(message.chatroom.id.in(chatroomIds))
+                .orderBy(message.chatroom.id.asc(), message.createdAt.desc())
+                .fetch();
+
+        // 각 채팅방의 가장 최신 메시지만 Map으로 정리
+        Map<Long, Message> lastMessageMap = new LinkedHashMap<>();
+        for(Tuple tuple : lastMessages){
+            Long chatroomId = tuple.get(message.chatroom.id);
+            if(!lastMessageMap.containsKey(chatroomId)){
+                lastMessageMap.put(chatroomId,tuple.get(message));
+            }
+        }
         return chatrooms.stream().map(cr -> {
-            Member target = queryFactory
-                    .select(member)
-                    .from(chat)
-                    .join(chat.member, member)
-                    .where(chat.chatroom.id.eq(cr.getId()), member.id.ne(memberId),
-                            chat.isActive.eq(true))
-                    .fetchOne();
-            Message lastMessage = queryFactory
-                    .selectFrom(message)
-                    .where(message.chatroom.id.eq(cr.getId()))
-                    .orderBy(message.createdAt.desc())
-                    .limit(1)
-                    .fetchOne();
+            Member target = targetMemberMap.get(cr.getId());
+            Message last = lastMessageMap.get(cr.getId());
             return OneToOneChatroomSummaryResponse.builder()
                     .chatroomId(cr.getId())
-                    .targetMemberId(target != null ? target.getId(): null)
-                    .targetNickname(target != null ? target.getNickname() : "unknown")
+                    .targetMemberId(target != null ? target.getId() : null)
+                    .targetNickname(target != null ? target.getNickname() : null)
                     .targetProfileImageUrl(target != null ? target.getImageUrl() : null)
-                    .lastMessage(lastMessage != null ? lastMessage.getContent() : null)
-                    .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt() : null)
+                    .lastMessage(last != null ? last.getContent() : null)
+                    .lastMessageTime(last != null ? last.getCreatedAt() : null)
                     .build();
-
         }).toList();
     }
 }
