@@ -1,6 +1,6 @@
 package com.ourdressingtable.chat.controller;
 
-import com.ourdressingtable.chat.dto.ChatMessage;
+import com.ourdressingtable.chat.dto.ChatMessageRequest;
 import com.ourdressingtable.chat.service.ChatReadService;
 import com.ourdressingtable.chat.service.KafkaChatProducer;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class ChatMessageController {
 
     @Operation(summary = "메시지 전송", description = "사용자가 메시지를 전송합니다.")
     @PostMapping("/api/chatrooms/{chatroomId}/messages")
-    public ResponseEntity<Void> sendMessage(@RequestBody @Valid ChatMessage message) {
+    public ResponseEntity<Void> sendMessage(@RequestBody @Valid ChatMessageRequest message) {
         kafkaChatProducer.sendMessage("chat-message", message);
         return ResponseEntity.ok().build();
     }
@@ -39,7 +38,7 @@ public class ChatMessageController {
     }
 
     @MessageMapping("/ws/chat/send")
-    public void sendMessageByWebsocket(ChatMessage chatMessage) {
+    public void sendMessageByWebsocket(ChatMessageRequest chatMessage) {
         kafkaChatProducer.sendMessage("chat-message", chatMessage);
     }
 
