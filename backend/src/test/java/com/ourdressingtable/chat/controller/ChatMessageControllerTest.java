@@ -1,10 +1,13 @@
 package com.ourdressingtable.chat.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.chat.dto.ChatMessageRequest;
 import com.ourdressingtable.chat.service.ChatReadService;
 import com.ourdressingtable.chat.service.KafkaChatProducer;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
+import com.ourdressingtable.common.util.TestDataFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,12 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ChatMessageController.class)
@@ -34,6 +40,9 @@ public class ChatMessageControllerTest {
 
     @MockBean
     private KafkaChatProducer kafkaChatProducer;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Nested
     @DisplayName("메세지 읽음 처리 API 테스트")
@@ -57,6 +66,41 @@ public class ChatMessageControllerTest {
 
             doThrow(new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND)).when(chatReadService).markAsRead(chatroomId);
             mockMvc.perform(patch("/api/chatrooms/{chatroomId}/read", chatroomId))
+                    .andExpect(status().isNotFound());
+
+        }
+    }
+
+    @Nested
+    @DisplayName("메세지 전송 API 테스트")
+    class SendMessageApiTest {
+
+        @DisplayName("메세지 전송 성공 API 테스트")
+        @Test
+        public void readMessage_returnSuccess() throws Exception {
+            Long chatroomId = 1L;
+
+            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, 1L);
+
+            mockMvc.perform(post("/api/chatrooms/{chatroomId}/messages", chatroomId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(chatMessageRequest)))
+                    .andExpect(status().isOk());
+
+            verify(kafkaChatProducer).sendMessage(eq("chat-message"), eq(chatMessageRequest));
+        }
+
+        @DisplayName("메세지 전송 실패 API 테스트")
+        @Test
+        public void readMessage_returnError() throws Exception {
+            Long chatroomId = 10L;
+            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, 1L);
+
+            doThrow(new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND)).when(kafkaChatProducer).sendMessage(eq("chat-message"), eq(chatMessageRequest));
+
+            mockMvc.perform(post("/api/chatrooms/{chatroomId}/messages", chatroomId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(chatMessageRequest)))
                     .andExpect(status().isNotFound());
 
         }
