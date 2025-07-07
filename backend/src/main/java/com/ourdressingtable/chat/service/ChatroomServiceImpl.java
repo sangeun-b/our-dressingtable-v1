@@ -56,7 +56,7 @@ public class ChatroomServiceImpl implements ChatroomService {
                     .joinAt(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
-            redisTemplate.opsForSet().add("chatroom:"+chatroomId+"members:"+memberId.toString());
+            redisTemplate.opsForSet().add("chatroom:"+chatroomId+":members"+memberId.toString());
         }
     }
 
@@ -67,11 +67,9 @@ public class ChatroomServiceImpl implements ChatroomService {
         Chat chat = chatRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND));
 
-        if (chat.isActive()) {
-            chat.updateActive(false);
-        }
+        chat.updateActive(false);
 
-        String redisKey = "chatroom:" + chatroomId + "members:";
+        String redisKey = "chatroom:" + chatroomId + ":members";
         redisTemplate.opsForSet().remove(redisKey, memberId.toString());
 //        redisTemplate.opsForSet().remove("chatroom:"+chatroomId+":members"+memberId.toString());
 
@@ -80,7 +78,8 @@ public class ChatroomServiceImpl implements ChatroomService {
         boolean  allInactive = allChats.stream().allMatch(c -> !c.isActive());
 
         if(isOneToOne && allInactive) {
-            chatroomRepository.deleteById(chatroomId);
+            Chatroom chatroom = getChatroomEntityById(chatroomId);
+            chatroom.markAsDeleted();
         }
     }
 
@@ -113,7 +112,7 @@ public class ChatroomServiceImpl implements ChatroomService {
                     chat.updateActive(true);
                     chatRepository.save(chat);
 
-                    String redisKey = "chatroom:" + chatroomId + "members:";
+                    String redisKey = "chatroom:" + chatroomId + ":members";
                     redisTemplate.opsForSet().add(redisKey, memberId.toString());
 //                    redisTemplate.opsForSet().add("chatroom:"+chatroomId+"members:"+memberId.toString());
                 }
@@ -137,7 +136,7 @@ public class ChatroomServiceImpl implements ChatroomService {
                     .joinAt(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
-            String redisKey = "chatroom:" + newChatroom.getId() + "members:";
+            String redisKey = "chatroom:" + newChatroom.getId() + ":members";
             redisTemplate.opsForSet().add(redisKey, id.toString());
         }
         return new ChatroomResponse(newChatroom.getId(), newChatroom.getName(), newChatroom.getCreatedAt());

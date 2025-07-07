@@ -151,7 +151,7 @@ public class ChatroomServiceImplTest {
 
             chatroomService.leaveChatroom(chat.getId());
 
-            verify(redisTemplate.opsForSet()).remove("chatroom:"+room.getId() + "members:", member.getId().toString());
+            verify(redisTemplate.opsForSet()).remove("chatroom:"+room.getId() + ":members", member.getId().toString());
         }
 
         @DisplayName("채팅방 나가기 실패 - 미존재 채팅방")
