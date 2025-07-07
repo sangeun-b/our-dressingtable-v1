@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ourdressingtable.auth.dto.CustomUserDetails;
 import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.repository.ChatRepository;
@@ -18,30 +17,25 @@ import com.ourdressingtable.chat.dto.ChatMemberResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.common.security.WithCustomUser;
+import com.ourdressingtable.common.util.SecurityUtil;
+import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
-import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
-import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,26 +61,6 @@ public class ChatroomServiceImplTest {
     @Mock
     private SetOperations<String, String> setOperations;
 
-    @BeforeEach
-    void setUp() {
-        // 사용자 정보 생성
-        CustomUserDetails userDetails = CustomUserDetails.builder()
-                .memberId(1L)
-                .email("test@example.com")
-                .password("password")
-                .role(Role.ROLE_BASIC)
-                .status(Status.ACTIVE)
-                .build();
-
-        // Authentication 객체 생성 및 SecurityContext에 주입
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        when(redisTemplate.opsForSet()).thenReturn(setOperations);
-    }
-
     @Nested
     @DisplayName("1:1 채팅방 생성 테스트")
     class CreateOneToOneChatroomTest {
@@ -94,43 +68,49 @@ public class ChatroomServiceImplTest {
         @DisplayName("1:1 채팅방 생성 성공")
         @Test
         public void createdOneToOneChatroom_returnSuccess() {
-            Member member = TestDataFactory.testMember(1L);
-            Long targetId = 2L;
-            Member targetMember = TestDataFactory.testMember(targetId);
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+                when(redisTemplate.opsForSet()).thenReturn(setOperations);
+                Member member = TestDataFactory.testMember(1L);
+                Long targetId = 2L;
+                Member targetMember = TestDataFactory.testMember(targetId);
 
-            when(chatRepository.findOneToOneChatroom(member.getId(), targetId)).thenReturn(Optional.empty());
+                when(chatRepository.findOneToOneChatroom(member.getId(), targetId)).thenReturn(Optional.empty());
 
-            Chatroom room = TestDataFactory.testChatroom(1L);
-            given(chatroomRepository.save(any(Chatroom.class))).willAnswer( invocation -> {
+                Chatroom room = TestDataFactory.testChatroom(1L);
+                given(chatroomRepository.save(any(Chatroom.class))).willAnswer(invocation -> {
                     Chatroom saved = invocation.getArgument(0);
                     ReflectionTestUtils.setField(saved, "id", 1L);
                     return saved;
 
-            });
+                });
 
-            given(memberService.getMemberEntityById(member.getId())).willReturn(member);
-            given(memberService.getMemberEntityById(targetId)).willReturn(targetMember);
+                given(memberService.getMemberEntityById(member.getId())).willReturn(member);
+                given(memberService.getMemberEntityById(targetId)).willReturn(targetMember);
 
-            Chat memberChat = TestDataFactory.testChat(1L,room,member);
-            Chat targetChat = TestDataFactory.testChat(2L,room,targetMember);
-            when(chatRepository.save(any(Chat.class))).thenReturn(
-                    memberChat,targetChat
-            );
+                Chat memberChat = TestDataFactory.testChat(1L, room, member);
+                Chat targetChat = TestDataFactory.testChat(2L, room, targetMember);
+                when(chatRepository.save(any(Chat.class))).thenReturn(
+                        memberChat, targetChat
+                );
 
-            ChatroomResponse response = chatroomService.createOrGetOneToOneChatroom(targetId);
+                ChatroomResponse response = chatroomService.createOrGetOneToOneChatroom(targetId);
 
-            assertEquals(1L, response.getId());
-            verify(chatRepository,times(2)).save(any(Chat.class));
+                assertEquals(1L, response.getId());
+                verify(chatRepository, times(2)).save(any(Chat.class));
+            }
         }
 
         @DisplayName("1:1 채팅방 생성 실패 - 자신과 채팅 불가능")
         @Test
         public void createdOneToOneChatroom_returnError() {
-            Member member = TestDataFactory.testMember(1L);
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
 
-           assertThatThrownBy(() -> chatroomService.createOrGetOneToOneChatroom(1L))
-                   .isInstanceOf(OurDressingTableException.class)
-                   .hasMessageContaining(ErrorCode.NO_CHAT_WITH_MYSELF.getMessage());
+                Member member = TestDataFactory.testMember(1L);
+
+                assertThatThrownBy(() -> chatroomService.createOrGetOneToOneChatroom(1L))
+                        .isInstanceOf(OurDressingTableException.class)
+                        .hasMessageContaining(ErrorCode.NO_CHAT_WITH_MYSELF.getMessage());
+            }
         }
 
 
@@ -143,26 +123,31 @@ public class ChatroomServiceImplTest {
         @DisplayName("채팅방 나가기 성공")
         @Test
         public void leaveChatroom_returnSuccess() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
-            Member member = TestDataFactory.testMember(1L);
-            Chat chat = TestDataFactory.testChat(1L,room,member);
-            given(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
-                    .willReturn(Optional.of(chat));
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+                when(redisTemplate.opsForSet()).thenReturn(setOperations);
+                Chatroom room = TestDataFactory.testChatroom(1L);
+                Member member = TestDataFactory.testMember(1L);
+                Chat chat = TestDataFactory.testChat(1L, room, member);
+                given(chatRepository.findByChatroomIdAndMemberId(room.getId(), member.getId()))
+                        .willReturn(Optional.of(chat));
 
-            chatroomService.leaveChatroom(chat.getId());
+                chatroomService.leaveChatroom(chat.getId());
 
-            verify(redisTemplate.opsForSet()).remove("chatroom:"+room.getId() + ":members", member.getId().toString());
+                verify(redisTemplate.opsForSet()).remove("chatroom:" + room.getId() + ":members", member.getId().toString());
+            }
         }
 
         @DisplayName("채팅방 나가기 실패 - 미존재 채팅방")
         @Test
         public void leaveChatroom_returnError() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
-            Member member = TestDataFactory.testMember(1L);
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+                Chatroom room = TestDataFactory.testChatroom(1L);
+                Member member = TestDataFactory.testMember(1L);
 
-           when(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
-                   .thenReturn(Optional.empty());
-           assertThrows(OurDressingTableException.class, () -> chatroomService.leaveChatroom(room.getId()));
+                when(chatRepository.findByChatroomIdAndMemberId(room.getId(), member.getId()))
+                        .thenReturn(Optional.empty());
+                assertThrows(OurDressingTableException.class, () -> chatroomService.leaveChatroom(room.getId()));
+            }
         }
 
 
@@ -176,29 +161,34 @@ public class ChatroomServiceImplTest {
         @DisplayName("참여 회원 조회 성공")
         @Test
         public void leaveChatroom_returnSuccess() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
-            Member member = TestDataFactory.testMember(1L);
-            Chat chat = TestDataFactory.testChat(1L, room, member);
-            when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
-                    .thenReturn(List.of(chat));
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+                Chatroom room = TestDataFactory.testChatroom(1L);
+                Member member = TestDataFactory.testMember(1L);
+                Chat chat = TestDataFactory.testChat(1L, room, member);
+                when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
+                        .thenReturn(List.of(chat));
 
-            List<ChatMemberResponse> result = chatroomService.getActiveChatMembers(room.getId());
+                List<ChatMemberResponse> result = chatroomService.getActiveChatMembers(room.getId());
 
-            assertEquals(1, result.size());
+                assertEquals(1, result.size());
+            }
+
         }
 
         @DisplayName("참여 회원 조회 실패 - 미존재 채팅방")
         @Test
         public void leaveChatroom_returnError() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+                Chatroom room = TestDataFactory.testChatroom(1L);
 
-            when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
-                    .thenThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND));
+                when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
+                        .thenThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND));
 
-            assertThatThrownBy(() -> chatroomService.getActiveChatMembers(room.getId()))
-                    .isInstanceOf(OurDressingTableException.class)
-                    .hasMessageContaining(ErrorCode.CHAT_NOT_FOUND.getMessage());
+                assertThatThrownBy(() -> chatroomService.getActiveChatMembers(room.getId()))
+                        .isInstanceOf(OurDressingTableException.class)
+                        .hasMessageContaining(ErrorCode.CHAT_NOT_FOUND.getMessage());
 
+            }
         }
 
 
