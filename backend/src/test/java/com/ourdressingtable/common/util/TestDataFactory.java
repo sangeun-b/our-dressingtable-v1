@@ -4,7 +4,9 @@ import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
+import com.ourdressingtable.chat.domain.MessageType;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatMessageRequest;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.chat.dto.CreateOneToOneChatRequest;
 import com.ourdressingtable.community.comment.domain.Comment;
@@ -349,6 +351,14 @@ public class TestDataFactory {
                 .member(member)
                 .chatroom(chatroom)
                 .lastReadAt(LocalDateTime.now())
+                .build();
+    }
+    public static ChatMessageRequest testChatMessageRequest(Long chatroomId, Long senderId) {
+        return ChatMessageRequest.builder()
+                .senderId(senderId)
+                .chatroomId(chatroomId)
+                .messageType(MessageType.TEXT)
+                .content("안녕!")
                 .build();
     }
 }
