@@ -24,7 +24,7 @@ import lombok.ToString;
 public class ChatMessage {
 
     @Schema(description = "메시지 유형 (text, image, file, system 등)", example = "text")
-    private MessageType MessageType;
+    private MessageType messageType;
 
     @Schema(description = "채팅방 ID", example = "1")
     @NotNull(message = "채팅방 ID는 필수입니다.")
@@ -39,8 +39,8 @@ public class ChatMessage {
     private String content;
 
     @Builder
-    public ChatMessage(MessageType MessageType, Long chatroomId, Long senderId, String content) {
-        this.MessageType = MessageType;
+    public ChatMessage(MessageType messageType, Long chatroomId, Long senderId, String content) {
+        this.messageType = messageType;
         this.chatroomId = chatroomId;
         this.senderId = senderId;
         this.content = content;
@@ -48,7 +48,7 @@ public class ChatMessage {
 
     public Message toEntity(Chatroom chatroom, Member member) {
         return Message.builder()
-                .messageType(MessageType)
+                .messageType(messageType)
                 .chatroom(chatroom)
                 .sender(member)
                 .content(content)

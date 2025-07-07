@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chats/chatrooms")
+@RequestMapping("/api/chatrooms")
 @Tag(name = "채팅방", description = "채팅방 API")
 public class ChatroomController {
 
@@ -36,7 +36,7 @@ public class ChatroomController {
     @Operation(summary = "채팅방 생성", description = "새로운 채팅방을 생성합니다.")
     public ResponseEntity<CreateChatroomResponse> createChatroom(@Valid @RequestBody CreateChatroomRequest request) {
         Long id = chatroomService.createChatroom(request);
-        return ResponseEntity.created(URI.create("/api/chats/chatrooms/"+id))
+        return ResponseEntity.created(URI.create("/api/chatrooms/"+id))
                 .body(new CreateChatroomResponse(id));
     }
 
@@ -67,7 +67,7 @@ public class ChatroomController {
                 request.getTargetMemberId()));
     }
 
-    @GetMapping("/one-to-one")
+    @GetMapping("/one-to-one/my-chatrooms")
     @Operation(summary = "1:1 채팅방 목록", description = "내가 참여 중인 1:1 채팅방 목록을 조회합니다.")
     public ResponseEntity<List<OneToOneChatroomSummaryResponse>> getMyOneToOneChatrooms() {
         return ResponseEntity.ok(chatroomService.getMyOneToOneChatrooms());

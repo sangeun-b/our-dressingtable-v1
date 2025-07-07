@@ -1,14 +1,17 @@
 package com.ourdressingtable.chat.controller;
 
 import com.ourdressingtable.chat.dto.ChatMessage;
+import com.ourdressingtable.chat.service.ChatReadService;
 import com.ourdressingtable.chat.service.KafkaChatProducer;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -18,11 +21,26 @@ public class ChatMessageController {
 
     private final KafkaChatProducer kafkaChatProducer;
 
-    @MessageMapping("/chat/send")
-    public void sendMessage(ChatMessage chatMessage) {
-        kafkaChatProducer.sendMessage("chat-message", chatMessage);
+    private final ChatReadService chatReadService;
+
+
+    @Operation(summary = "메시지 전송", description = "사용자가 메시지를 전송합니다.")
+    @PostMapping("/api/chatrooms/{chatroomId}/messages")
+    public ResponseEntity<Void> sendMessage(@RequestBody @Valid ChatMessage message) {
+        kafkaChatProducer.sendMessage("chat-message", message);
+        return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "메시지 읽음 처리", description = "메시지를 읽음 처리합니다.")
+    @PatchMapping("/api/chatrooms/{chatroomId}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long chatroomId) {
+        chatReadService.markAsRead(chatroomId);
+        return ResponseEntity.ok().build();
+    }
 
+    @MessageMapping("/ws/chat/send")
+    public void sendMessageByWebsocket(ChatMessage chatMessage) {
+        kafkaChatProducer.sendMessage("chat-message", chatMessage);
+    }
 
 }
