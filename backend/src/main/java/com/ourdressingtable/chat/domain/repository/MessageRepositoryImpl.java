@@ -26,6 +26,7 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
                         message.createdAt.gt(lastReadAt)
                 )
                 .fetchOne();
+
         return Optional.ofNullable(result).orElse(0L);
     }
 }
