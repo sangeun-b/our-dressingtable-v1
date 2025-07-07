@@ -2,6 +2,7 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.chat.domain.Chat;
+import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
@@ -340,6 +341,14 @@ public class TestDataFactory {
     public static ChatMemberResponse testChatMemberResponse(Long id) {
         return ChatMemberResponse.builder()
                 .memberId(id)
+                .build();
+    }
+
+    public static ChatRead tesChatRead(Member member, Chatroom chatroom) {
+        return ChatRead.builder()
+                .member(member)
+                .chatroom(chatroom)
+                .lastReadAt(LocalDateTime.now())
                 .build();
     }
 }
