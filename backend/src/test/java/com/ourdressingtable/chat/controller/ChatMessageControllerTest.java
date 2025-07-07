@@ -1,7 +1,7 @@
 package com.ourdressingtable.chat.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.chat.service.ChatReadService;
+import com.ourdressingtable.chat.service.KafkaChatProducer;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
@@ -20,11 +20,11 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatReadController.class)
+@WebMvcTest(ChatMessageController.class)
 @ActiveProfiles("test")
 @DisplayName("메세지 읽음 API 테스트")
 @Import(TestSecurityConfig.class)
-public class ChatReadControllerTest {
+public class ChatMessageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,13 +32,16 @@ public class ChatReadControllerTest {
     @MockBean
     private ChatReadService chatReadService;
 
+    @MockBean
+    private KafkaChatProducer kafkaChatProducer;
+
     @Nested
     @DisplayName("메세지 읽음 처리 API 테스트")
     class ReadMessageApiTest {
 
-        @DisplayName("메세지 읽음 처리 API 성공 테스트")
+        @DisplayName("메세지 읽음 처리 성공 API 테스트")
         @Test
-        void readMessage_returnSuccess() throws Exception {
+        public void readMessage_returnSuccess() throws Exception {
             Long chatroomId = 1L;
 
             mockMvc.perform(patch("/api/chatrooms/{chatroomId}/read", chatroomId))
@@ -47,9 +50,9 @@ public class ChatReadControllerTest {
             verify(chatReadService).markAsRead(chatroomId);
         }
 
-        @DisplayName("메세지 읽음 처리 API 실패 테스트")
+        @DisplayName("메세지 읽음 처리 실패 API 테스트")
         @Test
-        void readMessage_returnError() throws Exception {
+        public void readMessage_returnError() throws Exception {
             Long chatroomId = 10L;
 
             doThrow(new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND)).when(chatReadService).markAsRead(chatroomId);
@@ -58,4 +61,5 @@ public class ChatReadControllerTest {
 
         }
     }
+
 }

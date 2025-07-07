@@ -24,9 +24,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -53,12 +49,6 @@ public class ChatReadServiceImplTest {
 
     @Mock
     private MemberService memberService;
-
-    @Mock
-    private RedisTemplate<String, String> redisTemplate;
-
-    @Mock
-    private SetOperations<String, String> setOperations;
 
     @Nested
     @DisplayName("메시지 읽음 테스트")
