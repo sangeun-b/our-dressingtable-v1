@@ -29,14 +29,18 @@ public class OneToOneChatroomSummaryResponse {
     @Schema(description = "마지막 채팅 시간", example = "2025년 05월 12일 13:20")
     private LocalDateTime lastMessageTime;
 
+    @Schema(description = "읽지 않은 메시지 수", example = "10")
+    private long unreadCount;
+
     @Builder
-    public OneToOneChatroomSummaryResponse(Long chatroomId, Long targetMemberId, String targetNickname, String targetProfileImageUrl, String lastMessage, LocalDateTime lastMessageTime) {
+    public OneToOneChatroomSummaryResponse(Long chatroomId, Long targetMemberId, String targetNickname, String targetProfileImageUrl, String lastMessage, LocalDateTime lastMessageTime, long unreadCount) {
         this.chatroomId = chatroomId;
         this.targetMemberId = targetMemberId;
         this.targetNickname = targetNickname;
         this.targetProfileImageUrl = targetProfileImageUrl;
         this.lastMessage = lastMessage;
         this.lastMessageTime = lastMessageTime;
+        this.unreadCount = unreadCount;
     }
 
 }

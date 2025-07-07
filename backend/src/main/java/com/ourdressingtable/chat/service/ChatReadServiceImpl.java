@@ -12,6 +12,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +54,7 @@ public class ChatReadServiceImpl implements ChatReadService {
         Long memberId = SecurityUtil.getCurrentMemberId();
         LocalDateTime lastReadAt = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
                 .map(ChatRead::getLastReadAt)
-                .orElse(LocalDateTime.MIN); // 한번도 안 읽었으면 가장 예전 시간으로 설정
+                .orElse(LocalDateTime.of(1970, 1, 1, 0, 0)); // 한번도 안 읽었으면 가장 예전 시간으로 설정
         return lastReadAt;
     }
 }

@@ -1,18 +1,17 @@
 package com.ourdressingtable.chat.domain.repository;
 
-import com.ourdressingtable.chat.domain.Chatroom;
-import com.ourdressingtable.chat.domain.ChatroomType;
-import com.ourdressingtable.chat.domain.Message;
-import com.ourdressingtable.chat.domain.QChat;
-import com.ourdressingtable.chat.domain.QChatroom;
-import com.ourdressingtable.chat.domain.QMessage;
+import com.ourdressingtable.chat.domain.*;
 import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.QMember;
+import com.ourdressingtable.member.repository.MemberRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,8 @@ import org.springframework.stereotype.Repository;
 public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
+    private final ChatReadRepository chatReadRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public List<OneToOneChatroomSummaryResponse> findOneToOneChatroomsByMemberId(Long memberId) {
@@ -91,6 +92,24 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
                 lastMessageMap.put(chatroomId,tuple.get(message));
             }
         }
+
+        // 읽은 시간 조회
+        List<ChatRead> chatReads = chatReadRepository.findByMemberIdAndChatroomIds(memberId, chatroomIds);
+        Map<Long, LocalDateTime> readAtMap = chatReads.stream()
+                .collect(Collectors.toMap(
+                        cr -> cr.getChatroom().getId(),
+                        ChatRead::getLastReadAt
+                ));
+
+        // 안 읽은 메시지 수 조회
+        Map<Long, Long> unreadCountMap = new HashMap<>();
+        for(Long chatroomId : chatroomIds){
+            LocalDateTime lastReadAt = readAtMap.get(chatroomId);
+            LocalDateTime safeLastReadAt = (lastReadAt != null) ? lastReadAt : LocalDateTime.of(1970, 1, 1, 0, 0);
+            long count = messageRepository.countUnreadMessages(chatroomId, memberId, safeLastReadAt);
+            unreadCountMap.put(chatroomId, count);
+        }
+
         return chatrooms.stream().map(cr -> {
             Member target = targetMemberMap.get(cr.getId());
             Message last = lastMessageMap.get(cr.getId());
@@ -101,6 +120,7 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
                     .targetProfileImageUrl(target != null ? target.getImageUrl() : null)
                     .lastMessage(last != null ? last.getContent() : null)
                     .lastMessageTime(last != null ? last.getCreatedAt() : null)
+                    .unreadCount(unreadCountMap.getOrDefault(cr.getId(), 0L).intValue())
                     .build();
         }).toList();
     }
