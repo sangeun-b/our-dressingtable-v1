@@ -1,7 +1,7 @@
 package com.ourdressingtable.chat.domain;
 
 import com.ourdressingtable.member.domain.Member;
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "chat_reads")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@Table(name = "chat_reads", uniqueConstraints = {

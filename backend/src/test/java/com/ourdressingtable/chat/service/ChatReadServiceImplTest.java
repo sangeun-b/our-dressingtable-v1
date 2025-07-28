@@ -1,6 +1,5 @@
 package com.ourdressingtable.chat.service;
 
-import com.ourdressingtable.auth.dto.CustomUserDetails;
 import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.repository.ChatReadRepository;
@@ -8,10 +7,7 @@ import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.common.util.SecurityUtilMockHelper;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.Role;
-import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.service.MemberService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,8 +18,6 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -98,7 +92,7 @@ public class ChatReadServiceImplTest {
             given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.empty());
 
             LocalDateTime lastReadAt = chatReadService.getLastReadAt("1");
-            assertThat(lastReadAt).isEqualTo(LocalDateTime.MIN);
+            assertThat(lastReadAt).isEqualTo(LocalDateTime.of(1970,1,1,0,0));
         }
     }
 }

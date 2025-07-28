@@ -1,6 +1,5 @@
 package com.ourdressingtable.common.component;
 
-import com.ourdressingtable.chat.ChatroomServicePerformanceTest;
 import javax.sql.DataSource;
 import net.ttddyy.dsproxy.support.ProxyDataSource;
 import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
