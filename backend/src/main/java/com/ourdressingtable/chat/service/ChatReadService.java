@@ -6,6 +6,6 @@ import java.time.LocalDateTime;
 
 public interface ChatReadService {
 
-    void markAsRead(Long chatroomId);
-    LocalDateTime getLastReadAt(Long chatroomId);
+    void markAsRead(String chatroomId);
+    LocalDateTime getLastReadAt(String chatroomId);
 }

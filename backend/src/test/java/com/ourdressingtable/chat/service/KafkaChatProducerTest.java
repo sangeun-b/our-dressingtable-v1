@@ -29,7 +29,7 @@ public class KafkaChatProducerTest {
     public void sendMessage_shouldCallKafkaChatProducer() {
 
         String topic = "chat-message";
-        ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(1L,1L);
+        ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest("1","1");
 
         kafkaChatProducer.sendMessage(topic, chatMessageRequest);
 

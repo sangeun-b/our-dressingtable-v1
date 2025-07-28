@@ -51,7 +51,7 @@ public class ChatMessageControllerTest {
         @DisplayName("메세지 읽음 처리 성공 API 테스트")
         @Test
         public void readMessage_returnSuccess() throws Exception {
-            Long chatroomId = 1L;
+            String chatroomId = "1";
 
             mockMvc.perform(patch("/api/chatrooms/{chatroomId}/read", chatroomId))
                     .andExpect(status().isOk());
@@ -62,7 +62,7 @@ public class ChatMessageControllerTest {
         @DisplayName("메세지 읽음 처리 실패 API 테스트")
         @Test
         public void readMessage_returnError() throws Exception {
-            Long chatroomId = 10L;
+            String chatroomId = "10";
 
             doThrow(new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND)).when(chatReadService).markAsRead(chatroomId);
             mockMvc.perform(patch("/api/chatrooms/{chatroomId}/read", chatroomId))
@@ -78,9 +78,9 @@ public class ChatMessageControllerTest {
         @DisplayName("메세지 전송 성공 API 테스트")
         @Test
         public void readMessage_returnSuccess() throws Exception {
-            Long chatroomId = 1L;
+            String chatroomId = "1";
 
-            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, 1L);
+            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, "1");
 
             mockMvc.perform(post("/api/chatrooms/{chatroomId}/messages", chatroomId)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -93,8 +93,8 @@ public class ChatMessageControllerTest {
         @DisplayName("메세지 전송 실패 API 테스트")
         @Test
         public void readMessage_returnError() throws Exception {
-            Long chatroomId = 10L;
-            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, 1L);
+            String chatroomId = "10";
+            ChatMessageRequest chatMessageRequest = TestDataFactory.testChatMessageRequest(chatroomId, "1");
 
             doThrow(new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND)).when(kafkaChatProducer).sendMessage(eq("chat-message"), eq(chatMessageRequest));
 

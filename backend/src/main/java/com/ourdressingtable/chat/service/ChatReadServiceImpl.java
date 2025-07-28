@@ -29,32 +29,32 @@ public class ChatReadServiceImpl implements ChatReadService {
 
     @Override
     @Transactional
-    public void markAsRead(Long chatroomId) {
+    public void markAsRead(String chatroomId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Chatroom chatroom = chatroomService.getChatroomEntityById(chatroomId);
         Member member = memberService.getMemberEntityById(memberId);
 
         LocalDateTime now = LocalDateTime.now();
 
-        ChatRead chatRead = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
+        ChatRead chatRead = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, String.valueOf(memberId))
                 .map(cr -> {
                     cr.updateReadAt(now);
                     return cr;
                 })
                 .orElse(ChatRead.builder()
-                        .chatroom(chatroom)
-                        .member(member)
+                        .chatroomId(String.valueOf(chatroom.getId()))
+                        .memberId(String.valueOf(memberId))
                         .lastReadAt(now)
                         .build());
         chatReadRepository.save(chatRead);
     }
 
     @Override
-    public LocalDateTime getLastReadAt(Long chatroomId) {
+    public LocalDateTime getLastReadAt(String chatroomId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        LocalDateTime lastReadAt = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, memberId)
+        LocalDateTime lastReadAt = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, String.valueOf(memberId))
                 .map(ChatRead::getLastReadAt)
-                .orElse(LocalDateTime.of(1970, 1, 1, 0, 0)); // 한번도 안 읽었으면 가장 예전 시간으로 설정
+                .orElse(LocalDateTime.MIN); // 한번도 안 읽었으면 가장 예전 시간으로 설정
         return lastReadAt;
     }
 }

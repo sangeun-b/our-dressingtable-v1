@@ -32,7 +32,7 @@ public class ChatMessageController {
 
     @Operation(summary = "메시지 읽음 처리", description = "메시지를 읽음 처리합니다.")
     @PatchMapping("/api/chatrooms/{chatroomId}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable Long chatroomId) {
+    public ResponseEntity<Void> markAsRead(@PathVariable String chatroomId) {
         chatReadService.markAsRead(chatroomId);
         return ResponseEntity.ok().build();
     }

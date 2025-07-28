@@ -30,12 +30,12 @@ public class KafkaChatConsumer {
     public void listen(@Payload ChatMessageRequest chatMessage) {
         log.info("[Kafka 수신] {}" + chatMessage);
 
-        Member sender = memberRepository.findById(chatMessage.getSenderId())
+        Member sender = memberRepository.findById(Long.valueOf(chatMessage.getSenderId()))
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_NOT_FOUND));
         Chatroom chatroom = chatroomRepository.findById(chatMessage.getChatroomId())
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND));
 
-        Message message = chatMessage.toEntity(chatroom, sender);
+        Message message = chatMessage.toEntity(chatroom.getId(), String.valueOf(sender.getId()));
 
         messageRepository.save(message);
 

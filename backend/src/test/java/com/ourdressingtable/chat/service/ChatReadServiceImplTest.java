@@ -59,12 +59,12 @@ public class ChatReadServiceImplTest {
         public void readMessage_returnUpdate() {
             try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
                 Member member = TestDataFactory.testMember(1L);
-                Chatroom chatroom = TestDataFactory.testChatroom(1L);
-                ChatRead chatRead = TestDataFactory.tesChatRead(member, chatroom);
+                Chatroom chatroom = TestDataFactory.testChatroom("1");
+                ChatRead chatRead = TestDataFactory.tesChatRead(String.valueOf(member.getId()), chatroom.getId());
 
-                given(chatroomService.getChatroomEntityById(1L)).willReturn(chatroom);
+                given(chatroomService.getChatroomEntityById("1")).willReturn(chatroom);
                 given(memberService.getMemberEntityById(1L)).willReturn(member);
-                given(chatReadRepository.findByChatroomIdAndMemberId(1L, 1L)).willReturn(Optional.of(chatRead));
+                given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.of(chatRead));
 
                 chatReadService.markAsRead(chatroom.getId());
 
@@ -78,11 +78,11 @@ public class ChatReadServiceImplTest {
         public void readMessage_returnCreate() {
             try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
                 Member member = TestDataFactory.testMember(1L);
-                Chatroom chatroom = TestDataFactory.testChatroom(1L);
+                Chatroom chatroom = TestDataFactory.testChatroom("1");
 
-                given(chatroomService.getChatroomEntityById(1L)).willReturn(chatroom);
+                given(chatroomService.getChatroomEntityById("1")).willReturn(chatroom);
                 given(memberService.getMemberEntityById(1L)).willReturn(member);
-                given(chatReadRepository.findByChatroomIdAndMemberId(1L, 1L)).willReturn(Optional.empty());
+                given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.empty());
 
                 chatReadService.markAsRead(chatroom.getId());
 
@@ -95,9 +95,9 @@ public class ChatReadServiceImplTest {
     @DisplayName("마지막 읽은 날짜없으면 MIN")
     void getLastReadAt_returnMIN() {
         try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
-            given(chatReadRepository.findByChatroomIdAndMemberId(1L, 1L)).willReturn(Optional.empty());
+            given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.empty());
 
-            LocalDateTime lastReadAt = chatReadService.getLastReadAt(1L);
+            LocalDateTime lastReadAt = chatReadService.getLastReadAt("1");
             assertThat(lastReadAt).isEqualTo(LocalDateTime.MIN);
         }
     }

@@ -13,30 +13,24 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chat_reads", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"chatroom_id","member_id"})
-})
+//@Table(name = "chat_reads", uniqueConstraints = {
+//        @UniqueConstraint(columnNames = {"chatroom_id","member_id"})
+//})
 public class ChatRead {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_read_id")
-    private Long id;
+    @Id
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id", nullable = false)
-    private Chatroom chatroom;
+    private String chatroomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private String memberId;
 
-    @Column(name = "last_read_at", nullable = false)
     private LocalDateTime lastReadAt;
 
     @Builder
-    public ChatRead(Chatroom chatroom, Member member, LocalDateTime lastReadAt) {
-        this.chatroom = chatroom;
-        this.member = member;
+    public ChatRead(String chatroomId, String memberId, LocalDateTime lastReadAt) {
+        this.chatroomId = chatroomId;
+        this.memberId = memberId;
         this.lastReadAt = lastReadAt;
     }
 

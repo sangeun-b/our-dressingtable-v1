@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ChatroomService {
 
-    Long createChatroom(CreateChatroomRequest request);
-    void joinChatroom(Long chatroomId);
-    Chatroom getChatroomEntityById(Long chatroomId);
-    void leaveChatroom(Long chatroomId);
-    List<ChatMemberResponse> getActiveChatMembers(Long chatroomId);
-    ChatroomResponse createOrGetOneToOneChatroom(Long targetId);;
+    String createChatroom(CreateChatroomRequest request);
+    void joinChatroom(String chatroomId);
+    Chatroom getChatroomEntityById(String chatroomId);
+    void leaveChatroom(String chatroomId);
+    List<ChatMemberResponse> getActiveChatMembers(String chatroomId);
+    ChatroomResponse createOrGetOneToOneChatroom(String targetId);;
     List<OneToOneChatroomSummaryResponse> getMyOneToOneChatrooms();
 }
