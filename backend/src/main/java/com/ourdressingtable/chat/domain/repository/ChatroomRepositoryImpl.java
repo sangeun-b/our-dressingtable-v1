@@ -1,11 +1,13 @@
 package com.ourdressingtable.chat.domain.repository;
 
+import static com.mongodb.client.model.Filters.ne;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 import com.ourdressingtable.chat.domain.Chat;
+import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.ChatroomType;
 import com.ourdressingtable.chat.domain.Message;
@@ -15,6 +17,7 @@ import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.repository.MemberRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,6 +103,19 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
                 .collect(Collectors.toMap(Message::getChatroomId, Function.identity()));
 
         return chatrooms.stream().map(cr -> {
+
+            ChatRead chatRead = mongoTemplate.findOne(
+                    new Query(Criteria.where("chatroomId").is(cr.getId())
+                            .and("memberId").is(memberId)),
+                    ChatRead.class,"chat_reads");
+            LocalDateTime lastReadAt = chatRead != null ? chatRead.getLastReadAt() : LocalDateTime.of(1970,1,1,0,0);
+            long unreadCount = mongoTemplate.count(
+                    new Query(Criteria.where("chatroomId").is(cr.getId())
+                            .and("senderId").ne(memberId)
+                            .and("createdAt").gt(lastReadAt)),
+                    Message.class, "messages");
+
+
             String targetId = chatroomToTargetMemberMap.get(cr.getId());
             Message last = chatroomToLastMessageMap.get(cr.getId());
             Member member = memberRepository.findById(Long.valueOf(targetId)).orElse(null);
@@ -109,7 +125,8 @@ public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
                     member != null ? member.getNickname() : null,
                     member != null ? member.getImageUrl() : null,
                     last != null ? last.getContent() : null,
-                    last != null ? last.getCreatedAt() : null
+                    last != null ? last.getCreatedAt() : null,
+                    unreadCount
             );
         }).toList();
     }

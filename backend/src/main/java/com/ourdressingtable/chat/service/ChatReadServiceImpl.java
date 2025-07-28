@@ -1,18 +1,12 @@
 package com.ourdressingtable.chat.service;
 
-import com.ourdressingtable.OurDressingTableApplication;
 import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.repository.ChatReadRepository;
-import com.ourdressingtable.chat.domain.repository.ChatroomRepository;
-import com.ourdressingtable.common.exception.ErrorCode;
-import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +20,7 @@ public class ChatReadServiceImpl implements ChatReadService {
     private final ChatReadRepository chatReadRepository;
     private final ChatroomService chatroomService;
     private final MemberService memberService;
+    private static final LocalDateTime SAFE_MIN_DATETIME = LocalDateTime.of(1970, 1, 1, 0, 0);
 
     @Override
     @Transactional
@@ -54,7 +49,7 @@ public class ChatReadServiceImpl implements ChatReadService {
         Long memberId = SecurityUtil.getCurrentMemberId();
         LocalDateTime lastReadAt = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, String.valueOf(memberId))
                 .map(ChatRead::getLastReadAt)
-                .orElse(LocalDateTime.MIN); // 한번도 안 읽었으면 가장 예전 시간으로 설정
+                .orElse(SAFE_MIN_DATETIME); // 한번도 안 읽었으면 가장 예전 시간으로 설정
         return lastReadAt;
     }
 }

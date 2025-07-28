@@ -25,5 +25,8 @@ public record OneToOneChatroomSummaryResponse (
     String lastMessage,
 
     @Schema(description = "마지막 채팅 시간", example = "2025년 05월 12일 13:20")
-    LocalDateTime lastMessageTime
+    LocalDateTime lastMessageTime,
+
+    @Schema(description = "읽지 않은 메세지 수", example = "13")
+    long unreadCount
     ){}
