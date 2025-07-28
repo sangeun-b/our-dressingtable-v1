@@ -7,12 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "채팅방 생성 응답 DTO")
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreateChatroomResponse {
+public record ChatroomIdResponse (
 
     @Schema(description = "생성된 채팅방 ID", example = "1")
-    private Long id;
+    String chatroomId
 
-}
+){}

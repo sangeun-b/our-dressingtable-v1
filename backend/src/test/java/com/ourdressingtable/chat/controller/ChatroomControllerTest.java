@@ -61,8 +61,8 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void createOneToOneChatroom_returnSuccess() throws Exception {
-            CreateOneToOneChatRequest request = TestDataFactory.testCreateOneToOneChatRequest(2L);
-            ChatroomResponse response = TestDataFactory.testChatroomResponse(1L);
+            CreateOneToOneChatRequest request = TestDataFactory.testCreateOneToOneChatRequest("2");
+            ChatroomResponse response = TestDataFactory.testChatroomResponse("1");
             given(chatroomService.createOrGetOneToOneChatroom(any())).willReturn(response);
             mockMvc.perform(post("/api/chats/chatrooms/one-to-one")
                     .with(csrf())
@@ -75,10 +75,10 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void createOneToOneChatroom_returnError() throws Exception {
-            CreateOneToOneChatRequest request = TestDataFactory.testCreateOneToOneChatRequest(1L);
+            CreateOneToOneChatRequest request = TestDataFactory.testCreateOneToOneChatRequest("1");
 
             doThrow(new OurDressingTableException(ErrorCode.NO_CHAT_WITH_MYSELF))
-                    .when(chatroomService).createOrGetOneToOneChatroom(eq(1L));
+                    .when(chatroomService).createOrGetOneToOneChatroom(eq("1"));
 
             mockMvc.perform(post("/api/chats/chatrooms/one-to-one")
                             .with(csrf())
@@ -97,7 +97,7 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void leaveChatroom_returnSuccess() throws Exception {
-           Long chatroomId = 1L;
+            String chatroomId = "1";
            mockMvc.perform(delete("/api/chats/chatrooms/{chatroomId}/members", chatroomId))
                    .andExpect(status().isNoContent());
            verify(chatroomService).leaveChatroom(chatroomId);
@@ -107,7 +107,7 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void leaveChatroom_returnError() throws Exception {
-            Long chatroomId = 2L;
+            String chatroomId = "2";
             doThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND))
                     .when(chatroomService).leaveChatroom(eq(chatroomId));
 
@@ -125,9 +125,9 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void getChatMembers_returnSuccess() throws Exception {
-            Long chatroomId = 1L;
-            ChatMemberResponse response = TestDataFactory.testChatMemberResponse(1L);
-            ChatMemberResponse second_response = TestDataFactory.testChatMemberResponse(2L);
+            String chatroomId = "1";
+            ChatMemberResponse response = TestDataFactory.testChatMemberResponse("1");
+            ChatMemberResponse second_response = TestDataFactory.testChatMemberResponse("2");
             List<ChatMemberResponse> members = List.of(
                     response, second_response
             );
@@ -142,7 +142,7 @@ public class ChatroomControllerTest {
         @WithCustomUser
         @Test
         public void getChatMembers_returnError() throws Exception {
-            Long chatroomId = 2L;
+            String chatroomId = "2";
             doThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND))
                     .when(chatroomService).getActiveChatMembers(eq(chatroomId));
 

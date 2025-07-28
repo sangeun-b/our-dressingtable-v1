@@ -28,29 +28,29 @@ public class ChatMessage {
 
     @Schema(description = "채팅방 ID", example = "1")
     @NotNull(message = "채팅방 ID는 필수입니다.")
-    private Long chatroomId;
+    private String chatroomId;
 
     @Schema(description = "발신자의 회원 ID", example = "1")
     @NotNull(message = "발신자 ID는 필수 입니다.")
-    private Long senderId;
+    private String senderId;
 
     @Schema(description = "메시지 내용", example = "반가워!")
     @NotBlank(message = "메시지 내용을 입력해주세요.")
     private String content;
 
     @Builder
-    public ChatMessage(MessageType MessageType, Long chatroomId, Long senderId, String content) {
+    public ChatMessage(MessageType MessageType, String chatroomId, String senderId, String content) {
         this.MessageType = MessageType;
         this.chatroomId = chatroomId;
         this.senderId = senderId;
         this.content = content;
     }
 
-    public Message toEntity(Chatroom chatroom, Member member) {
+    public Message toEntity(String chatroomId, String senderId) {
         return Message.builder()
                 .messageType(MessageType)
-                .chatroom(chatroom)
-                .sender(member)
+                .chatroomId(chatroomId)
+                .senderId(senderId)
                 .content(content)
                 .build();
     }

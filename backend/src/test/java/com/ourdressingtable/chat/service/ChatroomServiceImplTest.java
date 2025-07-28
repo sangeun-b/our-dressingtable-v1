@@ -95,31 +95,33 @@ public class ChatroomServiceImplTest {
         @Test
         public void createdOneToOneChatroom_returnSuccess() {
             Member member = TestDataFactory.testMember(1L);
-            Long targetId = 2L;
-            Member targetMember = TestDataFactory.testMember(targetId);
+            String targetId = "2";
+            Member targetMember = TestDataFactory.testMember(Long.valueOf(targetId));
 
-            when(chatRepository.findOneToOneChatroom(member.getId(), targetId)).thenReturn(Optional.empty());
+            when(chatRepository.findOneToOneChatroom(String.valueOf(member.getId()), targetId)).thenReturn(Optional.empty());
 
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            Chatroom room = TestDataFactory.testChatroom("1");
             given(chatroomRepository.save(any(Chatroom.class))).willAnswer( invocation -> {
                     Chatroom saved = invocation.getArgument(0);
-                    ReflectionTestUtils.setField(saved, "id", 1L);
+                    ReflectionTestUtils.setField(saved, "id", "1");
                     return saved;
 
             });
 
             given(memberService.getMemberEntityById(member.getId())).willReturn(member);
-            given(memberService.getMemberEntityById(targetId)).willReturn(targetMember);
+            given(memberService.getMemberEntityById(Long.valueOf(targetId))).willReturn(targetMember);
 
-            Chat memberChat = TestDataFactory.testChat(1L,room,member);
-            Chat targetChat = TestDataFactory.testChat(2L,room,targetMember);
+            Chat memberChat = TestDataFactory.testChat("1",room.getId(),
+                    String.valueOf(member.getId()));
+            Chat targetChat = TestDataFactory.testChat("2",room.getId(),
+                    String.valueOf(targetMember.getId()));
             when(chatRepository.save(any(Chat.class))).thenReturn(
                     memberChat,targetChat
             );
 
             ChatroomResponse response = chatroomService.createOrGetOneToOneChatroom(targetId);
 
-            assertEquals(1L, response.getId());
+            assertEquals("1", response.getId());
             verify(chatRepository,times(2)).save(any(Chat.class));
         }
 
@@ -128,7 +130,7 @@ public class ChatroomServiceImplTest {
         public void createdOneToOneChatroom_returnError() {
             Member member = TestDataFactory.testMember(1L);
 
-           assertThatThrownBy(() -> chatroomService.createOrGetOneToOneChatroom(1L))
+           assertThatThrownBy(() -> chatroomService.createOrGetOneToOneChatroom("1"))
                    .isInstanceOf(OurDressingTableException.class)
                    .hasMessageContaining(ErrorCode.NO_CHAT_WITH_MYSELF.getMessage());
         }
@@ -143,10 +145,11 @@ public class ChatroomServiceImplTest {
         @DisplayName("채팅방 나가기 성공")
         @Test
         public void leaveChatroom_returnSuccess() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            Chatroom room = TestDataFactory.testChatroom("1");
             Member member = TestDataFactory.testMember(1L);
-            Chat chat = TestDataFactory.testChat(1L,room,member);
-            given(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
+            Chat chat = TestDataFactory.testChat("1",room.getId(), String.valueOf(member.getId()));
+            given(chatRepository.findByChatroomIdAndMemberId(room.getId(),
+                    String.valueOf(member.getId())))
                     .willReturn(Optional.of(chat));
 
             chatroomService.leaveChatroom(chat.getId());
@@ -157,10 +160,11 @@ public class ChatroomServiceImplTest {
         @DisplayName("채팅방 나가기 실패 - 미존재 채팅방")
         @Test
         public void leaveChatroom_returnError() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            Chatroom room = TestDataFactory.testChatroom("1");
             Member member = TestDataFactory.testMember(1L);
 
-           when(chatRepository.findByChatroomIdAndMemberId(room.getId(),member.getId()))
+           when(chatRepository.findByChatroomIdAndMemberId(room.getId(),
+                   String.valueOf(member.getId())))
                    .thenReturn(Optional.empty());
            assertThrows(OurDressingTableException.class, () -> chatroomService.leaveChatroom(room.getId()));
         }
@@ -176,9 +180,9 @@ public class ChatroomServiceImplTest {
         @DisplayName("참여 회원 조회 성공")
         @Test
         public void leaveChatroom_returnSuccess() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            Chatroom room = TestDataFactory.testChatroom("1");
             Member member = TestDataFactory.testMember(1L);
-            Chat chat = TestDataFactory.testChat(1L, room, member);
+            Chat chat = TestDataFactory.testChat("1", room.getId(), String.valueOf(member.getId()));
             when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
                     .thenReturn(List.of(chat));
 
@@ -190,7 +194,7 @@ public class ChatroomServiceImplTest {
         @DisplayName("참여 회원 조회 실패 - 미존재 채팅방")
         @Test
         public void leaveChatroom_returnError() {
-            Chatroom room = TestDataFactory.testChatroom(1L);
+            Chatroom room = TestDataFactory.testChatroom("1");
 
             when(chatRepository.findAllByChatroomIdAndIsActiveTrue(room.getId()))
                     .thenThrow(new OurDressingTableException(ErrorCode.CHAT_NOT_FOUND));

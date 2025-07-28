@@ -310,34 +310,34 @@ public class TestDataFactory {
         return FindEmailRequest.builder().name(name).phoneNumber(phone).build();
     }
 
-    public static Chatroom testChatroom(Long id) {
+    public static Chatroom testChatroom(String id) {
         return Chatroom.builder()
                 .id(id)
                 .name(null)
                 .build();
     }
 
-    public static Chat testChat(Long id, Chatroom chatroom, Member member) {
+    public static Chat testChat(String id, String chatroomId, String memberId) {
         return Chat.builder()
                 .id(id)
-                .chatroom(chatroom)
-                .member(member)
+                .chatroom(chatroomId)
+                .memberId(memberId)
                 .isActive(true)
                 .build();
     }
 
-    public static CreateOneToOneChatRequest testCreateOneToOneChatRequest(Long id) {
+    public static CreateOneToOneChatRequest testCreateOneToOneChatRequest(String id) {
         return new CreateOneToOneChatRequest(id);
     }
 
-    public static ChatroomResponse testChatroomResponse(Long id) {
+    public static ChatroomResponse testChatroomResponse(String id) {
         return ChatroomResponse.builder()
                 .id(id)
                 .name(null)
                 .build();
     }
 
-    public static ChatMemberResponse testChatMemberResponse(Long id) {
+    public static ChatMemberResponse testChatMemberResponse(String id) {
         return ChatMemberResponse.builder()
                 .memberId(id)
                 .build();

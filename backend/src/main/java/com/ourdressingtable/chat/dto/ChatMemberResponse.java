@@ -17,13 +17,13 @@ import lombok.Setter;
 public class ChatMemberResponse {
 
     @Schema(description = "회원 ID", example = "101")
-    private Long memberId;
+    private String memberId;
 
     @Schema(description = "채팅방 참여 시각")
     private LocalDateTime joinAt;
 
     @Builder
-    public ChatMemberResponse(Long memberId, LocalDateTime joinAt) {
+    public ChatMemberResponse(String memberId, LocalDateTime joinAt) {
         this.memberId = memberId;
         this.joinAt = joinAt;
     }

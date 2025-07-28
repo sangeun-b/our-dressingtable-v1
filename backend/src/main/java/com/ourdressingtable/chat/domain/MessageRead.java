@@ -1,55 +1,35 @@
 package com.ourdressingtable.chat.domain;
 
-import com.ourdressingtable.member.domain.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "message_reads")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "message_reads",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"message_id","member_id"})
-)
 public class MessageRead {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "message_read_id")
-    private Long id;
+    @Id
+    private String id = UUID.randomUUID().toString();
 
-    @Column(name = "is_read")
-    @ColumnDefault("false")
     private boolean isRead = false;
 
-    @Column(name = "read_at")
     private LocalDateTime readAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id", nullable = false)
-    private Message message;
+    private String messageId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private String memberId;
 
     @Builder
-    public MessageRead(boolean isRead, LocalDateTime readAt, Message message, Member member) {
+    public MessageRead(boolean isRead, LocalDateTime readAt, String messageId, String memberId) {
         this.isRead = isRead;
         this.readAt = readAt;
-        this.message = message;
-        this.member = member;
+        this.messageId = messageId;
+        this.memberId = memberId;
     }
 }

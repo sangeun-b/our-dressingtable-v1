@@ -17,7 +17,7 @@ import lombok.Setter;
 public class ChatroomResponse {
 
     @Schema(description = "생성된 채팅방 ID", example = "1")
-    private Long id;
+    private String id;
 
     @Schema(description = "채팅방 이름", example = "우리의 첫 채팅방")
     private String name;
@@ -26,7 +26,7 @@ public class ChatroomResponse {
     private LocalDateTime createdAt;
 
     @Builder
-    public ChatroomResponse(Long id, String name, LocalDateTime createdAt){
+    public ChatroomResponse(String id, String name, LocalDateTime createdAt){
         this.id = id;
         this.name = name;
         this.createdAt = createdAt;

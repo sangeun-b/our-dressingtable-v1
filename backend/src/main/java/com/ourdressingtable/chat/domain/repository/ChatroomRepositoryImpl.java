@@ -1,107 +1,116 @@
 package com.ourdressingtable.chat.domain.repository;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+
+import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.ChatroomType;
 import com.ourdressingtable.chat.domain.Message;
-import com.ourdressingtable.chat.domain.QChat;
-import com.ourdressingtable.chat.domain.QChatroom;
-import com.ourdressingtable.chat.domain.QMessage;
+
+import com.ourdressingtable.chat.dto.ChatroomIdResponse;
 import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.domain.QMember;
-import com.querydsl.core.Tuple;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.LinkedHashMap;
+import com.ourdressingtable.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class ChatroomRepositoryImpl implements ChatroomRepositoryCustom{
 
-    private final JPAQueryFactory queryFactory;
+    private final MongoTemplate mongoTemplate;
+    private final MemberRepository memberRepository;
 
     @Override
-    public List<OneToOneChatroomSummaryResponse> findOneToOneChatroomsByMemberId(Long memberId) {
-        QChatroom chatroom = QChatroom.chatroom;
-        QChat chat = QChat.chat;
-        QMember member = QMember.member;
-        QMessage message = QMessage.message;
+    public List<OneToOneChatroomSummaryResponse> findOneToOneChatroomsByMemberId(String memberId) {
+        
+        // 1:1 채팅방 ID
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("isActive").is(true)),
+                group("chatroomId").count().as("count"),
+                match(Criteria.where("count").is(2)),
+                project("_id").and("_id").as("chatroomId")
+        );
 
-        // 1:1 채팅방 ID 조회
-        List<Long> oneToOneChatroomIds = queryFactory
-                .select(chat.chatroom.id)
-                .from(chat)
-                .groupBy(chat.chatroom.id)
-                .having(chat.count().eq(2L))
-                .fetch();
+        List<String> oneToOneChatroomIds = mongoTemplate
+                .aggregate(aggregation, "chats", ChatroomIdResponse.class)
+                .getMappedResults()
+                .stream()
+                .map(ChatroomIdResponse::chatroomId)
+                .toList();
 
-        if(oneToOneChatroomIds.isEmpty()) return List.of();
+        if(oneToOneChatroomIds.isEmpty()){
+            return List.of();
+        }
+        
+        // 내가 참여 중인 채팅방
+        Query myActiveChatQuery = new Query(Criteria.where("memberId").is(memberId)
+                .and("isActive").is(true)
+                .and("chatroomId").in(oneToOneChatroomIds));
 
-        // 현재 회원이 참여 중인 채팅방 목록 조회
-        List<Chatroom> chatrooms = queryFactory
-                .selectFrom(chatroom)
-                .where(chatroom.type.eq(ChatroomType.ONE_TO_ONE),
-                        chatroom.id.in(
-                                JPAExpressions
-                                        .select(chat.chatroom.id)
-                                        .from(chat)
-                                        .where(chat.member.id.eq(memberId), chat.isActive.eq(true))
-                        ),
-                        chatroom.id.in(oneToOneChatroomIds))
-                .fetch();
+        List<Chat> myChats = mongoTemplate.find(myActiveChatQuery, Chat.class,"chats");
+        List<String> myChatroomIds = myChats.stream()
+                .map(Chat::getChatroomId)
+                .toList();
 
-        List<Long> chatroomIds = chatrooms.stream().map(Chatroom::getId).toList();
+        if(myChatroomIds.isEmpty()){
+            return List.of();
+        }
+        
+        // chatrooms 정보 조회 
+        Query chatroomQuery = new  Query(Criteria.where("_id").in(myChatroomIds)
+                .and("type").is(ChatroomType.ONE_TO_ONE));
+        List<Chatroom> chatrooms = mongoTemplate.find(chatroomQuery, Chatroom.class,"chatrooms");
+        
+        // 상대방 정보 조회
+        Query targetChatQuery = new Query(Criteria.where("chatroomId").in(myChatroomIds)
+                .and("isActive").is(true)
+                .and("memberId").ne(memberId));
+        List<Chat> targetChats = mongoTemplate.find(targetChatQuery, Chat.class,"chats");
 
-        // Target Member 조회 (채팅방당 상대방 1명씩)
-        List<Tuple> targetMemberTuples = queryFactory
-                .select(chat.chatroom.id, member)
-                .from(chat)
-                .join(chat.member, member)
-                .where(chat.chatroom.id.in(chatroomIds),
-                        member.id.ne(memberId),
-                        chat.isActive.eq(true))
-                .fetch();
-
-        Map<Long, Member> targetMemberMap = targetMemberTuples.stream()
-                .collect(Collectors.toMap(
-                        tuple -> tuple.get(chat.chatroom.id),
-                        tuple -> tuple.get(member)
-                ));
+        Map<String, String> chatroomToTargetMemberMap = targetChats.stream()
+                .collect(Collectors.toMap(Chat::getChatroomId, Chat::getMemberId));
 
         // 마지막 메시지 조회
-        List<Tuple> lastMessages = queryFactory
-                .select(message.chatroom.id, message)
-                .from(message)
-                .where(message.chatroom.id.in(chatroomIds))
-                .orderBy(message.chatroom.id.asc(), message.createdAt.desc())
-                .fetch();
+        List<Message> lastMessages = chatrooms.stream().map(cr -> {
+            Query messageQuery = new Query(Criteria.where("chatroomId").is(cr.getId()))
+                    .with(Sort.by(Direction.DESC, "createdAt"))
+                    .limit(1);
+            return mongoTemplate.findOne(messageQuery, Message.class, "messages");
 
-        // 각 채팅방의 가장 최신 메시지만 Map으로 정리
-        Map<Long, Message> lastMessageMap = new LinkedHashMap<>();
-        for(Tuple tuple : lastMessages){
-            Long chatroomId = tuple.get(message.chatroom.id);
-            if(!lastMessageMap.containsKey(chatroomId)){
-                lastMessageMap.put(chatroomId,tuple.get(message));
-            }
-        }
+        }).filter(Objects::nonNull).toList();
+
+
+        Map<String, Message> chatroomToLastMessageMap = lastMessages.stream()
+                .collect(Collectors.toMap(Message::getChatroomId, Function.identity()));
+
         return chatrooms.stream().map(cr -> {
-            Member target = targetMemberMap.get(cr.getId());
-            Message last = lastMessageMap.get(cr.getId());
-            return OneToOneChatroomSummaryResponse.builder()
-                    .chatroomId(cr.getId())
-                    .targetMemberId(target != null ? target.getId() : null)
-                    .targetNickname(target != null ? target.getNickname() : null)
-                    .targetProfileImageUrl(target != null ? target.getImageUrl() : null)
-                    .lastMessage(last != null ? last.getContent() : null)
-                    .lastMessageTime(last != null ? last.getCreatedAt() : null)
-                    .build();
+            String targetId = chatroomToTargetMemberMap.get(cr.getId());
+            Message last = chatroomToLastMessageMap.get(cr.getId());
+            Member member = memberRepository.findById(Long.valueOf(targetId)).orElse(null);
+            return new OneToOneChatroomSummaryResponse(
+                    cr.getId(),
+                    member != null ? String.valueOf(member.getId()) : null,
+                    member != null ? member.getNickname() : null,
+                    member != null ? member.getImageUrl() : null,
+                    last != null ? last.getContent() : null,
+                    last != null ? last.getCreatedAt() : null
+            );
         }).toList();
     }
 }

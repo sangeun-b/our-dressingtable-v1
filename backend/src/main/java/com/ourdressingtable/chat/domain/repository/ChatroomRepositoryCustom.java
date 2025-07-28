@@ -5,5 +5,5 @@ import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 import java.util.List;
 
 public interface ChatroomRepositoryCustom {
-    List<OneToOneChatroomSummaryResponse> findOneToOneChatroomsByMemberId(Long memberId);
+    List<OneToOneChatroomSummaryResponse> findOneToOneChatroomsByMemberId(String memberId);
 }

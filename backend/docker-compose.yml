@@ -54,6 +54,12 @@ services:
     networks:
       - chat-backend-network
 
+  mongodb:
+    image: mongo:6
+    container_name: mongo-container
+    ports:
+      -  "27017:27017"
+
 networks:
   chat-backend-network:
     driver: bridge

@@ -42,7 +42,7 @@ spring:
       on-profile: local
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
   logging:
     level:

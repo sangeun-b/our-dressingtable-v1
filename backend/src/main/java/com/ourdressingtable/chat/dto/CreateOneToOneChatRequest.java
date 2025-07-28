@@ -17,7 +17,7 @@ public class CreateOneToOneChatRequest {
 
     @Schema(description = "상대방 회원 ID", example = "2")
     @NotNull(message = "대상 회원 ID는 필수입니다.")
-    private Long targetMemberId;
+    private String targetMemberId;
 
 
 }
