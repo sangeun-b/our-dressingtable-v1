@@ -320,7 +320,7 @@ public class TestDataFactory {
     public static Chat testChat(String id, String chatroomId, String memberId) {
         return Chat.builder()
                 .id(id)
-                .chatroom(chatroomId)
+                .chatroomId(chatroomId)
                 .memberId(memberId)
                 .isActive(true)
                 .build();
