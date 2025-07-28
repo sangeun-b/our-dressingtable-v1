@@ -4,7 +4,7 @@ import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.Message;
 import com.ourdressingtable.chat.domain.repository.ChatroomRepository;
 import com.ourdressingtable.chat.domain.repository.MessageRepository;
-import com.ourdressingtable.chat.dto.ChatMessage;
+import com.ourdressingtable.chat.dto.ChatMessageRequest;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
@@ -27,7 +27,7 @@ public class KafkaChatConsumer {
     private final SimpMessagingTemplate messagingTemplate;
 
     @KafkaListener(topics = "chat-message", groupId = "chat-consumer")
-    public void listen(@Payload ChatMessage chatMessage) {
+    public void listen(@Payload ChatMessageRequest chatMessage) {
         log.info("[Kafka 수신] {}" + chatMessage);
 
         Member sender = memberRepository.findById(Long.valueOf(chatMessage.getSenderId()))

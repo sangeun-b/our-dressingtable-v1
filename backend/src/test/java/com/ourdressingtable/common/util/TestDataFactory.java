@@ -2,8 +2,11 @@ package com.ourdressingtable.common.util;
 
 import com.ourdressingtable.auth.dto.FindEmailRequest;
 import com.ourdressingtable.chat.domain.Chat;
+import com.ourdressingtable.chat.domain.ChatRead;
 import com.ourdressingtable.chat.domain.Chatroom;
+import com.ourdressingtable.chat.domain.MessageType;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatMessageRequest;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.chat.dto.CreateOneToOneChatRequest;
 import com.ourdressingtable.community.comment.domain.Comment;
@@ -340,6 +343,22 @@ public class TestDataFactory {
     public static ChatMemberResponse testChatMemberResponse(String id) {
         return ChatMemberResponse.builder()
                 .memberId(id)
+                .build();
+    }
+
+    public static ChatRead tesChatRead(String memberId, String chatroomId) {
+        return ChatRead.builder()
+                .memberId(memberId)
+                .chatroomId(chatroomId)
+                .lastReadAt(LocalDateTime.now())
+                .build();
+    }
+    public static ChatMessageRequest testChatMessageRequest(String chatroomId, String senderId) {
+        return ChatMessageRequest.builder()
+                .messageType(MessageType.TEXT)
+                .senderId(senderId)
+                .chatroomId(chatroomId)
+                .content("안녕!")
                 .build();
     }
 }
