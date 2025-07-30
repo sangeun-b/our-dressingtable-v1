@@ -2,6 +2,7 @@ package com.ourdressingtable.chat.service;
 
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatroomEnterResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.chat.dto.CreateChatroomRequest;
 import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
@@ -16,4 +17,6 @@ public interface ChatroomService {
     List<ChatMemberResponse> getActiveChatMembers(String chatroomId);
     ChatroomResponse createOrGetOneToOneChatroom(String targetId);;
     List<OneToOneChatroomSummaryResponse> getMyOneToOneChatrooms();
+
+    ChatroomEnterResponse enterChatroom(String chatroomId, int size);
 }

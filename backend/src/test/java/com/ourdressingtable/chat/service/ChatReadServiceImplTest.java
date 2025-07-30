@@ -85,14 +85,14 @@ public class ChatReadServiceImplTest {
         }
     }
 
-    @Test
-    @DisplayName("마지막 읽은 날짜없으면 MIN")
-    void getLastReadAt_returnMIN() {
-        try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
-            given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.empty());
-
-            LocalDateTime lastReadAt = chatReadService.getLastReadAt("1");
-            assertThat(lastReadAt).isEqualTo(LocalDateTime.of(1970,1,1,0,0));
-        }
-    }
+//    @Test
+//    @DisplayName("마지막 읽은 날짜없으면 MIN")
+//    void getLastReadAt_returnMIN() {
+//        try (MockedStatic<SecurityUtil> mockedStatic = SecurityUtilMockHelper.mockCurrentMemberId(1L)) {
+//            given(chatReadRepository.findByChatroomIdAndMemberId("1", "1")).willReturn(Optional.empty());
+//
+//            LocalDateTime lastReadAt = chatReadService.getLastReadAt("1");
+//            assertThat(lastReadAt).isEqualTo(LocalDateTime.of(1970,1,1,0,0));
+//        }
+//    }
 }

@@ -20,7 +20,6 @@ public class ChatReadServiceImpl implements ChatReadService {
     private final ChatReadRepository chatReadRepository;
     private final ChatroomService chatroomService;
     private final MemberService memberService;
-    private static final LocalDateTime SAFE_MIN_DATETIME = LocalDateTime.of(1970, 1, 1, 0, 0);
 
     @Override
     @Transactional
@@ -42,14 +41,5 @@ public class ChatReadServiceImpl implements ChatReadService {
                         .lastReadAt(now)
                         .build());
         chatReadRepository.save(chatRead);
-    }
-
-    @Override
-    public LocalDateTime getLastReadAt(String chatroomId) {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        LocalDateTime lastReadAt = chatReadRepository.findByChatroomIdAndMemberId(chatroomId, String.valueOf(memberId))
-                .map(ChatRead::getLastReadAt)
-                .orElse(SAFE_MIN_DATETIME); // 한번도 안 읽었으면 가장 예전 시간으로 설정
-        return lastReadAt;
     }
 }

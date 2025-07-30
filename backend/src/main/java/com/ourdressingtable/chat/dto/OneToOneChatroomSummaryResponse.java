@@ -1,5 +1,6 @@
 package com.ourdressingtable.chat.dto;
 
+import com.ourdressingtable.chat.domain.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -24,9 +25,10 @@ public record OneToOneChatroomSummaryResponse (
     @Schema(description = "마지막 메시지", example = "고마워!")
     String lastMessage,
 
-    @Schema(description = "마지막 채팅 시간", example = "2025년 05월 12일 13:20")
+    @Schema(description = "마지막 채팅 시간", example = "2025-05-12T13:20:00")
     LocalDateTime lastMessageTime,
 
     @Schema(description = "읽지 않은 메세지 수", example = "13")
     long unreadCount
-    ){}
+    ){
+}
