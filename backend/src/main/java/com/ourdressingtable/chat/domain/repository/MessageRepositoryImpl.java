@@ -1,7 +1,9 @@
 package com.ourdressingtable.chat.domain.repository;
 
 import com.ourdressingtable.chat.domain.Message;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -23,5 +25,15 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 
         Query query = new Query(criteria);
         return mongoTemplate.count(query, Message.class, "messages");
+    }
+
+
+    @Override
+    public List<Message> findRecentMessages(String chatroomId, int size) {
+        Criteria criteria = Criteria.where("chatroomId").is(chatroomId);
+        Query query = new Query(criteria)
+                .with(Sort.by(Sort.Direction.DESC, "lastReadAt"))
+                .limit(size);
+        return mongoTemplate.find(query, Message.class, "messages");
     }
 }

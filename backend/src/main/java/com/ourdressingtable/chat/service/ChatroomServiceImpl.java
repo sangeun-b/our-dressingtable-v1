@@ -3,19 +3,23 @@ package com.ourdressingtable.chat.service;
 import com.ourdressingtable.chat.domain.Chat;
 import com.ourdressingtable.chat.domain.Chatroom;
 import com.ourdressingtable.chat.domain.ChatroomType;
+import com.ourdressingtable.chat.domain.Message;
 import com.ourdressingtable.chat.domain.repository.ChatRepository;
 import com.ourdressingtable.chat.domain.repository.ChatroomRepository;
+import com.ourdressingtable.chat.domain.repository.MessageRepositoryCustom;
 import com.ourdressingtable.chat.dto.ChatMemberResponse;
+import com.ourdressingtable.chat.dto.ChatroomEnterResponse;
 import com.ourdressingtable.chat.dto.ChatroomResponse;
 import com.ourdressingtable.chat.dto.CreateChatroomRequest;
+import com.ourdressingtable.chat.dto.MessageResponse;
 import com.ourdressingtable.chat.dto.OneToOneChatroomSummaryResponse;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.member.repository.MemberRepository;
 import com.ourdressingtable.member.service.MemberService;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +36,8 @@ public class ChatroomServiceImpl implements ChatroomService {
     private final ChatroomRepository chatroomRepository;
     private final ChatRepository chatRepository;
     private final MemberService memberService;
+    private final ChatReadQueryService chatReadQueryService;
+    private final MessageRepositoryCustom messageRepositoryCustom;
     private final RedisTemplate<String, String> redisTemplate;
 
 
@@ -150,5 +156,55 @@ public class ChatroomServiceImpl implements ChatroomService {
         String memberId = String.valueOf(SecurityUtil.getCurrentMemberId());
         List<OneToOneChatroomSummaryResponse> chatrooms = chatroomRepository.findOneToOneChatroomsByMemberId(memberId);
         return chatrooms;
+    }
+
+    @Override
+    public ChatroomEnterResponse enterChatroom(String chatroomId, int size) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+
+        Chatroom chatroom = chatroomRepository.findById(chatroomId)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        String targetId = getTargetMemberId(chatroomId, currentMemberId);
+        Member target = memberService.getMemberEntityById(Long.valueOf(targetId));
+
+        LocalDateTime lastReadAt = chatReadQueryService.getLastReadAt(chatroomId);
+
+        List<Message> messages = messageRepositoryCustom.findRecentMessages(chatroomId, size + 1);
+
+        long unreadCount = messageRepositoryCustom.countUnreadMessages(chatroomId,
+                String.valueOf(currentMemberId), lastReadAt);
+        boolean hasNext = messages.size() > size;
+
+        List<Message> trimmedMessages = hasNext ? messages.subList(0, size) : messages;
+        Message lastMessage = trimmedMessages.stream()
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
+
+        OneToOneChatroomSummaryResponse summaryResponse = new OneToOneChatroomSummaryResponse(
+                chatroomId, targetId, target.getNickname(), target.getImageUrl(),
+                lastMessage != null ? lastMessage.getContent() : null,
+                lastMessage != null ? lastMessage.getCreatedAt() : null,
+                unreadCount
+        );
+
+        return new ChatroomEnterResponse(
+                summaryResponse,
+                trimmedMessages.stream()
+                        .sorted(Comparator.comparing(Message::getCreatedAt))
+                        .map(MessageResponse::from)
+                        .toList(),
+                hasNext);
+
+    }
+
+    private String getTargetMemberId(String chatroomId, Long memberId) {
+        List<Chat> chats = chatRepository.findAllByChatroomIdAndIsActiveTrue(chatroomId);
+        String currentMemberId = String.valueOf(memberId);
+        return chats.stream()
+                .map(Chat::getMemberId)
+                .filter(id->!id.equals(currentMemberId))
+                .findFirst()
+                .orElseThrow(()->new OurDressingTableException(ErrorCode.CHAT_MEMBER_NOT_FOUND));
     }
 }

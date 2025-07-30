@@ -33,7 +33,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
                 project("_id").and("_id").as("chatroomId")
         );
 
-        AggregationResults<ChatroomIdResponse> results = mongoTemplate.aggregate(aggregation, "chat", ChatroomIdResponse.class);
+        AggregationResults<ChatroomIdResponse> results = mongoTemplate.aggregate(aggregation, "chats", ChatroomIdResponse.class);
 
         return results.getMappedResults().stream()
                 .map(ChatroomIdResponse::chatroomId)

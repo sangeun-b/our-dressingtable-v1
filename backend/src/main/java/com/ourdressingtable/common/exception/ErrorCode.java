@@ -57,7 +57,7 @@ public enum ErrorCode {
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "Z001", "채팅방을 찾을 수 없습니다."),
     CHAT_NOT_FOUND(HttpStatus.NOT_FOUND, "Z002", "채팅방 참여 정보가 없습니다."),
     NO_CHAT_WITH_MYSELF(HttpStatus.BAD_REQUEST, "Z003", "자기 자신과는 채팅할 수 없습니다."),
-
+    CHAT_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "Z004","채팅 상태를 찾을 수 없습니다." ),
     // KAFKA 관련
     KAFKA_SERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "K001", "Kafka 메시지 직렬화 실패");
 
