@@ -1,7 +1,7 @@
-package com.ourdressingtable.memberCosmetic.domain;
+package com.ourdressingtable.membercosmetic.domain;
 
 import com.ourdressingtable.cosmetic.domain.Cosmetic;
-import com.ourdressingtable.dressingTable.domain.DressingTable;
+import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -9,7 +9,7 @@ import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.community.service.CommunityService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
-import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.communitycategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

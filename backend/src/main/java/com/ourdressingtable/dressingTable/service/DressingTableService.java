@@ -1,9 +1,9 @@
-package com.ourdressingtable.dressingTable.service;
+package com.ourdressingtable.dressingtable.service;
 
-import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
-import com.ourdressingtable.dressingTable.dto.DressingTableDetailResponse;
-import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
+import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingtable.dto.DressingTableDetailResponse;
+import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
+import com.ourdressingtable.dressingtable.dto.UpdateDressingTableRequest;
 import java.util.List;
 
 public interface DressingTableService {

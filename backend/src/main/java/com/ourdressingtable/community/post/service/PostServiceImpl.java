@@ -3,9 +3,8 @@ package com.ourdressingtable.community.post.service;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.repository.PostRepository;
-import com.ourdressingtable.community.service.CommunityService;
-import com.ourdressingtable.communityCategory.domain.CommunityCategory;
-import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
+import com.ourdressingtable.communitycategory.domain.CommunityCategory;
+import com.ourdressingtable.communitycategory.service.CommunityCategoryService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
@@ -15,9 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

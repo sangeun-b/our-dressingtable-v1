@@ -8,7 +8,7 @@ import com.ourdressingtable.community.comment.service.CommentService;
 import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.service.PostLikeService;
-import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
+import com.ourdressingtable.communitycategory.service.CommunityCategoryService;
 import com.ourdressingtable.community.post.service.PostService;
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;

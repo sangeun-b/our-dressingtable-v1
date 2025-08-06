@@ -1,4 +1,4 @@
-package com.ourdressingtable.memberCosmetic.domain;
+package com.ourdressingtable.membercosmetic.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -24,7 +24,7 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
 
     public final com.ourdressingtable.cosmetic.domain.QCosmetic cosmetic;
 
-    public final com.ourdressingtable.dressingTable.domain.QDressingTable dressingTable;
+    public final com.ourdressingtable.dressingtable.domain.QDressingTable dressingTable;
 
     public final DatePath<java.time.LocalDate> expiredDate = createDate("expiredDate", java.time.LocalDate.class);
 
@@ -63,7 +63,7 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
     public QMemberCosmetic(Class<? extends MemberCosmetic> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.cosmetic = inits.isInitialized("cosmetic") ? new com.ourdressingtable.cosmetic.domain.QCosmetic(forProperty("cosmetic"), inits.get("cosmetic")) : null;
-        this.dressingTable = inits.isInitialized("dressingTable") ? new com.ourdressingtable.dressingTable.domain.QDressingTable(forProperty("dressingTable"), inits.get("dressingTable")) : null;
+        this.dressingTable = inits.isInitialized("dressingTable") ? new com.ourdressingtable.dressingtable.domain.QDressingTable(forProperty("dressingTable"), inits.get("dressingTable")) : null;
         this.member = inits.isInitialized("member") ? new com.ourdressingtable.member.domain.QMember(forProperty("member")) : null;
     }
 

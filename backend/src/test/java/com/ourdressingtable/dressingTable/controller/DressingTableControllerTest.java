@@ -1,4 +1,4 @@
-package com.ourdressingtable.dressingTable.controller;
+package com.ourdressingtable.dressingtable.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.exception.ErrorCode;
@@ -6,10 +6,10 @@ import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
-import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
-import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
-import com.ourdressingtable.dressingTable.service.DressingTableService;
+import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
+import com.ourdressingtable.dressingtable.dto.UpdateDressingTableRequest;
+import com.ourdressingtable.dressingtable.service.DressingTableService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,9 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 

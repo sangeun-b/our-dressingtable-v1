@@ -1,4 +1,4 @@
-package com.ourdressingtable.dressingTable.domain;
+package com.ourdressingtable.dressingtable.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -37,7 +37,7 @@ public class QDressingTable extends EntityPathBase<DressingTable> {
 
     public final com.ourdressingtable.member.domain.QMember member;
 
-    public final ListPath<com.ourdressingtable.memberCosmetic.domain.MemberCosmetic, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic> memberCosmetics = this.<com.ourdressingtable.memberCosmetic.domain.MemberCosmetic, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic>createList("memberCosmetics", com.ourdressingtable.memberCosmetic.domain.MemberCosmetic.class, com.ourdressingtable.memberCosmetic.domain.QMemberCosmetic.class, PathInits.DIRECT2);
+    public final ListPath<com.ourdressingtable.membercosmetic.domain.MemberCosmetic, com.ourdressingtable.membercosmetic.domain.QMemberCosmetic> memberCosmetics = this.<com.ourdressingtable.membercosmetic.domain.MemberCosmetic, com.ourdressingtable.membercosmetic.domain.QMemberCosmetic>createList("memberCosmetics", com.ourdressingtable.membercosmetic.domain.MemberCosmetic.class, com.ourdressingtable.membercosmetic.domain.QMemberCosmetic.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
 
