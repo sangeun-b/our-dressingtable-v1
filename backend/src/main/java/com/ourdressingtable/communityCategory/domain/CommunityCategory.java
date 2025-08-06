@@ -1,4 +1,4 @@
-package com.ourdressingtable.communityCategory.domain;
+package com.ourdressingtable.communitycategory.domain;
 
 
 import com.ourdressingtable.common.util.BaseTimeEntity;

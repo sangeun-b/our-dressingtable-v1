@@ -1,4 +1,4 @@
-package com.ourdressingtable.communityCategory.domain;
+package com.ourdressingtable.communitycategory.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 

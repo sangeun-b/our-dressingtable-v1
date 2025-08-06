@@ -2,8 +2,7 @@ package com.ourdressingtable.community.post.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ourdressingtable.community.comment.domain.Comment;
-import com.ourdressingtable.communityCategory.domain.CommunityCategory;
-import com.ourdressingtable.community.post.dto.CreatePostRequest;
+import com.ourdressingtable.communitycategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.common.util.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -12,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;

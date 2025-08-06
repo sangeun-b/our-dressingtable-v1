@@ -1,6 +1,6 @@
-package com.ourdressingtable.dressingTable.dto;
+package com.ourdressingtable.dressingtable.dto;
 
-import com.ourdressingtable.dressingTable.domain.DressingTable;
+import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

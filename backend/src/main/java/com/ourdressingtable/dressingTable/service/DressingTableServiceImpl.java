@@ -1,14 +1,14 @@
-package com.ourdressingtable.dressingTable.service;
+package com.ourdressingtable.dressingtable.service;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
-import com.ourdressingtable.dressingTable.domain.DressingTable;
-import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
-import com.ourdressingtable.dressingTable.dto.DressingTableDetailResponse;
-import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
-import com.ourdressingtable.dressingTable.repository.DressingTableRepository;
+import com.ourdressingtable.dressingtable.domain.DressingTable;
+import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingtable.dto.DressingTableDetailResponse;
+import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
+import com.ourdressingtable.dressingtable.dto.UpdateDressingTableRequest;
+import com.ourdressingtable.dressingtable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import java.util.List;

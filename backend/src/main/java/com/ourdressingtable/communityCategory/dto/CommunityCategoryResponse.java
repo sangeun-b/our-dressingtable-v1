@@ -1,7 +1,7 @@
-package com.ourdressingtable.communityCategory.dto;
+package com.ourdressingtable.communitycategory.dto;
 
 
-import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.communitycategory.domain.CommunityCategory;
 import lombok.*;
 
 @Getter

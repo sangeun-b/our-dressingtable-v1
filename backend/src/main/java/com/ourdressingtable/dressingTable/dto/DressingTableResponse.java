@@ -1,8 +1,7 @@
-package com.ourdressingtable.dressingTable.dto;
+package com.ourdressingtable.dressingtable.dto;
 
-import com.ourdressingtable.cosmetic.domain.Cosmetic;
-import com.ourdressingtable.dressingTable.domain.DressingTable;
-import com.ourdressingtable.memberCosmetic.domain.MemberCosmetic;
+import com.ourdressingtable.dressingtable.domain.DressingTable;
+import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AccessLevel;

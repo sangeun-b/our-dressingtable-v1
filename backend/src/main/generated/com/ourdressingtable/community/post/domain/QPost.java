@@ -26,7 +26,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public final ListPath<com.ourdressingtable.community.comment.domain.Comment, com.ourdressingtable.community.comment.domain.QComment> comments = this.<com.ourdressingtable.community.comment.domain.Comment, com.ourdressingtable.community.comment.domain.QComment>createList("comments", com.ourdressingtable.community.comment.domain.Comment.class, com.ourdressingtable.community.comment.domain.QComment.class, PathInits.DIRECT2);
 
-    public final com.ourdressingtable.communityCategory.domain.QCommunityCategory communityCategory;
+    public final com.ourdressingtable.communitycategory.domain.QCommunityCategory communityCategory;
 
     public final StringPath content = createString("content");
 
@@ -70,7 +70,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.communityCategory = inits.isInitialized("communityCategory") ? new com.ourdressingtable.communityCategory.domain.QCommunityCategory(forProperty("communityCategory")) : null;
+        this.communityCategory = inits.isInitialized("communityCategory") ? new com.ourdressingtable.communitycategory.domain.QCommunityCategory(forProperty("communityCategory")) : null;
         this.member = inits.isInitialized("member") ? new com.ourdressingtable.member.domain.QMember(forProperty("member")) : null;
     }
 

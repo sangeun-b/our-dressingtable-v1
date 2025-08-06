@@ -1,7 +1,7 @@
-package com.ourdressingtable.communityCategory.controller;
+package com.ourdressingtable.communitycategory.controller;
 
-import com.ourdressingtable.communityCategory.dto.CommunityCategoryResponse;
-import com.ourdressingtable.communityCategory.service.CommunityCategoryService;
+import com.ourdressingtable.communitycategory.dto.CommunityCategoryResponse;
+import com.ourdressingtable.communitycategory.service.CommunityCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

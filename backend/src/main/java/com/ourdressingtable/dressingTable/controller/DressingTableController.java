@@ -1,13 +1,11 @@
-package com.ourdressingtable.dressingTable.controller;
+package com.ourdressingtable.dressingtable.controller;
 
-import com.ourdressingtable.common.util.SecurityUtil;
-import com.ourdressingtable.dressingTable.dto.CreateDressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.CreateDressingTableRequest;
-import com.ourdressingtable.dressingTable.dto.DressingTableDetailResponse;
-import com.ourdressingtable.dressingTable.dto.DressingTableResponse;
-import com.ourdressingtable.dressingTable.dto.UpdateDressingTableRequest;
-import com.ourdressingtable.dressingTable.service.DressingTableService;
-import com.ourdressingtable.member.service.MemberService;
+import com.ourdressingtable.dressingtable.dto.CreateDressingTableResponse;
+import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
+import com.ourdressingtable.dressingtable.dto.DressingTableDetailResponse;
+import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
+import com.ourdressingtable.dressingtable.dto.UpdateDressingTableRequest;
+import com.ourdressingtable.dressingtable.service.DressingTableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +15,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

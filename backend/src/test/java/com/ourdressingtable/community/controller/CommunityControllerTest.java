@@ -27,7 +27,7 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.service.CommunityService;
-import com.ourdressingtable.communityCategory.domain.CommunityCategory;
+import com.ourdressingtable.communitycategory.domain.CommunityCategory;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Status;
 import org.hamcrest.Matchers;

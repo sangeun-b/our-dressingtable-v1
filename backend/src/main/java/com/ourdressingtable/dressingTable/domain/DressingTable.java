@@ -1,8 +1,7 @@
-package com.ourdressingtable.dressingTable.domain;
+package com.ourdressingtable.dressingtable.domain;
 
-import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.member.domain.Member;
-import com.ourdressingtable.memberCosmetic.domain.MemberCosmetic;
+import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
