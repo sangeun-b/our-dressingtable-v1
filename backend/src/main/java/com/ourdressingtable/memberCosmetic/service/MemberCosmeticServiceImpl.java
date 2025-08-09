@@ -23,6 +23,7 @@ public class MemberCosmeticServiceImpl implements
     private final MemberService memberService;
 
     @Override
+    @Transactional
     public Long createMemberCosmetic(CreateMemberCosmeticRequest request) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
