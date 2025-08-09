@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QDressingTable extends EntityPathBase<DressingTable> {
 
-    private static final long serialVersionUID = -986332658L;
+    private static final long serialVersionUID = 6301166L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

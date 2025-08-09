@@ -9,6 +9,7 @@ import com.ourdressingtable.member.dto.request.WithdrawalMemberRequest;
 import com.ourdressingtable.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Tag(name = "회원", description = "회원 관련 API")
+
 public class MemberController {
 
     private final MemberService memberService;
