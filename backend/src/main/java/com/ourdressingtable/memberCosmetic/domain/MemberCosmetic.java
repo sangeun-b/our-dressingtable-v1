@@ -51,9 +51,13 @@ public class MemberCosmetic {
     @ColumnDefault("false")
     private Boolean setNotification = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cosmetic_id", nullable = false)
-    private Cosmetic cosmetic;
+    @Column(name = "notification_date")
+    private LocalDate notificationDate;
+
+    // TODO: 추후 화장품 정보 등록 추가
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "cosmetic_id", nullable = false)
+//    private Cosmetic cosmetic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -64,7 +68,7 @@ public class MemberCosmetic {
     private DressingTable dressingTable;
 
     @Builder
-    public MemberCosmetic(Long id, String imageUrl, LocalDate expiredDate, LocalDate openDate, LocalDate useByDate, BigDecimal price, String store, Boolean setNotification, Cosmetic cosmetic, Member member, DressingTable dressingTable) {
+    public MemberCosmetic(Long id, String imageUrl, LocalDate expiredDate, LocalDate openDate, LocalDate useByDate, BigDecimal price, String store, Boolean setNotification, LocalDate notificationDate, Member member, DressingTable dressingTable) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.expiredDate = expiredDate;
@@ -73,7 +77,8 @@ public class MemberCosmetic {
         this.price = price;
         this.store = store;
         this.setNotification = setNotification;
-        this.cosmetic = cosmetic;
+        this.notificationDate = notificationDate;
+//        this.cosmetic = cosmetic;
         this.member = member;
         this.dressingTable = dressingTable;
 
