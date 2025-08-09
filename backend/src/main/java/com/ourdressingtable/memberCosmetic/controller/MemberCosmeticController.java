@@ -4,6 +4,7 @@ import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.service.MemberCosmeticService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member-cosmetics")
+@Tag(name = "화장품", description = "화장품 관련 API")
+
 public class MemberCosmeticController {
 
     private final MemberCosmeticService memberCosmeticService;
