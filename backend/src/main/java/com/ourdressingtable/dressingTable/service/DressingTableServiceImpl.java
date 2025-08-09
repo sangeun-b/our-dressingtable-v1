@@ -82,4 +82,10 @@ public class DressingTableServiceImpl implements DressingTableService {
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
         return DressingTableDetailResponse.from(dressingTable);
     }
+
+    @Override
+    public DressingTable getDressingTableEntityById(Long id) {
+        return dressingTableRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.DRESSING_TABLE_NOT_FOUND));
+    }
 }

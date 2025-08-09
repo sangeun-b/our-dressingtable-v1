@@ -1,5 +1,6 @@
 package com.ourdressingtable.dressingtable.service;
 
+import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingtable.dto.DressingTableDetailResponse;
 import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
@@ -12,4 +13,5 @@ public interface DressingTableService {
     void deleteDressingTable(Long id);
     List<DressingTableResponse> getAllMyDressingTables();
     DressingTableDetailResponse getDressingTableDetail(Long id);
+    DressingTable getDressingTableEntityById(Long id);
 }
