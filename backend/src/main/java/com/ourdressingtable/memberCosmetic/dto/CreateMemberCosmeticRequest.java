@@ -4,6 +4,7 @@ import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -44,6 +45,7 @@ public class CreateMemberCosmeticRequest {
     private LocalDate notificationDate;
 
     @Schema(description = "화장대 ID", example = "1")
+    @NotNull(message = "화장대 ID는 필수입니다.")
     private Long dressingTableId;
 
     @Builder

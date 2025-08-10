@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourdressingtable.common.security.TestSecurityConfig;
-import com.ourdressingtable.common.security.WithCustomUser;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.service.MemberCosmeticService;
