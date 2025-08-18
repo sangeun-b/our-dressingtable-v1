@@ -24,6 +24,8 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
 
     public final com.ourdressingtable.dressingtable.domain.QDressingTable dressingTable;
 
+    public final StringPath expirationType = createString("expirationType");
+
     public final DatePath<java.time.LocalDate> expiredDate = createDate("expiredDate", java.time.LocalDate.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -33,6 +35,10 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
     public final com.ourdressingtable.member.domain.QMember member;
 
     public final DatePath<java.time.LocalDate> notificationDate = createDate("notificationDate", java.time.LocalDate.class);
+
+    public final NumberPath<Integer> notifyBeforeDays = createNumber("notifyBeforeDays", Integer.class);
+
+    public final EnumPath<NotifyType> notifyType = createEnum("notifyType", NotifyType.class);
 
     public final DatePath<java.time.LocalDate> openDate = createDate("openDate", java.time.LocalDate.class);
 

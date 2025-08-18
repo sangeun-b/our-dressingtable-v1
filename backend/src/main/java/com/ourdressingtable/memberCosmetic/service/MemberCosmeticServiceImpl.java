@@ -1,5 +1,7 @@
 package com.ourdressingtable.membercosmetic.service;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.dressingtable.service.DressingTableService;
@@ -7,6 +9,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.repository.MemberCosmeticRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,5 +34,12 @@ public class MemberCosmeticServiceImpl implements
         MemberCosmetic memberCosmetic = request.toEntity(dressingTable, member);
         memberCosmeticRepository.save(memberCosmetic);
         return memberCosmetic.getId();
+    }
+
+    @Override
+    public MemberCosmeticResponse getMemberCosmeticDetail(Long id) {
+        MemberCosmetic memberCosmetic = memberCosmeticRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
+        return MemberCosmeticResponse.from(memberCosmetic);
     }
 }
