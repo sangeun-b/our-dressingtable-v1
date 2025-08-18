@@ -34,6 +34,7 @@ import com.ourdressingtable.auth.email.dto.ConfirmPasswordResetRequest;
 import com.ourdressingtable.auth.email.dto.ResetPasswordEmailRequest;
 
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -386,6 +387,18 @@ public class TestDataFactory {
                 .notificationDate(LocalDate.parse("2026-09-01"))
                 .useByDate(LocalDate.parse("2026-09-01"))
                 .dressingTableId(null)
+                .build();
+    }
+
+    public static MemberCosmeticResponse testMemberCosmeticResponse() {
+        return MemberCosmeticResponse.builder()
+                .store("올리브영")
+                .price(BigDecimal.valueOf(15000))
+                .expiredDate(LocalDate.parse("2026-09-10"))
+                .openDate(LocalDate.parse("2026-04-10"))
+                .setNotification(true)
+                .notificationDate(LocalDate.parse("2026-09-01"))
+                .useByDate(LocalDate.parse("2026-09-01"))
                 .build();
     }
 }

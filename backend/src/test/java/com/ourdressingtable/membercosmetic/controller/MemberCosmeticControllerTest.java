@@ -1,15 +1,20 @@
 package com.ourdressingtable.membercosmetic.controller;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.security.TestSecurityConfig;
 import com.ourdressingtable.common.util.TestDataFactory;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.service.MemberCosmeticService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,5 +73,36 @@ public class MemberCosmeticControllerTest {
                     .andExpect(status().isBadRequest());
         }
 
+    }
+
+    @Nested
+    @DisplayName("회원 화장품 조회 테스트")
+    class GetMemberCosmetic {
+
+        @DisplayName("회원 화장품 조회 성공")
+        @Test
+        public void getMemberCosmetic_returnSuccess() throws Exception {
+            MemberCosmeticResponse response = TestDataFactory.testMemberCosmeticResponse();
+
+            given(memberCosmeticService.getMemberCosmeticDetail(1L)).willReturn(response);
+
+            mockMvc.perform(get("/api/member-cosmetics/{id}",1L)
+                    .with(csrf()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.store").value("올리브영"));
+        }
+
+        @DisplayName("회원 화장품 조회 실패")
+        @Test
+        public void getMemberCosmetic_returnNotFoundError() throws Exception {
+            MemberCosmeticResponse response = TestDataFactory.testMemberCosmeticResponse();
+
+            doThrow(new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND))
+                    .when(memberCosmeticService).getMemberCosmeticDetail(100L);
+
+            mockMvc.perform(get("/api/member-cosmetics/{id}",100L)
+                            .with(csrf()))
+                    .andExpect(status().isNotFound());
+        }
     }
 }
