@@ -53,6 +53,9 @@ public enum ErrorCode {
     // 화장대 관련
     DRESSING_TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "D001", "화장대를 찾을 수 없습니다."),
 
+    // 회원 화장품 관련
+    MEMBER_COSMETIC_NOT_FOUND(HttpStatus.NOT_FOUND, "E001","회원 화장품을 찾을 수 없습니다."),
+
     // 채팅 관련
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "Z001", "채팅방을 찾을 수 없습니다."),
     CHAT_NOT_FOUND(HttpStatus.NOT_FOUND, "Z002", "채팅방 참여 정보가 없습니다."),

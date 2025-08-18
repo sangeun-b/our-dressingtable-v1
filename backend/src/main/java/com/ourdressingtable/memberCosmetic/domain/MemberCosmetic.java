@@ -42,10 +42,19 @@ public class MemberCosmetic {
     @Column(name = "use_by_date")
     private LocalDate useByDate;
 
+    @Column(name="expiration_type")
+    private String expirationType;
+
     @Column(scale =  2, precision = 10)
     private BigDecimal price;
 
     private String store;
+
+    @Column(name = "notify_type")
+    private NotifyType notifyType;
+
+    @Column(name = "notify_before_days")
+    private Integer notifyBeforeDays;
 
     @Column(name = "set_notification")
     @ColumnDefault("false")
@@ -68,14 +77,18 @@ public class MemberCosmetic {
     private DressingTable dressingTable;
 
     @Builder
-    public MemberCosmetic(Long id, String imageUrl, LocalDate expiredDate, LocalDate openDate, LocalDate useByDate, BigDecimal price, String store, Boolean setNotification, LocalDate notificationDate, Member member, DressingTable dressingTable) {
+    public MemberCosmetic(Long id, String imageUrl, LocalDate expiredDate, LocalDate openDate, LocalDate useByDate, BigDecimal price, String store, Boolean setNotification, LocalDate notificationDate, Member member, DressingTable dressingTable,
+            NotifyType notifyType, String expirationType, Integer notifyBeforeDays) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.expiredDate = expiredDate;
         this.openDate = openDate;
         this.useByDate = useByDate;
+        this.expirationType = expirationType;
+        this.notifyType = notifyType;
         this.price = price;
         this.store = store;
+        this.notifyBeforeDays = notifyBeforeDays;
         this.setNotification = setNotification;
         this.notificationDate = notificationDate;
 //        this.cosmetic = cosmetic;
