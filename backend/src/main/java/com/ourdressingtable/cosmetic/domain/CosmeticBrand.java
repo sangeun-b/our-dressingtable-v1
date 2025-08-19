@@ -6,7 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,16 +35,20 @@ public class CosmeticBrand {
     @Column(name = "homepage_url")
     private String homepageUrl;
 
-    @Lob
+    @Column(length = 1000)
     private String description;
 
+    @OneToMany(mappedBy = "brand")
+    private List<Cosmetic> cosmetics = new ArrayList<>();
+
     @Builder
-    public CosmeticBrand(Long id, String name, String logoUrl, String homepageUrl, String description) {
+    public CosmeticBrand(Long id, String name, String logoUrl, String homepageUrl, String description,List<Cosmetic> cosmetics) {
         this.id = id;
         this.name = name;
         this.logoUrl = logoUrl;
         this.homepageUrl = homepageUrl;
         this.description = description;
+        this.cosmetics = cosmetics;
 
     }
 }
