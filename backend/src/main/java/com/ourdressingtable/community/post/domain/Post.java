@@ -31,6 +31,7 @@ public class Post extends BaseTimeEntity {
 
     private String title;
 
+    @Lob
     private String content;
 
     @ColumnDefault("0")
