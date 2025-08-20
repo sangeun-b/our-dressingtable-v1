@@ -1,5 +1,7 @@
 package com.ourdressingtable.cosmetic.domain;
 
+import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
+import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

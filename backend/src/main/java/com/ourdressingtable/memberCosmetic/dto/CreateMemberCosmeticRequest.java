@@ -1,5 +1,7 @@
 package com.ourdressingtable.membercosmetic.dto;
 
+import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
+import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
@@ -20,6 +22,15 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateMemberCosmeticRequest {
 
+    @Schema(description = "화장품 브랜드", example = "1")
+    private Long brandId;
+
+    @Schema(description = "화장품 이름", example = "그린티 세럼")
+    private String name;
+
+    @Schema(description = "화장품 카테고리", example = "1")
+    private Long categoryId;
+
     @Schema(description = "화장품 이미지 URL", example = "URL")
     private String imageUrl;
 
@@ -32,7 +43,7 @@ public class CreateMemberCosmeticRequest {
     @Schema(description = "개봉 후 사용기간", example = "12M")
     private LocalDate useByDate;
 
-    @Schema(description = "구입금액", example = "15,000")
+    @Schema(description = "구입금액", example = "15000")
     private BigDecimal price;
 
     @Schema(description = "구매처", example = "올리브영")
@@ -49,9 +60,12 @@ public class CreateMemberCosmeticRequest {
     private Long dressingTableId;
 
     @Builder
-    public CreateMemberCosmeticRequest(String imageUrl, LocalDate expiredDate, LocalDate openDate,
+    public CreateMemberCosmeticRequest(Long brandId, String name, Long categoryId, String imageUrl, LocalDate expiredDate, LocalDate openDate,
             LocalDate useByDate, BigDecimal price, String store, Boolean setNotification,
             LocalDate notificationDate, Long dressingTableId) {
+        this.brandId = brandId;
+        this.name = name;
+        this.categoryId = categoryId;
         this.imageUrl = imageUrl;
         this.expiredDate = expiredDate;
         this.openDate = openDate;
@@ -64,8 +78,11 @@ public class CreateMemberCosmeticRequest {
 
     }
 
-    public MemberCosmetic toEntity(DressingTable dressingTable, Member member) {
+    public MemberCosmetic toEntity(DressingTable dressingTable, Member member, CosmeticBrand brand, CosmeticCategory category) {
         return MemberCosmetic.builder()
+                .brand(brand)
+                .name(name)
+                .category(category)
                 .imageUrl(imageUrl)
                 .expiredDate(expiredDate)
                 .openDate(openDate)
@@ -78,8 +95,5 @@ public class CreateMemberCosmeticRequest {
                 .member(member)
                 .build();
     }
-
-
-
 
 }

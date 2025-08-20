@@ -6,12 +6,19 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.repository.PostRepository;
 import com.ourdressingtable.communitycategory.domain.CommunityCategory;
 import com.ourdressingtable.communitycategory.repository.CommunityCategoryRepository;
+import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
+import com.ourdressingtable.cosmeticbrand.repository.CosmeticBrandRepository;
+import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
+import com.ourdressingtable.cosmeticcategory.repository.CosmeticCategoryRepository;
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.dressingtable.repository.DressingTableRepository;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.domain.Role;
 import com.ourdressingtable.member.domain.Status;
 import com.ourdressingtable.member.repository.MemberRepository;
+import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
+import com.ourdressingtable.membercosmetic.repository.MemberCosmeticRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -31,6 +38,9 @@ public class DummyDataInitializer implements CommandLineRunner {
     private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DressingTableRepository dressingTableRepository;
+    private final CosmeticBrandRepository cosmeticBrandRepository;
+    private final CosmeticCategoryRepository cosmeticCategoryRepository;
+    private final MemberCosmeticRepository memberCosmeticRepository;
 
     @Override
     @Transactional
@@ -103,6 +113,7 @@ public class DummyDataInitializer implements CommandLineRunner {
 
         commentRepository.saveAll(List.of(comment1, comment2));
 
+        // DressingTable 생성
         DressingTable dressingTable = DressingTable.builder()
                 .name("나의 화장대")
                 .imageUrl("https://image.img")
@@ -110,6 +121,29 @@ public class DummyDataInitializer implements CommandLineRunner {
                 .build();
 
         dressingTableRepository.save(dressingTable);
+
+        // CosmeticBrand 생성
+        CosmeticBrand cosmeticBrand = CosmeticBrand.builder()
+                .name("헤라").build();
+
+        cosmeticBrandRepository.save(cosmeticBrand);
+
+        // CosmeticCategory 생성
+        CosmeticCategory cosmeticCategory = CosmeticCategory.builder()
+                .name("메이크업")
+                .build();
+        cosmeticCategoryRepository.save(cosmeticCategory);
+
+        // MemberCosmetic 생성
+        MemberCosmetic memberCosmetic = MemberCosmetic.builder()
+                .brand(cosmeticBrand)
+                .category(cosmeticCategory)
+                .dressingTable(dressingTable)
+                .member(member)
+                .name("블랙 쿠션")
+                .openDate(LocalDate.now())
+                .build();
+        memberCosmeticRepository.save(memberCosmetic);
     }
 
 }

@@ -22,6 +22,12 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
 
     public static final QMemberCosmetic memberCosmetic = new QMemberCosmetic("memberCosmetic");
 
+    public final com.ourdressingtable.cosmeticbrand.domain.QCosmeticBrand brand;
+
+    public final com.ourdressingtable.cosmeticcategory.domain.QCosmeticCategory category;
+
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
+
     public final com.ourdressingtable.dressingtable.domain.QDressingTable dressingTable;
 
     public final StringPath expirationType = createString("expirationType");
@@ -32,7 +38,11 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
 
     public final StringPath imageUrl = createString("imageUrl");
 
+    public final BooleanPath isDeleted = createBoolean("isDeleted");
+
     public final com.ourdressingtable.member.domain.QMember member;
+
+    public final StringPath name = createString("name");
 
     public final DatePath<java.time.LocalDate> notificationDate = createDate("notificationDate", java.time.LocalDate.class);
 
@@ -68,6 +78,8 @@ public class QMemberCosmetic extends EntityPathBase<MemberCosmetic> {
 
     public QMemberCosmetic(Class<? extends MemberCosmetic> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.brand = inits.isInitialized("brand") ? new com.ourdressingtable.cosmeticbrand.domain.QCosmeticBrand(forProperty("brand")) : null;
+        this.category = inits.isInitialized("category") ? new com.ourdressingtable.cosmeticcategory.domain.QCosmeticCategory(forProperty("category"), inits.get("category")) : null;
         this.dressingTable = inits.isInitialized("dressingTable") ? new com.ourdressingtable.dressingtable.domain.QDressingTable(forProperty("dressingTable"), inits.get("dressingTable")) : null;
         this.member = inits.isInitialized("member") ? new com.ourdressingtable.member.domain.QMember(forProperty("member")) : null;
     }

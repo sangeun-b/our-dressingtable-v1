@@ -1,8 +1,14 @@
 package com.ourdressingtable.membercosmetic.service;
 
+import static com.ourdressingtable.common.util.JsonNullableUtils.isUndefined;
+
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
+import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
+import com.ourdressingtable.cosmeticbrand.service.CosmeticBrandService;
+import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
+import com.ourdressingtable.cosmeticcategory.service.CosmeticCategoryService;
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.dressingtable.service.DressingTableService;
 import com.ourdressingtable.member.domain.Member;
@@ -10,8 +16,10 @@ import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
+import com.ourdressingtable.membercosmetic.dto.UpdateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.repository.MemberCosmeticRepository;
 import lombok.RequiredArgsConstructor;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +32,8 @@ public class MemberCosmeticServiceImpl implements
     private final MemberCosmeticRepository memberCosmeticRepository;
     private final DressingTableService dressingTableService;
     private final MemberService memberService;
+    private final CosmeticBrandService cosmeticBrandService;
+    private final CosmeticCategoryService cosmeticCategoryService;
 
     @Override
     @Transactional
@@ -31,15 +41,61 @@ public class MemberCosmeticServiceImpl implements
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
         DressingTable dressingTable = dressingTableService.getDressingTableEntityById(request.getDressingTableId());
-        MemberCosmetic memberCosmetic = request.toEntity(dressingTable, member);
+        CosmeticBrand cosmeticBrand = cosmeticBrandService.getCosmeticBrandEntityById(request.getBrandId());
+        CosmeticCategory cosmeticCategory = cosmeticCategoryService.getCosmeticCategoryEntityById(request.getCategoryId());
+        MemberCosmetic memberCosmetic = request.toEntity(dressingTable, member, cosmeticBrand, cosmeticCategory);
         memberCosmeticRepository.save(memberCosmetic);
         return memberCosmetic.getId();
     }
 
     @Override
     public MemberCosmeticResponse getMemberCosmeticDetail(Long id) {
-        MemberCosmetic memberCosmetic = memberCosmeticRepository.findById(id)
-                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
+        MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
         return MemberCosmeticResponse.from(memberCosmetic);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMemberCosmetic(Long id) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
+
+        if(!memberCosmetic.getMember().getId().equals(memberId)) {
+            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+        }
+
+        memberCosmetic.markAsDeleted();
+    }
+
+    @Override
+    @Transactional
+    public void updateMemberCosmetic(Long id, UpdateMemberCosmeticRequest request) {
+        MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
+
+        CosmeticBrand brand = null;
+        if(request.getBrandId() != null) {
+            brand = cosmeticBrandService.getCosmeticBrandEntityById(request.getBrandId());
+        }
+
+        CosmeticCategory category = null;
+        if(request.getCategoryId() != null) {
+            category = cosmeticCategoryService.getCosmeticCategoryEntityById(request.getCategoryId());
+
+        }
+
+        memberCosmetic.updateMemberCosmetic(request, brand, category);
+
+    }
+
+    @Override
+    public MemberCosmetic getMemberCosmeticEntityById(Long id) {
+        return memberCosmeticRepository.findById(id)
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
+    }
+
+    @Override
+    public MemberCosmetic getValidMemberCosmeticEntityById(Long id) {
+        return memberCosmeticRepository.findById(id).filter(memberCosmetic -> !memberCosmetic.isDeleted())
+                .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
     }
 }

@@ -1,4 +1,4 @@
-package com.ourdressingtable.cosmetic.domain;
+package com.ourdressingtable.cosmeticbrand.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -15,9 +16,11 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QCosmeticBrand extends EntityPathBase<CosmeticBrand> {
 
-    private static final long serialVersionUID = -1171748637L;
+    private static final long serialVersionUID = -903038706L;
 
     public static final QCosmeticBrand cosmeticBrand = new QCosmeticBrand("cosmeticBrand");
+
+    public final ListPath<com.ourdressingtable.cosmetic.domain.Cosmetic, com.ourdressingtable.cosmetic.domain.QCosmetic> cosmetics = this.<com.ourdressingtable.cosmetic.domain.Cosmetic, com.ourdressingtable.cosmetic.domain.QCosmetic>createList("cosmetics", com.ourdressingtable.cosmetic.domain.Cosmetic.class, com.ourdressingtable.cosmetic.domain.QCosmetic.class, PathInits.DIRECT2);
 
     public final StringPath description = createString("description");
 
