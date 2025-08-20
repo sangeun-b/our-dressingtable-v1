@@ -1,4 +1,4 @@
-package com.ourdressingtable.cosmetic.domain;
+package com.ourdressingtable.cosmeticcategory.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,9 @@ public class CosmeticCategory {
     @JoinColumn(name = "parent_id")
     private CosmeticCategory parent;
 
+    @Builder
+    public CosmeticCategory(String name, CosmeticCategory parent) {
+        this.name = name;
+        this.parent = parent;
+    }
 }
