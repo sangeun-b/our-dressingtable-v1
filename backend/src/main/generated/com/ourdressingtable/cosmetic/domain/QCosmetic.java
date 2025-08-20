@@ -26,11 +26,11 @@ public class QCosmetic extends EntityPathBase<Cosmetic> {
 
     public final StringPath barcode = createString("barcode");
 
-    public final QCosmeticBrand brand;
+    public final com.ourdressingtable.cosmeticbrand.domain.QCosmeticBrand brand;
 
     public final StringPath certifications = createString("certifications");
 
-    public final QCosmeticCategory cosmeticCategory;
+    public final com.ourdressingtable.cosmeticcategory.domain.QCosmeticCategory cosmeticCategory;
 
     public final StringPath countryOfOrigin = createString("countryOfOrigin");
 
@@ -80,8 +80,8 @@ public class QCosmetic extends EntityPathBase<Cosmetic> {
 
     public QCosmetic(Class<? extends Cosmetic> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.brand = inits.isInitialized("brand") ? new QCosmeticBrand(forProperty("brand")) : null;
-        this.cosmeticCategory = inits.isInitialized("cosmeticCategory") ? new QCosmeticCategory(forProperty("cosmeticCategory")) : null;
+        this.brand = inits.isInitialized("brand") ? new com.ourdressingtable.cosmeticbrand.domain.QCosmeticBrand(forProperty("brand")) : null;
+        this.cosmeticCategory = inits.isInitialized("cosmeticCategory") ? new com.ourdressingtable.cosmeticcategory.domain.QCosmeticCategory(forProperty("cosmeticCategory"), inits.get("cosmeticCategory")) : null;
     }
 
 }

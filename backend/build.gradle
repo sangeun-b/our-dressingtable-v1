@@ -75,15 +75,18 @@ dependencies {
 
 	// JSON 메시지 직렬화/역직렬화
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 
-	// websocket
+    // websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.webjars:sockjs-client:1.5.1'
 	implementation 'org.webjars:stomp-websocket:2.3.4'
 
-	//mongoDB
+	// mongoDB
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+    // JsonNullable
+    implementation "org.openapitools:jackson-databind-nullable:0.2.6"
 }
 
 def querydslDir = "src/main/generated"
