@@ -78,7 +78,7 @@ public class CreateMemberCosmeticRequest {
 
     }
 
-    public MemberCosmetic toEntity(DressingTable dressingTable, Member member, CosmeticBrand brand, CosmeticCategory category) {
+    public MemberCosmetic toEntity(Member member, CosmeticBrand brand, CosmeticCategory category) {
         return MemberCosmetic.builder()
                 .brand(brand)
                 .name(name)
@@ -91,7 +91,6 @@ public class CreateMemberCosmeticRequest {
                 .store(store)
                 .setNotification(setNotification)
                 .notificationDate(notificationDate)
-                .dressingTable(dressingTable)
                 .member(member)
                 .build();
     }

@@ -1,5 +1,7 @@
 package com.ourdressingtable.dressingtable.domain;
 
+import com.ourdressingtable.common.exception.ErrorCode;
+import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import jakarta.persistence.*;
@@ -65,5 +67,20 @@ public class DressingTable extends BaseTimeEntity {
     public void markAsDeleted() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void addMemberCosmetic(MemberCosmetic memberCosmetic) {
+        if(this.isDeleted) {
+            throw new OurDressingTableException(ErrorCode.DELETED_DRESSING_TABLE);
+        }
+
+        if(memberCosmetic.getMember() == null || !memberCosmetic.getMember().getId().equals(this.member.getId())) {
+            throw new OurDressingTableException(ErrorCode
+                    .NO_PERMISSION_FOR_DRESSING_TABLE);
+        }
+
+        memberCosmetics.add(memberCosmetic);
+        memberCosmetic.changeDressingTable(this);
+
     }
 }

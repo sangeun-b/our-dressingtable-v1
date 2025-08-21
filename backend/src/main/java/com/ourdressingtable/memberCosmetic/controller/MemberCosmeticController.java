@@ -2,6 +2,7 @@ package com.ourdressingtable.membercosmetic.controller;
 
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticResponse;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticDetailResponse;
 import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.dto.UpdateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.service.MemberCosmeticService;
@@ -45,7 +46,7 @@ public class MemberCosmeticController {
 
     @GetMapping("/{id}")
     @Operation(summary = "회원 화장품 상세 조회", description = "회원의 화장품 상세 정보를 조회합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<MemberCosmeticResponse> getMemberCosmeticDetail(@PathVariable Long id) {
+    public ResponseEntity<MemberCosmeticDetailResponse> getMemberCosmeticDetail(@PathVariable Long id) {
         return ResponseEntity.ok(memberCosmeticService.getMemberCosmeticDetail(id));
     }
 
