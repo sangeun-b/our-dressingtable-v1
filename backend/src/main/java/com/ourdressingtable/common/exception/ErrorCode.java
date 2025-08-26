@@ -57,7 +57,7 @@ public enum ErrorCode {
     // 회원 화장품 관련
     MEMBER_COSMETIC_NOT_FOUND(HttpStatus.NOT_FOUND, "E001","회원 화장품을 찾을 수 없습니다."),
     MEMBER_COSMETIC_NAME_EMPTY(HttpStatus.BAD_REQUEST,"E002", "화장품 이름을 입력해주세요."),
-
+    NO_PERMISSION_FOR_MEMBER_COSMETIC(HttpStatus.FORBIDDEN,"E003","회원 화장품에 권한이 없습니다."),
     // 화장품 브랜드
     COSMETIC_BRAND_NOT_FOUND(HttpStatus.NOT_FOUND, "F001", "화장품 브랜드를 찾을 수 업습니다."),
     COSMETIC_BRAND_EMPTY(HttpStatus.BAD_REQUEST,"F002", "화장품 브랜드를 입력해주세요."),

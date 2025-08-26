@@ -68,7 +68,7 @@ public class MemberCosmeticServiceImpl implements
         MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
 
         if(!memberCosmetic.getMember().getId().equals(memberId)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_FOR_MEMBER_COSMETIC);
         }
 
         memberCosmetic.markAsDeleted();
@@ -78,6 +78,12 @@ public class MemberCosmeticServiceImpl implements
     @Transactional
     public void updateMemberCosmetic(Long id, UpdateMemberCosmeticRequest request) {
         MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        if(!memberCosmetic.getMember().getId().equals(memberId)) {
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_FOR_MEMBER_COSMETIC);
+        }
+
 
         CosmeticBrand brand = null;
         if(request.getBrandId() != null) {
@@ -105,4 +111,5 @@ public class MemberCosmeticServiceImpl implements
         return memberCosmeticRepository.findById(id).filter(memberCosmetic -> !memberCosmetic.isDeleted())
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
     }
+
 }
