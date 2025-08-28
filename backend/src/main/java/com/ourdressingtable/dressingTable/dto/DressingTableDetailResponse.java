@@ -2,8 +2,10 @@ package com.ourdressingtable.dressingtable.dto;
 
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -27,10 +29,10 @@ public class DressingTableDetailResponse {
     private String imageUrl;
 
     @Schema(description = "등록된 화장품")
-    private List<MemberCosmetic> memberCosmetics;
+    private List<MemberCosmeticResponse> memberCosmetics;
 
     @Builder
-    public DressingTableDetailResponse(Long id, String name, String imageUrl, List<MemberCosmetic> memberCosmetics) {
+    public DressingTableDetailResponse(Long id, String name, String imageUrl, List<MemberCosmeticResponse> memberCosmetics) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -39,11 +41,15 @@ public class DressingTableDetailResponse {
 
 
     public static DressingTableDetailResponse from(DressingTable dressingTable) {
+        List<MemberCosmeticResponse> memberCosmeticResponses = dressingTable.getMemberCosmetics()
+                .stream().map(MemberCosmeticResponse::from)
+                .collect(Collectors.toList());
+
         return DressingTableDetailResponse.builder()
                 .id(dressingTable.getId())
                 .name(dressingTable.getName())
                 .imageUrl(dressingTable.getImageUrl())
-                .memberCosmetics(dressingTable.getMemberCosmetics())
+                .memberCosmetics(memberCosmeticResponses)
                 .build();
     }
 }

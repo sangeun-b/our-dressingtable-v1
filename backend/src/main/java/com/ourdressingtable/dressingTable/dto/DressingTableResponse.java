@@ -28,15 +28,12 @@ public class DressingTableResponse {
     @Schema(description = "화장대 이미지", example = "https://image.img")
     private String imageUrl;
 
-    @Schema(description = "등록된 화장품 목록")
-    private List<MemberCosmeticResponse> cosmetics;
-
     @Builder
-    public DressingTableResponse(Long id, String name, String imageUrl, List<MemberCosmeticResponse> cosmetics) {
+    public DressingTableResponse(Long id, String name, String imageUrl) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
-        this.cosmetics = cosmetics;
+
     }
 
     public static DressingTableResponse from(DressingTable dressingTable) {
@@ -44,19 +41,6 @@ public class DressingTableResponse {
                 .id(dressingTable.getId())
                 .name(dressingTable.getName())
                 .imageUrl(dressingTable.getImageUrl())
-                .build();
-    }
-
-    public static DressingTableResponse fromWithCosmetics(DressingTable dressingTable, List<MemberCosmetic> memberCosmetics) {
-        List<MemberCosmeticResponse> cosmeticResponses = memberCosmetics.stream()
-                .map(MemberCosmeticResponse::from)
-                .collect(Collectors.toList());
-
-        return DressingTableResponse.builder()
-                .id(dressingTable.getId())
-                .name(dressingTable.getName())
-                .imageUrl(dressingTable.getImageUrl())
-                .cosmetics(cosmeticResponses)
                 .build();
     }
 
