@@ -1,7 +1,5 @@
 package com.ourdressingtable.membercosmetic.service;
 
-import static com.ourdressingtable.common.util.JsonNullableUtils.isUndefined;
-
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
 import com.ourdressingtable.common.util.SecurityUtil;
@@ -19,7 +17,6 @@ import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.dto.UpdateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.repository.MemberCosmeticRepository;
 import lombok.RequiredArgsConstructor;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

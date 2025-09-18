@@ -1,7 +1,6 @@
 package com.ourdressingtable.membercosmetic.domain;
 
 import static com.ourdressingtable.common.util.JsonNullableUtils.applyTriState;
-import static com.ourdressingtable.common.util.JsonNullableUtils.isUndefined;
 
 import com.ourdressingtable.common.exception.ErrorCode;
 import com.ourdressingtable.common.exception.OurDressingTableException;
@@ -28,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
-import org.openapitools.jackson.nullable.JsonNullable;
 
 @Entity
 @Getter
