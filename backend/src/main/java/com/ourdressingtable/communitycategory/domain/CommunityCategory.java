@@ -27,15 +27,15 @@ public class CommunityCategory extends BaseTimeEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
-    private int sort_order;
+    private int sortOrder;
 
     @Builder
-    public CommunityCategory(Long id, String name, String code, String description, int sort_order, boolean isActive) {
+    public CommunityCategory(Long id, String name, String code, String description, int sortOrder, boolean isActive) {
         this.id = id;
         this.name = name;
         this.code = code;
         this.description = description;
         this.isActive = isActive;
-        this.sort_order = sort_order;
+        this.sortOrder = sortOrder;
     }
 }
