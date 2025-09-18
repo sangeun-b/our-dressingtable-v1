@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0.27
+    image: mysql:8.0.36
     container_name: mysql-container
     restart: always
     ports:
@@ -8,7 +8,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      # 필요시 문자셋/타임존
+      MYSQL_ROOT_HOST: "%"
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./db/mysql/data:/var/lib/mysql
       - ./db/mysql/init:/docker-entrypoint-initdb.d
@@ -23,42 +29,44 @@ services:
       - "6600:6379"
     networks:
       - chat-backend-network
+
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
+    image: bitnami/zookeeper:3.9
     container_name: zookeeper
+    restart: unless-stopped
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      - ALLOW_ANONYMOUS_LOGIN=yes
     ports:
       - "2181:2181"
-    restart: unless-stopped
     networks:
       - chat-backend-network
 
   kafka:
-    image: confluentinc/cp-kafka:7.3.0
+    image: bitnami/kafka:3.6
     container_name: kafka
     depends_on:
       - zookeeper
+    restart: unless-stopped
     ports:
       - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_DELETE_TOPIC_ENABLE: 'true'
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    restart: unless-stopped
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
     networks:
       - chat-backend-network
 
   mongodb:
     image: mongo:6
     container_name: mongo-container
+    restart: unless-stopped
     ports:
-      -  "27017:27017"
+      - "27017:27017"
+    networks:
+      - chat-backend-network
 
 networks:
   chat-backend-network:
