@@ -16,6 +16,8 @@ import com.ourdressingtable.community.post.domain.Post;
 import com.ourdressingtable.community.post.domain.PostLike;
 import com.ourdressingtable.community.post.dto.*;
 import com.ourdressingtable.communitycategory.domain.CommunityCategory;
+import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
+import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
 import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.dressingtable.dto.CreateDressingTableRequest;
 import com.ourdressingtable.dressingtable.dto.DressingTableResponse;
@@ -33,11 +35,14 @@ import com.ourdressingtable.auth.dto.LoginRequest;
 import com.ourdressingtable.auth.email.dto.ConfirmPasswordResetRequest;
 import com.ourdressingtable.auth.email.dto.ResetPasswordEmailRequest;
 
+import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticDetailResponse;
 import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class TestDataFactory {
 
@@ -390,8 +395,8 @@ public class TestDataFactory {
                 .build();
     }
 
-    public static MemberCosmeticResponse testMemberCosmeticResponse() {
-        return MemberCosmeticResponse.builder()
+    public static MemberCosmeticDetailResponse testMemberCosmeticDetailResponse() {
+        return MemberCosmeticDetailResponse.builder()
                 .store("올리브영")
                 .price(BigDecimal.valueOf(15000))
                 .expiredDate(LocalDate.parse("2026-09-10"))
@@ -400,5 +405,39 @@ public class TestDataFactory {
                 .notificationDate(LocalDate.parse("2026-09-01"))
                 .useByDate(LocalDate.parse("2026-09-01"))
                 .build();
+    }
+
+    public static MemberCosmetic testMemberCosmetic(Long id, CosmeticBrand cosmeticBrand,
+            CosmeticCategory cosmeticCategory, DressingTable dressingTable, Member member) {
+        return MemberCosmetic.builder()
+                .id(id)
+                .category(cosmeticCategory)
+                .dressingTable(dressingTable)
+                .name("니들샷")
+                .brand(cosmeticBrand)
+                .store("올리브영")
+                .price(BigDecimal.valueOf(15000))
+                .expiredDate(LocalDate.parse("2026-09-10"))
+                .openDate(LocalDate.parse("2026-04-10"))
+                .setNotification(true)
+                .notificationDate(LocalDate.parse("2026-09-01"))
+                .useByDate(LocalDate.parse("2026-09-01"))
+                .member(member)
+                .build();
+    }
+
+    public static CosmeticBrand testCosmeticBrand(Long id) {
+        return CosmeticBrand.builder()
+                .id(id)
+                .name("헤라")
+                .build();
+    }
+
+    public static CosmeticCategory testCosmeticCategory(Long id) {
+        CosmeticCategory cosmeticCategory = CosmeticCategory.builder()
+                .name("메이크업")
+                .build();
+        ReflectionTestUtils.setField(cosmeticCategory, "id", id);
+        return cosmeticCategory;
     }
 }

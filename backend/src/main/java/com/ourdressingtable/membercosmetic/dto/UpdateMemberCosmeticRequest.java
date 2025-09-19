@@ -53,7 +53,7 @@ public class UpdateMemberCosmeticRequest {
     @Schema(description = "알림 사용 여부 (미전달=유지, null=삭제, 값=갱신)", example = "true")
     private JsonNullable<Boolean> setNotification = JsonNullable.undefined();
 
-    @Schema(description = "알림 기준(expired, open, use) (미전달=유지, null=삭제, 값=갱신)", example = "expired")
+    @Schema(description = "알림 기준(EXPIRED, OPEN, USE) (미전달=유지, null=삭제, 값=갱신)", example = "OPEN")
     private JsonNullable<NotifyType> notifyType = JsonNullable.undefined();
 
     @Schema(description = "유효기간 (미전달=유지, null=삭제, 값=갱신)", example = "2025-12-31")

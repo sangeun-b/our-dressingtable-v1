@@ -11,6 +11,8 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.membercosmetic.dto.UpdateMemberCosmeticRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Getter
@@ -63,6 +66,7 @@ public class MemberCosmetic {
 
     private String store;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "notify_type")
     private NotifyType notifyType;
 
@@ -139,7 +143,7 @@ public class MemberCosmetic {
     public void updateMemberCosmetic(UpdateMemberCosmeticRequest request, CosmeticBrand brand, CosmeticCategory category) {
 
         if(request.getName() != null) {
-            if(request.getName() == null) {
+            if(!StringUtils.hasText(request.getName())) {
                 throw new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NAME_EMPTY);
             }
             this.name = request.getName();
@@ -174,9 +178,13 @@ public class MemberCosmetic {
 
     }
 
+    public void changeDressingTable(DressingTable dressingTable) {
+        this.dressingTable = dressingTable;
+    }
 
     private <T> T getOrDefault(T newValue, T currentValue) {
         return (newValue != null) ? newValue : currentValue;
     }
+
 
 }

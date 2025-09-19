@@ -13,6 +13,7 @@ import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.member.service.MemberService;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import com.ourdressingtable.membercosmetic.dto.CreateMemberCosmeticRequest;
+import com.ourdressingtable.membercosmetic.dto.MemberCosmeticDetailResponse;
 import com.ourdressingtable.membercosmetic.dto.MemberCosmeticResponse;
 import com.ourdressingtable.membercosmetic.dto.UpdateMemberCosmeticRequest;
 import com.ourdressingtable.membercosmetic.repository.MemberCosmeticRepository;
@@ -38,17 +39,24 @@ public class MemberCosmeticServiceImpl implements
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberService.getActiveMemberEntityById(memberId);
         DressingTable dressingTable = dressingTableService.getDressingTableEntityById(request.getDressingTableId());
+
+        if(!dressingTable.getMember().getId().equals(memberId)) {
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_FOR_DRESSING_TABLE);
+        }
+
         CosmeticBrand cosmeticBrand = cosmeticBrandService.getCosmeticBrandEntityById(request.getBrandId());
         CosmeticCategory cosmeticCategory = cosmeticCategoryService.getCosmeticCategoryEntityById(request.getCategoryId());
-        MemberCosmetic memberCosmetic = request.toEntity(dressingTable, member, cosmeticBrand, cosmeticCategory);
+        MemberCosmetic memberCosmetic = request.toEntity(member, cosmeticBrand, cosmeticCategory);
+
+        dressingTable.addMemberCosmetic(memberCosmetic);
         memberCosmeticRepository.save(memberCosmetic);
         return memberCosmetic.getId();
     }
 
     @Override
-    public MemberCosmeticResponse getMemberCosmeticDetail(Long id) {
+    public MemberCosmeticDetailResponse getMemberCosmeticDetail(Long id) {
         MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
-        return MemberCosmeticResponse.from(memberCosmetic);
+        return MemberCosmeticDetailResponse.from(memberCosmetic);
     }
 
     @Override
@@ -58,7 +66,7 @@ public class MemberCosmeticServiceImpl implements
         MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
 
         if(!memberCosmetic.getMember().getId().equals(memberId)) {
-            throw new OurDressingTableException(ErrorCode.FORBIDDEN);
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_FOR_MEMBER_COSMETIC);
         }
 
         memberCosmetic.markAsDeleted();
@@ -68,6 +76,12 @@ public class MemberCosmeticServiceImpl implements
     @Transactional
     public void updateMemberCosmetic(Long id, UpdateMemberCosmeticRequest request) {
         MemberCosmetic memberCosmetic = getValidMemberCosmeticEntityById(id);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        if(!memberCosmetic.getMember().getId().equals(memberId)) {
+            throw new OurDressingTableException(ErrorCode.NO_PERMISSION_FOR_MEMBER_COSMETIC);
+        }
+
 
         CosmeticBrand brand = null;
         if(request.getBrandId() != null) {
@@ -95,4 +109,5 @@ public class MemberCosmeticServiceImpl implements
         return memberCosmeticRepository.findById(id).filter(memberCosmetic -> !memberCosmetic.isDeleted())
                 .orElseThrow(() -> new OurDressingTableException(ErrorCode.MEMBER_COSMETIC_NOT_FOUND));
     }
+
 }

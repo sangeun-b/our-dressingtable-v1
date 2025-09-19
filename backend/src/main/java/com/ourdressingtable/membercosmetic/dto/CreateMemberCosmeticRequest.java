@@ -2,7 +2,6 @@ package com.ourdressingtable.membercosmetic.dto;
 
 import com.ourdressingtable.cosmeticbrand.domain.CosmeticBrand;
 import com.ourdressingtable.cosmeticcategory.domain.CosmeticCategory;
-import com.ourdressingtable.dressingtable.domain.DressingTable;
 import com.ourdressingtable.member.domain.Member;
 import com.ourdressingtable.membercosmetic.domain.MemberCosmetic;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -78,7 +77,7 @@ public class CreateMemberCosmeticRequest {
 
     }
 
-    public MemberCosmetic toEntity(DressingTable dressingTable, Member member, CosmeticBrand brand, CosmeticCategory category) {
+    public MemberCosmetic toEntity(Member member, CosmeticBrand brand, CosmeticCategory category) {
         return MemberCosmetic.builder()
                 .brand(brand)
                 .name(name)
@@ -91,7 +90,6 @@ public class CreateMemberCosmeticRequest {
                 .store(store)
                 .setNotification(setNotification)
                 .notificationDate(notificationDate)
-                .dressingTable(dressingTable)
                 .member(member)
                 .build();
     }
